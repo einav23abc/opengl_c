@@ -37,12 +37,31 @@ typedef struct {
 } uvec3_t;
 
 typedef struct {
-    uvec2_t size; // {columns (width), rows (height)}
-    float* mat;
-} mat_t;
+    float w;
+    float x;
+    float y;
+    float z;
+} quat_t;
+
+typedef struct {
+    quat_t rot;
+    vec3_t pos;
+    vec3_t scale;
+} quat_vec_vec_t;
+
+typedef struct {
+    float mat[9];
+} mat3_t;
+
+typedef struct {
+    float mat[16];
+} mat4_t;
 
 struct vbo_data_t;
+struct joint_t;
 struct mesh_t;
+struct key_frame_t;
+struct animation_t;
 
 struct shader_t;
 
@@ -64,6 +83,16 @@ typedef struct vbo_data_t {
     uint32_t divisor;
 } vbo_data_t;
 
+typedef struct joint_t {
+    uint32_t index;
+    char* name;
+    uint32_t parent;
+    mat4_t inverse_bind_transform_mat;
+
+    // set and used by the animatoring functions
+    mat4_t model_transform_mat;
+} joint_t;
+
 typedef struct mesh_t {
     const uint64_t mesh_index;
     
@@ -72,7 +101,28 @@ typedef struct mesh_t {
     uint32_t* vbos;
     uint32_t indices_count;
     uint32_t* indices_array;
+    
+    uint32_t joints_amount;
+    joint_t* joints;
 } mesh_t;
+
+typedef struct key_frame_t {
+    mat4_t joint_local_transform;
+    quat_vec_vec_t joint_local_transform_qvv;
+    float time_stamp;
+} key_frame_t;
+
+typedef struct joint_key_frame_t {
+    uint32_t key_frames_amount;
+    key_frame_t* key_frames;
+} joint_key_frame_t;
+
+typedef struct animation_t {
+    const uint64_t animation_index;
+
+    uint32_t joints_amount;
+    joint_key_frame_t* joints_key_frames;
+} animation_t;
 
 
 typedef struct shader_t {
@@ -87,6 +137,8 @@ typedef struct shader_t {
     // <uniforms>
         int32_t u_texture_loc;
         int32_t u_camera_world_view_projection_matrix_loc;
+
+        int32_t u_joint_matrices_loc;
 
         int32_t u_instanced_drawing_float_data_loc;
         int32_t u_instanced_drawing_uint_data_loc;
@@ -172,7 +224,7 @@ typedef struct camera_t {
     float viewport_w;
     float viewport_h;
 
-    mat_t world_view_projection_matrix;
+    mat4_t world_view_projection_matrix;
 } camera_t;
 #define wvp_mat world_view_projection_matrix
 

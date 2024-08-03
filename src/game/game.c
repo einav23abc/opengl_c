@@ -20,14 +20,16 @@ const float ENGINE_CONFIG_DEFAULT_PILLARBOX_COLOR_B = 0.1;
 
 
 // variable declarations
+float frames;
+
 texture_t* global_texture;
 shader_t* global_shader;
 
 camera_t* player_camera;
-mesh_t* player_mesh;
 player_t player;
 
 mesh_t* man_mesh;
+animation_t* anim;
 
 mesh_t* cube_mesh;
 #define _CUBES_AMOUNT_ (3)
@@ -40,18 +42,19 @@ camera_t* sun_shadow_map_camera;
 fbo_t* sun_shadow_map_fbo;
 shader_t* sun_shadow_map_shader;
 
+
 // constants
 const uint64_t CUBES_AMOUNT = _CUBES_AMOUNT_;
 
 // functions
 void cube_update_aabb(cube_t* cube) {
-    mat_t rotation_x_matrix;
-    mat_t rotation_y_matrix;
-    mat_t rotation_z_matrix;
-    mat_t rotation_matrix = matrix_create((uvec2_t){3,3});
-    mat_t ping_pong_matrix1 = matrix_create((uvec2_t){3,3});
-    mat_t vert;
-    mat_t result = matrix_create((uvec2_t){1,3});
+    // mat3_t rotation_x_matrix;
+    // mat3_t rotation_y_matrix;
+    // mat3_t rotation_z_matrix;
+    // mat3_t rotation_matrix;
+    quat_t quat_rotation;
+    vec3_t vert;
+    vec3_t result;
 
     float min_x;
     float max_x;
@@ -61,60 +64,43 @@ void cube_update_aabb(cube_t* cube) {
     float max_z;
     uint8_t i;
     
-    rotation_x_matrix = (mat_t){
-        .size = (uvec2_t){
-            .x = 3,
-            .y = 3
-        },
-        .mat = (float[9]){
-            1, 0,               0,
-            0, cos(-cube->rx), -sin(-cube->rx),
-            0, sin(-cube->rx),  cos(-cube->rx),
-        }
-    };
-    rotation_y_matrix = (mat_t){
-        .size = (uvec2_t){
-            .x = 3,
-            .y = 3
-        },
-        .mat = (float[9]){
-             cos(-cube->ry), 0, sin(-cube->ry),
-             0,              1, 0,
-            -sin(-cube->ry), 0, cos(-cube->ry),
-        }
-    };
-    rotation_z_matrix = (mat_t){
-        .size = (uvec2_t){
-            .x = 3,
-            .y = 3
-        },
-        .mat = (float[9]){
-            cos(-cube->rz), -sin(-cube->rz), 0,
-            sin(-cube->rz),  cos(-cube->rz), 0,
-            0,               0,              1,
-        }
-    };
-    matrix_multiply(&rotation_z_matrix, &rotation_y_matrix, &ping_pong_matrix1);
-    matrix_multiply(&rotation_x_matrix, &ping_pong_matrix1, &rotation_matrix);
+    // rotation_x_matrix = (mat3_t){
+    //     .mat = {
+    //         1, 0,               0,
+    //         0, cos(-cube->rx), -sin(-cube->rx),
+    //         0, sin(-cube->rx),  cos(-cube->rx),
+    //     }
+    // };
+    // rotation_y_matrix = (mat3_t){
+    //     .mat = {
+    //          cos(-cube->ry), 0, sin(-cube->ry),
+    //          0,              1, 0,
+    //         -sin(-cube->ry), 0, cos(-cube->ry),
+    //     }
+    // };
+    // rotation_z_matrix = (mat3_t){
+    //     .mat = {
+    //         cos(-cube->rz), -sin(-cube->rz), 0,
+    //         sin(-cube->rz),  cos(-cube->rz), 0,
+    //         0,               0,              1,
+    //     }
+    // };
+    // rotation_matrix = mat3_mul(mat3_mul(rotation_x_matrix, rotation_z_matrix), rotation_y_matrix);
+    quat_rotation = quat_from_axis_angles_yzx(-cube->rx, -cube->ry, -cube->rz);
 
     for (i = 0; i < 8; i++) {
-        vert = (mat_t){
-            .size = (uvec2_t){
-                .x = 1,
-                .y = 3
-            },
-            .mat = (float[3]){
-                0.5*cube->w*(((i&0b001)==0)*2.0-1.0),
-                0.5*cube->h*(((i&0b010)==0)*2.0-1.0),
-                0.5*cube->d*(((i&0b100)==0)*2.0-1.0)
-            }
+        vert = (vec3_t){
+            .x = 0.5*cube->w*(((i&0b001)==0)*2.0-1.0),
+            .y = 0.5*cube->h*(((i&0b010)==0)*2.0-1.0),
+            .z = 0.5*cube->d*(((i&0b100)==0)*2.0-1.0)
         };
-        matrix_multiply(&rotation_matrix, &vert, &result);
+        // result = vec3_mul_by_mat3(vert, rotation_matrix);
+        result = rotate_vector(vert, quat_rotation);
 
         cube->vertices[i] = (vec3_t){
-            .x = result.mat[0]+cube->x,
-            .y = result.mat[1]+cube->y,
-            .z = result.mat[2]+cube->z
+            .x = result.x+cube->x,
+            .y = result.y+cube->y,
+            .z = result.z+cube->z
         };
 
         if (i == 0) {
@@ -141,28 +127,7 @@ void cube_update_aabb(cube_t* cube) {
     cube->aabb_h = max_y-min_y;
     cube->aabb_d = max_z-min_z;
 
-    free(rotation_matrix.mat);
-    free(ping_pong_matrix1.mat);
-    free(result.mat);
-
     return;
-}
-
-void cube_draw(cube_t* cube) {
-    // u_position
-    glUniform3f(shaders_list[current_shader]->uniform_locations[0], cube->x, cube->y, cube->z);
-    // u_scale
-    glUniform3f(shaders_list[current_shader]->uniform_locations[1], cube->w, cube->h, cube->d);
-    // u_rotation
-    glUniform3f(shaders_list[current_shader]->uniform_locations[2], -cube->rx, -cube->ry, -cube->rz);
-    draw_with_mesh(cube_mesh);
-}
-
-void cube_debug_draw_vertices(cube_t* cube) {
-    sdm_set_color(1, 0, 0, 1);
-    for (uint8_t j = 0; j < 8; j++) {
-        sdm_draw_ball(cube->vertices[j].x, cube->vertices[j].y, cube->vertices[j].z, 5);
-    }
 }
 
 vec3_t inline vec3_cross_product(vec3_t vec1, vec3_t vec2) {

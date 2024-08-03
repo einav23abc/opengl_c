@@ -10,7 +10,21 @@ void clean();
     uint32_t hash(uint32_t x);
     uint32_t uintmin(uint32_t a, uint32_t b);
     uint32_t uintmax(uint32_t a, uint32_t b);
+    int32_t intmin(int32_t a, int32_t b);
+    int32_t intmax(int32_t a, int32_t b);
+    int64_t int64min(int64_t a, int64_t b);
+    int64_t int64max(int64_t a, int64_t b);
     uint64_t load_file_contents(char** load_to, const char* file_path);
+    int64_t str_find_substr(char* str, char* substr);
+    // assumes str is numbers with spaces in between
+    // array needs to be freed at the end of use
+    float* str_to_float_array(char* str, uint64_t arr_size);
+    // assumes str is numbers with spaces in between
+    // array needs to be freed at the end of use
+    int32_t* str_to_int_array(char* str, uint64_t arr_size);
+    // assumes str is numbers with spaces in between
+    // array needs to be bigger/equal to floats_amount
+    void str_to_existing_float_array(char* str, uint64_t floats_amount, float* arr);
 // </miscellaneous>
 
 // <texture>
@@ -73,11 +87,19 @@ void clean();
     mesh_t* generate_2d_quad_mesh( float min_x, float max_x, float min_y, float max_y,
                                     float min_u, float max_u, float min_v, float max_v);
     mesh_t* mesh_generate_ball(uint32_t divisions);
-    mesh_t* generate_mesh_from_wavefront_obj(const char* obj_file_path);
-    void draw_with_mesh(mesh_t* mesh);
-    void draw_instanced_with_mesh(mesh_t* mesh, uint32_t instance_count);
+    mesh_t* mesh_from_wavefront_obj_ext(const char* obj_file_path, quat_vec_vec_t transform_qvv);
+    mesh_t* mesh_from_wavefront_obj(const char* obj_file_path);
+    mesh_t* mesh_from_collada_dae_ext(const char* dae_file_path, quat_vec_vec_t transform_qvv);
+    mesh_t* mesh_from_collada_dae(const char* dae_file_path);
+    void draw_mesh(mesh_t* mesh);
+    void draw_instanced_mesh(mesh_t* mesh, uint32_t instance_count);
     void destroy_mesh(mesh_t* mesh);
     void clean_mesh(mesh_t* mesh);
+    animation_t* animation_from_collada_dae_ext(const char* dae_file_path, joint_t* joints, uint32_t joints_amount, quat_vec_vec_t transform_qvv);
+    animation_t* animation_from_collada_dae(const char* dae_file_path, joint_t* joints, uint32_t joints_amount);
+    void draw_mesh_animated(mesh_t* mesh, animation_t* anim, float time_stamp);
+    void destroy_animation(animation_t* anim);
+    void clean_animation(animation_t* anim);
 // </mesh>
 
 // <camera>
@@ -95,12 +117,50 @@ void clean();
     #define camera_update_wvp_mat camera_update_world_view_projection_matrix
 // </camera>
 
-// <matrices>
-    mat_t matrix_create(uvec2_t size);
-    void matrix_multiply(mat_t* mat1, mat_t* mat2, mat_t* restrict mat3);
-    void matrix_multiply_by_scalar(mat_t* mat1, float scalar, mat_t* mat2);
-    void matrix_add(mat_t* mat1, mat_t* mat2, mat_t* mat3);
-// </matrices>
+// <matrices vectors and quaternions>
+    vec3_t vec3_mul(vec3_t vec1, vec3_t vec2);
+    vec3_t vec3_add(vec3_t vec1, vec3_t vec2);
+    float dot_product(vec3_t vec1, vec3_t vec2);
+    vec3_t cross_product(vec3_t vec1, vec3_t vec2);
+
+    mat4_t mat4_from_mat3(mat3_t mat);
+    mat3_t mat3_from_mat4(mat4_t mat);
+    //  assumes:
+    //      mat1 width  = mat2 height = m
+    //      mat3 width  = mat2 width  = n
+    //      mat3 height = mat1 height = i
+    void mat_mul(float* mat1, float* mat2, float* restrict mat3, uint8_t m, uint8_t i, uint8_t n);
+    mat3_t mat3_mul(mat3_t mat1, mat3_t mat2);
+    mat4_t mat4_mul(mat4_t mat1, mat4_t mat2);
+    vec3_t vec3_mul_by_mat3(vec3_t vec, mat3_t mat);
+    mat3_t mat3_mul_by_scalar(mat3_t mat, float scalar);
+    mat4_t mat4_mul_by_scalar(mat4_t mat, float scalar);
+    //  assumes:
+    //      mat1 width  = mat2 width  = mat3 width  = w
+    //      mat1 height = mat3 height = mat3 height = h 
+    void mat_add(float* mat1, float* mat2, float* mat3, uint8_t w, uint8_t h);
+    mat3_t mat3_add(mat3_t mat1, mat3_t mat2);
+    mat4_t mat4_add(mat4_t mat1, mat4_t mat2);
+    // mat must be of size 3x3
+    mat3_t mat3_from_axis_angle(vec3_t axis, float ang);
+
+    quat_t quat_multiply(quat_t q1, quat_t q2);
+    quat_t quat_conjugate(quat_t q);
+    quat_t quat_slerp(quat_t q1, quat_t q2, float t);
+    quat_t quat_from_axis_angle(vec3_t vec, float ang);
+    quat_t quat_from_euler_angles(float roll, float pitch, float yaw);
+    quat_t quat_from_axis_angles_yzx(float rx, float ry, float rz);
+    vec3_t rotate_vector(vec3_t vec, quat_t q);
+    vec3_t vec_scale_rotate_translate(vec3_t vec, quat_vec_vec_t qvv);
+    mat3_t rot_mat3_from_quat(quat_t q);
+    quat_t quat_from_rot_mat3(mat3_t mat);
+    quat_vec_vec_t quat_vec_vec_from_mat4(mat4_t mat);
+    mat4_t mat4_from_quat_vec_vec(quat_vec_vec_t qvv);
+
+    void print_mat3(mat3_t mat);
+    void print_mat4(mat4_t mat);
+    void print_quat_vec_vec(quat_vec_vec_t qvv);
+// </matrices vectors and quaternions>
 
 // <simple draw module>
     void simple_draw_module_set_color(float r, float g, float b, float a);

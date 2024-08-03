@@ -86,6 +86,7 @@
     extern const uint64_t TEXTURES_MAX_AMOUNT;
     extern const uint64_t OBJECT_TYPES_MAX_AMOUNT;
     extern const uint64_t MESHES_MAX_AMOUNT;
+    extern const uint64_t ANIMATIONS_MAX_AMOUNT;
     extern const uint64_t FBOS_MAX_AMOUNT;
 
     // <simple draw module>

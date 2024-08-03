@@ -61,4 +61,6 @@ void main(){
     color = (color*aerial_mixing)+(aerial_color*(1-aerial_mixing));
 
     gl_FragColor = vec4(color,1.0);
+
+    // gl_FragColor = vec4(v_normal*0.5+0.5,1.0);
 }

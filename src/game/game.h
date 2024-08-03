@@ -9,14 +9,16 @@
 // externs
 
 // variables declaration
+extern float frames;
+
 extern texture_t* global_texture;
 extern shader_t* global_shader;
 
 extern camera_t* player_camera;
-extern mesh_t* player_mesh;
 extern player_t player;
 
 extern mesh_t* man_mesh;
+extern animation_t* anim;
 
 extern mesh_t* cube_mesh;
 extern cube_t cubes[];

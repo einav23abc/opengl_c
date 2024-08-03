@@ -51,20 +51,24 @@ void game_render() {
     // </player camera>
 
     shader_use((shader_t*)default_shader);
-
     return;
 }
 
 void game_render_world() {
+    quat_t quat_rotation;
+
     // <player>
         bind_texture(global_texture, shaders_list[current_shader]->u_texture_loc, 0);
         // u_position
-        glUniform3f(shaders_list[current_shader]->uniform_locations[0], player.cube.x, player.cube.y, player.cube.z);
+        glUniform3f(shaders_list[current_shader]->uniform_locations[0], player.cube.x, player.cube.y-20, player.cube.z);
         // u_scale
-        glUniform3f(shaders_list[current_shader]->uniform_locations[1], 1, 1, 1);
-        // u_rotation
-        glUniform3f(shaders_list[current_shader]->uniform_locations[2], 0, -player.cube.ry, 0);
-        draw_with_mesh(player_mesh);
+        glUniform3f(shaders_list[current_shader]->uniform_locations[1], 5, 5, 5);
+        // // u_rotation
+        // glUniform3f(shaders_list[current_shader]->uniform_locations[2], 0, -player.cube.ry, 0);
+        // u_quat_rotation
+        quat_rotation = quat_from_axis_angles_yzx(0, -player.cube.ry, 0);
+        glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
+        draw_mesh_animated(man_mesh, anim, 0);
     // </player>
 
     // <cubes>
@@ -76,15 +80,36 @@ void game_render_world() {
     // </cubes>
 
     // <man mesh>
-        glDisable(GL_CULL_FACE);
         bind_texture(global_texture, shaders_list[current_shader]->u_texture_loc, 0);
         // u_position
-        glUniform3f(shaders_list[current_shader]->uniform_locations[0], 0, 0, -60);
+        glUniform3f(shaders_list[current_shader]->uniform_locations[0], 0, 40, -60);
         // u_scale
         glUniform3f(shaders_list[current_shader]->uniform_locations[1], 20, 20, 20);
-        // u_rotation
-        glUniform3f(shaders_list[current_shader]->uniform_locations[2], 0, 0, 0);
-        draw_with_mesh(man_mesh);
-        glEnable(GL_CULL_FACE);
+        // // u_rotation
+        // glUniform3f(shaders_list[current_shader]->uniform_locations[2], 0, 0, 0);
+        // u_quat_rotation
+        quat_rotation = quat_from_axis_angles_yzx(0, 0, 0);
+        glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
+        draw_mesh_animated(man_mesh, anim, frames*0.001);
     // </man mesh>
+}
+
+void cube_draw(cube_t* cube) {
+    // u_position
+    glUniform3f(shaders_list[current_shader]->uniform_locations[0], cube->x, cube->y, cube->z);
+    // u_scale
+    glUniform3f(shaders_list[current_shader]->uniform_locations[1], cube->w, cube->h, cube->d);
+    // // u_rotation
+    // glUniform3f(shaders_list[current_shader]->uniform_locations[2], -cube->rx, -cube->ry, -cube->rz);
+    // u_quat_rotation
+    quat_t quat_rotation = quat_from_axis_angles_yzx(-cube->rx, -cube->ry, -cube->rz);
+    glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
+    draw_mesh(cube_mesh);
+}
+
+void cube_debug_draw_vertices(cube_t* cube) {
+    sdm_set_color(1, 0, 0, 1);
+    for (uint8_t j = 0; j < 8; j++) {
+        sdm_draw_ball(cube->vertices[j].x, cube->vertices[j].y, cube->vertices[j].z, 5);
+    }
 }

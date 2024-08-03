@@ -114,6 +114,10 @@
     uint64_t meshes_amount = 0;
     mesh_t* meshes_list[_MESHES_MAX_AMOUNT_];
 
+    #define _ANIMATIONS_MAX_AMOUNT_ (128)
+    uint64_t animations_amount = 0;
+    animation_t* animations_list[_ANIMATIONS_MAX_AMOUNT_];
+
     #define _FBOS_MAX_AMOUNT_ (128)
     uint64_t fbos_amount = 0;
     uint64_t current_fbo = 0;
@@ -137,6 +141,7 @@
     const uint64_t CAMERAS_MAX_AMOUNT = _CAMERAS_MAX_AMOUNT_;
     const uint64_t TEXTURES_MAX_AMOUNT = _TEXTURES_MAX_AMOUNT_;
     const uint64_t MESHES_MAX_AMOUNT = _MESHES_MAX_AMOUNT_;
+    const uint64_t ANIMATIONS_MAX_AMOUNT = _ANIMATIONS_MAX_AMOUNT_;
     const uint64_t FBOS_MAX_AMOUNT = _FBOS_MAX_AMOUNT_;
 // </constants>
 
@@ -222,6 +227,30 @@ int32_t main(int32_t argc, char** argv) {
             }
             return b;
         }
+        int32_t intmin(int32_t a, int32_t b) {
+            if (a < b){
+                return a;
+            }
+            return b;
+        }
+        int32_t intmax(int32_t a, int32_t b) {
+            if (a > b){
+                return a;
+            }
+            return b;
+        }
+        int64_t int64min(int64_t a, int64_t b) {
+            if (a < b){
+                return a;
+            }
+            return b;
+        }
+        int64_t int64max(int64_t a, int64_t b) {
+            if (a > b){
+                return a;
+            }
+            return b;
+        }
         uint64_t load_file_contents(char** load_to, const char* file_path) {
             FILE* file_pointer = fopen(file_path, "r");
             if (file_pointer == NULL){
@@ -248,6 +277,79 @@ int32_t main(int32_t argc, char** argv) {
             fclose(file_pointer);
 
             return read_count;
+        }
+        int64_t str_find_substr(char* str, char* substr) {
+            uint64_t i = 0;
+            uint64_t j = 0;
+            char ch = str[0];
+            while (ch != '\0') {
+                j = 0;
+                while (ch == substr[j]) {
+                    j += 1;
+                    ch = str[i+j];
+                    if (substr[j] == '\0'){
+                        return i;
+                    }
+                    if (ch == '\0'){
+                        return -1;
+                    }
+                }
+                
+                i += 1;
+                ch = str[i];
+            }
+
+            return -1;
+        }
+        // assumes str is numbers with spaces in between
+        // array needs to be freed at the end of use
+        float* str_to_float_array(char* str, uint64_t arr_size) {
+            uint64_t i = 0;
+            float* arr = malloc(sizeof(float)*arr_size);
+            if (arr == NULL){
+                return NULL;
+            }
+            for (uint64_t j = 0; j < arr_size; j++) {
+                arr[j] = atof(&(str[i]));
+                int64_t di = str_find_substr(&(str[i+1]), " ");
+                if (di == -1){
+                    return arr;
+                }
+                i += di+1;
+            }
+            return arr;
+        }
+        // assumes str is numbers with spaces in between
+        // array needs to be freed at the end of use
+        int32_t* str_to_int_array(char* str, uint64_t arr_size) {
+            uint64_t i = 0;
+            int32_t* arr = calloc(1, sizeof(int32_t)*arr_size);
+            if (arr == NULL){
+                return NULL;
+            }
+            for (uint64_t j = 0; j < arr_size; j++) {
+                arr[j] = atoi(&(str[i]));
+                int64_t di = str_find_substr(&(str[i+1]), " ");
+                if (di == -1){
+                    return arr;
+                }
+                i += di+1;
+            }
+            return arr;
+        }
+        // assumes str is numbers with spaces in between
+        // array needs to be bigger/equal to floats_amount
+        void str_to_existing_float_array(char* str, uint64_t floats_amount, float* arr) {
+            uint64_t i = 0;
+            for (uint64_t j = 0; j < floats_amount; j++) {
+                arr[j] = atof(&(str[i]));
+                int64_t di = str_find_substr(&(str[i+1]), " \0");
+                if (di = -1){
+                    return;
+                }
+                i += di;
+            }
+            return;
         }
     // </miscellaneous>
 
@@ -721,7 +823,7 @@ int32_t main(int32_t argc, char** argv) {
                 glDisable(GL_DEPTH_TEST);
                 shader_use((shader_t*)screen_quad_mesh_shader);
                 bind_fbo_color_texture((fbo_t*)outport_fbo, screen_quad_mesh_shader->u_texture_loc, 0);
-                draw_with_mesh((mesh_t*)screen_quad_mesh);
+                draw_mesh((mesh_t*)screen_quad_mesh);
                 glEnable(GL_DEPTH_TEST);
             // </draw outport frame buffer to screen>
             
@@ -756,6 +858,13 @@ int32_t main(int32_t argc, char** argv) {
                     clean_mesh(meshes_list[i]);
                 }
             // </clean meshes>
+
+            // <clean animations>
+                printf("cleaning %u animations\n", animations_amount);
+                for (uint64_t i = 0; i < animations_amount; i++) {
+                    clean_animation(animations_list[i]);
+                }
+            // </clean animations>
 
             // <clean cameras>
                 printf("cleaning %u cameras\n", cameras_amount);
@@ -1134,6 +1243,7 @@ int32_t main(int32_t argc, char** argv) {
                 shader->u_camera_world_view_projection_matrix_loc   = glGetUniformLocation(shader->program , "u_camera_world_view_projection_matrix");
                 shader->u_instanced_drawing_float_data_loc          = glGetUniformLocation(shader->program , "u_instanced_drawing_float_data");
                 shader->u_instanced_drawing_uint_data_loc           = glGetUniformLocation(shader->program , "u_instanced_drawing_uint_data");
+                shader->u_joint_matrices_loc                        = glGetUniformLocation(shader->program , "u_joint_matrices");
             // </shader default uniforms>
 
             // <shader user defined uniforms>
@@ -1237,7 +1347,7 @@ int32_t main(int32_t argc, char** argv) {
         }
     // </shaders>
 
-    // <mesh_t>
+    // <meshes and animations>
         mesh_t* generate_mesh(vbo_data_t* vbo_datas_arr, uint32_t vbo_datas_arr_size, uint32_t* indices_array, uint32_t indices_count) {
             if (meshes_amount >= MESHES_MAX_AMOUNT) {
                 return NULL;
@@ -1264,7 +1374,11 @@ int32_t main(int32_t argc, char** argv) {
                 glGenBuffers(1, &(mesh->vbos[i]));
                 glBindBuffer(GL_ARRAY_BUFFER, mesh->vbos[i]);
                 glBufferData(GL_ARRAY_BUFFER, vbo_datas_arr[i].data_arr_size, vbo_datas_arr[i].data_arr, GL_STATIC_DRAW);
-                glVertexAttribPointer(i, vbo_datas_arr[i].size, vbo_datas_arr[i].type, GL_FALSE, vbo_datas_arr[i].stride, (void*)0);
+                if (vbo_datas_arr[i].type == GL_INT) {
+                    glVertexAttribIPointer(i, vbo_datas_arr[i].size, vbo_datas_arr[i].type, vbo_datas_arr[i].stride, (void*)0);
+                }else {
+                    glVertexAttribPointer(i, vbo_datas_arr[i].size, vbo_datas_arr[i].type, GL_FALSE, vbo_datas_arr[i].stride, (void*)0);
+                }
                 glEnableVertexAttribArray(i);
                 glVertexAttribDivisor(i, vbo_datas_arr[i].divisor);
             }
@@ -1276,6 +1390,8 @@ int32_t main(int32_t argc, char** argv) {
                 return mesh;
             }
             memcpy(mesh->indices_array, indices_array, sizeof(uint32_t)*mesh->indices_count);
+
+            mesh->joints = NULL;
 
             *((uint64_t*)&mesh->mesh_index) = meshes_amount;
             meshes_list[meshes_amount] = mesh;
@@ -1501,7 +1617,7 @@ int32_t main(int32_t argc, char** argv) {
 
             return result;
         }
-        mesh_t* generate_mesh_from_wavefront_obj(const char* obj_file_path) {
+        mesh_t* mesh_from_wavefront_obj_ext(const char* obj_file_path, quat_vec_vec_t transform_qvv) {
             char* obj_str;
             uint64_t file_length = load_file_contents(&obj_str,obj_file_path);
             if (obj_str == NULL) {
@@ -1535,6 +1651,8 @@ int32_t main(int32_t argc, char** argv) {
             uint32_t between_spaces_slash_count;
 
             uint64_t i;
+
+            vec3_t vec3;
 
             vec3_t* vertices;
             vec3_t* normals;
@@ -1712,7 +1830,8 @@ int32_t main(int32_t argc, char** argv) {
                         }
                         
                         if (line_space_count <= 2) {
-                            indices_array[polygon_index*3 + line_space_count] = unique_vertex_index;
+                            indices_array[polygon_index*3 + line_space_count] = unique_vertex_index
+                                                           /* fix indices order for face culling */ + (-line_space_count+1)*2;
                         }else {
                             // multipile polyons at 1 face
                             // add an entire polygon
@@ -1742,6 +1861,30 @@ int32_t main(int32_t argc, char** argv) {
                 }
 
                 last_char = obj_str[i];
+            }
+
+            // transform
+            for (i = 0; i < unique_vertices_count; i++) {
+                vec3 = (vec3_t){
+                    .x = vertices_position_arr[i*3    ],
+                    .y = vertices_position_arr[i*3 + 1],
+                    .z = vertices_position_arr[i*3 + 2]
+                };
+                vec3 = vec_scale_rotate_translate(vec3, transform_qvv);
+                vertices_position_arr[i*3    ] = vec3.x;
+                vertices_position_arr[i*3 + 1] = vec3.y;
+                vertices_position_arr[i*3 + 2] = vec3.z;
+            }
+            for (i = 0; i < unique_vertices_count; i++) {
+                vec3 = (vec3_t){
+                    .x = vertices_normal_arr[i*3    ],
+                    .y = vertices_normal_arr[i*3 + 1],
+                    .z = vertices_normal_arr[i*3 + 2]
+                };
+                vec3 = rotate_vector(vec3, transform_qvv.rot);
+                vertices_normal_arr[i*3    ] = vec3.x;
+                vertices_normal_arr[i*3 + 1] = vec3.y;
+                vertices_normal_arr[i*3 + 2] = vec3.z;
             }
 
             // <debug>
@@ -1839,12 +1982,561 @@ int32_t main(int32_t argc, char** argv) {
                 return mesh;
             }
         }
-        void draw_with_mesh(mesh_t* mesh) {
+        mesh_t* mesh_from_wavefront_obj(const char* obj_file_path) {
+            quat_vec_vec_t transform_qvv = (quat_vec_vec_t){
+                .rot = (quat_t){
+                    .w = 1,
+                    .x = 0,
+                    .y = 0,
+                    .z = 0
+                },
+                .pos = (vec3_t){
+                    .x = 0,
+                    .y = 0,
+                    .z = 0,
+                },
+                .scale = (vec3_t){
+                    .x = 1,
+                    .y = 1,
+                    .z = 1,
+                }
+            };
+            return mesh_from_wavefront_obj_ext(obj_file_path, transform_qvv);
+        }
+        void static mesh_from_collada_dae_joint_hierarchy(char* dae_str, mesh_t* mesh) {
+            uint32_t i;
+            int64_t str_i;
+            int64_t dstr_i1;
+            int64_t dstr_i2;
+            uint32_t current_parent_joint;
+            uint32_t current_joint;
+            int32_t joint_depth;
+            char* name;
+
+            // find first joint
+            str_i = str_find_substr(dae_str, "<node");
+            while (str_find_substr(&(dae_str[str_i]), "type=\"NODE\">") < str_find_substr(&(dae_str[str_i]), "type=\"JOINT\">")) {
+                str_i += str_find_substr(&(dae_str[str_i+1]), "<node");
+            }
+            
+            joint_depth = -1;
+            while (1) {
+                dstr_i1 = str_find_substr(&(dae_str[str_i]), "</node>");
+                dstr_i2 = str_find_substr(&(dae_str[str_i]), "<node");
+                if (dstr_i1 < dstr_i2) {
+                    str_i += dstr_i1;
+                    str_i += str_find_substr(&(dae_str[str_i]), ">");
+                    // go back with current_joint and current_parent_joint
+                    current_joint = current_parent_joint;
+                    current_parent_joint = mesh->joints[current_parent_joint].parent;
+                    joint_depth -= 1;
+                    if (joint_depth < 0) {
+                        break;
+                    }
+                    continue;
+                }
+
+                // set str_i to the start of the "<node..." string
+                str_i += dstr_i2;
+                joint_depth += 1;
+
+                // set current_parent_joint to the last joint
+                current_parent_joint = current_joint;
+
+                // find joint name
+                str_i += str_find_substr(&(dae_str[str_i]), "name=\"");
+                str_i += strlen("name=\"");
+                dstr_i1 = str_find_substr(&(dae_str[str_i]), "\"");
+                name = malloc(sizeof(char)*(dstr_i1+1));
+                memcpy(name, &(dae_str[str_i]), dstr_i1);
+                name[dstr_i1] = '\0';
+                // find joint index from name
+                for (i = 0; i < mesh->joints_amount; i++) {
+                    if (strcmp(name, mesh->joints[i].name) == 0) {
+                        current_joint = i;
+                        break;
+                    }
+                }
+                free(name);
+
+                if (joint_depth == 0) {
+                    current_parent_joint = current_joint;
+                }
+
+                // set parent
+                mesh->joints[current_joint].parent = current_parent_joint;
+                
+                // go to end of joint row
+                str_i += str_find_substr(&(dae_str[str_i]), ">");
+            }
+
+        }
+        mesh_t* mesh_from_collada_dae_ext(const char* dae_file_path, quat_vec_vec_t transform_qvv) {
+            char* dae_str;
+            uint64_t file_length = load_file_contents(&dae_str,dae_file_path);
+            if (dae_str == NULL) {
+                return NULL;
+            }
+
+            mesh_t* mesh;
+            int64_t str_i;
+            int64_t dstr_i;
+
+            uint64_t vertices_positions_array_length;
+            float* vertices_positions_array;
+            uint64_t vertices_normals_array_length;
+            float* vertices_normals_array;
+            uint64_t vertices_texcoords_array_length;
+            float* vertices_texcoords_array;
+            uint64_t vertices_joint_ids_array_length;
+            int32_t* vertices_joint_ids_array;
+            uint64_t vertices_joint_wheights_array_length;
+            float* vertices_joint_wheights_array;
+            
+            uint64_t joints_data_count_array_length;
+            int32_t* joints_data_count_array;
+            uint64_t joints_data_array_length;
+            int32_t* joints_data_array;
+            uint64_t joint_wheights_array_length;
+            float* joint_wheights_array;
+
+            int32_t i;
+            int32_t j;
+            uint64_t triangles_count;
+            uint64_t current_triangles_count;
+            uint64_t current_triangle_index;
+            int32_t* triangles_data_arr;
+            int32_t vertex_i;
+            int32_t normal_i;
+            int32_t texcoord_i;
+            int32_t joint_data_count;
+            uint64_t joint_data_index;
+            float joint_data_wheight_max1;
+            int64_t joint_data_wheight_max1_index;
+            float joint_data_wheight_max2;
+            int64_t joint_data_wheight_max2_index;
+            float joint_data_wheight_max3;
+            int64_t joint_data_wheight_max3_index;
+            float joint_data_wheight_tmp;
+            int64_t joint_data_wheight_tmp_index;
+            uint64_t indice_index;
+            float vertex_joint_wheights_total;
+            vec3_t vec3;
+
+            uint32_t* indices_array;
+            float* vbo_vertices_position_arr;
+            float* vbo_vertices_texcoord_arr;
+            float* vbo_vertices_normal_arr;
+            int32_t* vbo_vertices_joint_id_arr;
+            float* vbo_vertices_joint_wheight_arr;
+
+            uint64_t joints_inverse_bind_matrices_array_length;
+            float* joints_inverse_bind_matrices_array;
+
+            mat4_t transform_mat = mat4_from_quat_vec_vec(transform_qvv);
+
+
+            // vertex positions array
+            str_i = str_find_substr(dae_str, "positions-array\" count=\"");
+            str_i += strlen("positions-array\" count=\"");
+            vertices_positions_array_length = atoi(&(dae_str[str_i]));
+            str_i += str_find_substr(&(dae_str[str_i]), "\">");
+            str_i += strlen("\">");
+            vertices_positions_array = str_to_float_array(&(dae_str[str_i]), vertices_positions_array_length);
+            if (vertices_positions_array == NULL){
+                goto clean_and_return;
+            }
+            
+            // vertex normals array
+            str_i = str_find_substr(dae_str, "normals-array\" count=\"");
+            str_i += strlen("normals-array\" count=\"");
+            vertices_normals_array_length = atoi(&(dae_str[str_i]));
+            str_i += str_find_substr(&(dae_str[str_i]), "\">");
+            str_i += strlen("\">");
+            vertices_normals_array = str_to_float_array(&(dae_str[str_i]), vertices_normals_array_length);
+            if (vertices_normals_array == NULL){
+                goto clean_and_return;
+            }
+            
+            // vertex texcoords array
+            str_i = str_find_substr(dae_str, "map-0-array\" count=\"");
+            str_i += strlen("map-0-array\" count=\"");
+            vertices_texcoords_array_length = atoi(&(dae_str[str_i]));
+            str_i += str_find_substr(&(dae_str[str_i]), "\">");
+            str_i += strlen("\">");
+            vertices_texcoords_array = str_to_float_array(&(dae_str[str_i]), vertices_texcoords_array_length);
+            if (vertices_texcoords_array == NULL){
+                goto clean_and_return;
+            }
+            
+            // vertex joint wheights and vertex joint ids arrays
+            // joint wheights array
+            str_i = str_find_substr(dae_str, "skin-weights-array\" count=\"");
+            str_i += strlen("skin-weights-array\" count=\"");
+            joint_wheights_array_length = atoi(&(dae_str[str_i]));
+            str_i += str_find_substr(&(dae_str[str_i]), "\">");
+            str_i += strlen("\">");
+            joint_wheights_array = str_to_float_array(&(dae_str[str_i]), joint_wheights_array_length);
+            if (joint_wheights_array == NULL){
+                goto clean_and_return;
+            }
+            // joints data count array
+            str_i = str_find_substr(dae_str, "<vertex_weights count=\"");
+            str_i += strlen("<vertex_weights count=\"");
+            joints_data_count_array_length = atoi(&(dae_str[str_i]));
+            str_i += str_find_substr(&(dae_str[str_i]), "<vcount>");
+            str_i += strlen("<vcount>");
+            joints_data_count_array = str_to_int_array(&(dae_str[str_i]), joints_data_count_array_length);
+            if (joints_data_count_array == NULL){
+                goto clean_and_return;
+            }
+            // joints data array
+            joints_data_array_length = 0;
+            for (i = 0; i < joints_data_count_array_length; i++) {
+                joints_data_array_length += joints_data_count_array[i];
+            }
+            joints_data_array_length *= 2;
+            str_i += str_find_substr(&(dae_str[str_i]), "<v>");
+            str_i += strlen("<v>");
+            joints_data_array = str_to_int_array(&(dae_str[str_i]), joints_data_array_length);
+            if (joints_data_array == NULL){
+                goto clean_and_return;
+            }
+            // vertex joint wheights and vertex joint ids arrays
+            vertices_joint_ids_array = malloc(sizeof(int32_t)*joints_data_count_array_length*3);
+            vertices_joint_wheights_array = malloc(sizeof(float)*joints_data_count_array_length*3);
+            if (vertices_joint_ids_array == NULL || vertices_joint_wheights_array == NULL){
+                goto clean_and_return;
+            }
+            joint_data_index = 0;
+            for (i = 0; i < joints_data_count_array_length; i++) {
+                joint_data_count = joints_data_count_array[i];
+                if (joint_data_count < 3) {
+                    for (j = 0; j < 3; j++) {
+                        if (j < joint_data_count) {
+                            vertices_joint_ids_array[i*3 + j]      = joints_data_array[joint_data_index*2];
+                            vertices_joint_wheights_array[i*3 + j] = joint_wheights_array[joints_data_array[joint_data_index*2 + 1]];
+                            joint_data_index += 1;
+                        }else {
+                            vertices_joint_ids_array[i*3 + j]      = 0;
+                            vertices_joint_wheights_array[i*3 + j] = 0;
+                        }
+                    }
+                }else {
+                    // initial values
+                    joint_data_wheight_max1_index = -1;
+                    joint_data_wheight_max1 = 0;
+                    joint_data_wheight_max2_index = -1;
+                    joint_data_wheight_max2 = 0;
+                    joint_data_wheight_max3_index = -1;
+                    joint_data_wheight_max3 = 0;
+
+
+                    // find 3 biggest wheight values
+                    for (j = 0; j < joint_data_count; j++) {
+                        joint_data_wheight_tmp_index = joint_data_index + j;
+                        joint_data_wheight_tmp = joint_wheights_array[joints_data_array[joint_data_wheight_tmp_index*2 + 1]];
+
+                        if (joint_data_wheight_tmp > joint_data_wheight_max3) {
+                            joint_data_wheight_max3 = joint_data_wheight_tmp;
+                            joint_data_wheight_max3_index = joint_data_wheight_tmp_index;
+                            
+                            if (joint_data_wheight_max3 > joint_data_wheight_max2) {
+                                joint_data_wheight_tmp        = joint_data_wheight_max2;
+                                joint_data_wheight_tmp_index  = joint_data_wheight_max2_index;
+                                joint_data_wheight_max2       = joint_data_wheight_max3;
+                                joint_data_wheight_max2_index = joint_data_wheight_max3_index;
+                                joint_data_wheight_max3       = joint_data_wheight_tmp;
+                                joint_data_wheight_max3_index = joint_data_wheight_tmp_index;
+
+                                if (joint_data_wheight_max2 > joint_data_wheight_max1) {
+                                    joint_data_wheight_tmp        = joint_data_wheight_max1;
+                                    joint_data_wheight_tmp_index  = joint_data_wheight_max1_index;
+                                    joint_data_wheight_max1       = joint_data_wheight_max2;
+                                    joint_data_wheight_max1_index = joint_data_wheight_max2_index;
+                                    joint_data_wheight_max2       = joint_data_wheight_tmp;
+                                    joint_data_wheight_max2_index = joint_data_wheight_tmp_index;
+                                }
+                            }
+                        }
+                    }
+
+                    // set data
+                    if (joint_data_wheight_max1_index >= 0) {
+                        vertices_joint_ids_array[i*3    ]      = joints_data_array[joint_data_wheight_max1_index*2];
+                        vertices_joint_wheights_array[i*3    ] = joint_wheights_array[joints_data_array[joint_data_wheight_max1_index*2 + 1]];
+                    }else {
+                        vertices_joint_ids_array[i*3    ] = 0;
+                        vertices_joint_wheights_array[i*3    ] = 0;
+                    }
+                    if (joint_data_wheight_max2_index >= 0) {
+                        vertices_joint_ids_array[i*3 + 1]      = joints_data_array[joint_data_wheight_max2_index*2];
+                        vertices_joint_wheights_array[i*3 + 1] = joint_wheights_array[joints_data_array[joint_data_wheight_max2_index*2 + 1]];
+                    }else {
+                        vertices_joint_ids_array[i*3 + 1] = 0;
+                        vertices_joint_wheights_array[i*3 + 1] = 0;
+                    }
+                    if (joint_data_wheight_max3_index >= 0) {
+                        vertices_joint_ids_array[i*3 + 2]      = joints_data_array[joint_data_wheight_max3_index*2];
+                        vertices_joint_wheights_array[i*3 + 2] = joint_wheights_array[joints_data_array[joint_data_wheight_max3_index*2 + 1]];
+                    }else {
+                        vertices_joint_ids_array[i*3 + 2] = 0;
+                        vertices_joint_wheights_array[i*3 + 2] = 0;
+                    }
+
+                    joint_data_index += joint_data_count;
+                }
+
+                vertex_joint_wheights_total = vertices_joint_wheights_array[i*3] + vertices_joint_wheights_array[i*3 + 1] + vertices_joint_wheights_array[i*3 + 2];
+                if (vertex_joint_wheights_total != 0) {
+                    vertices_joint_wheights_array[i*3    ] /= vertex_joint_wheights_total;
+                    vertices_joint_wheights_array[i*3 + 1] /= vertex_joint_wheights_total;
+                    vertices_joint_wheights_array[i*3 + 2] /= vertex_joint_wheights_total;
+                }
+            }
+            
+
+            // find triangles_count
+            triangles_count = 0;
+            str_i = 0;
+            while (1) {
+                dstr_i = str_find_substr(&(dae_str[str_i]), "<triangles");
+                str_i += dstr_i;
+                if (dstr_i == -1) {
+                    break;
+                }
+                str_i += str_find_substr(&(dae_str[str_i]), "count=\"");
+                str_i += strlen("count=\"");
+                triangles_count += atoi(&(dae_str[str_i]));
+            }
+
+            // set all values
+            indices_array = malloc(sizeof(uint32_t)*triangles_count*3);
+            vbo_vertices_position_arr = malloc(sizeof(float)*triangles_count*3*3);
+            vbo_vertices_texcoord_arr = malloc(sizeof(float)*triangles_count*3*2);
+            vbo_vertices_normal_arr = malloc(sizeof(float)*triangles_count*3*3);
+            vbo_vertices_joint_id_arr = malloc(sizeof(int32_t)*triangles_count*3*3);
+            vbo_vertices_joint_wheight_arr = malloc(sizeof(float)*triangles_count*3*3);
+            if (
+                indices_array == NULL ||
+                vbo_vertices_position_arr == NULL ||
+                vbo_vertices_texcoord_arr == NULL ||
+                vbo_vertices_normal_arr == NULL ||
+                vbo_vertices_joint_id_arr == NULL ||
+                vbo_vertices_joint_wheight_arr == NULL
+            ) {
+                goto clean_and_return;
+            }
+
+            str_i = 0;
+            indice_index = 0;
+            while (1) {
+                dstr_i = str_find_substr(&(dae_str[str_i]), "<triangles");
+                str_i += dstr_i;
+                if (dstr_i == -1) {
+                    break;
+                }
+                str_i += str_find_substr(&(dae_str[str_i]), "count=\"");
+                str_i += strlen("count=\"");
+                current_triangles_count = atoi(&(dae_str[str_i]));
+                str_i += str_find_substr(&(dae_str[str_i]), "<p>");
+                str_i += strlen("<p>");
+                triangles_data_arr = str_to_int_array(&(dae_str[str_i]), current_triangles_count*3*3);
+                if (triangles_data_arr == NULL) {
+                    goto clean_and_return;
+                }
+
+                for (current_triangle_index = 0; current_triangle_index < current_triangles_count; current_triangle_index++) {
+                    for (i = 0; i < 3; i++) {
+                        vertex_i   = triangles_data_arr[current_triangle_index*3*3 + i*3    ];
+                        normal_i   = triangles_data_arr[current_triangle_index*3*3 + i*3 + 1];
+                        texcoord_i = triangles_data_arr[current_triangle_index*3*3 + i*3 + 2];
+                        
+                        vec3 = (vec3_t){
+                            .x = vertices_positions_array[vertex_i*3    ],
+                            .y = vertices_positions_array[vertex_i*3 + 1],
+                            .z = vertices_positions_array[vertex_i*3 + 2]
+                        };
+                        vec3 = vec_scale_rotate_translate(vec3, transform_qvv);
+                        vbo_vertices_position_arr[(indice_index+i)*3    ] = vec3.x;
+                        vbo_vertices_position_arr[(indice_index+i)*3 + 1] = vec3.y;
+                        vbo_vertices_position_arr[(indice_index+i)*3 + 2] = vec3.z;
+                        
+                        vec3 = (vec3_t){
+                            .x = vertices_normals_array[normal_i*3    ],
+                            .y = vertices_normals_array[normal_i*3 + 1],
+                            .z = vertices_normals_array[normal_i*3 + 2]
+                        };
+                        vec3 = rotate_vector(vec3, transform_qvv.rot);
+                        vbo_vertices_normal_arr[  (indice_index+i)*3    ] = vec3.x;
+                        vbo_vertices_normal_arr[  (indice_index+i)*3 + 1] = vec3.y;
+                        vbo_vertices_normal_arr[  (indice_index+i)*3 + 2] = vec3.z;
+                        
+                        vbo_vertices_texcoord_arr[(indice_index+i)*2    ] = vertices_texcoords_array[texcoord_i*2    ];
+                        vbo_vertices_texcoord_arr[(indice_index+i)*2 + 1] = vertices_texcoords_array[texcoord_i*2 + 1];
+                        
+                        vbo_vertices_joint_id_arr[(indice_index+i)*3    ]      = vertices_joint_ids_array[vertex_i*3    ];
+                        vbo_vertices_joint_id_arr[(indice_index+i)*3 + 1]      = vertices_joint_ids_array[vertex_i*3 + 1];
+                        vbo_vertices_joint_id_arr[(indice_index+i)*3 + 2]      = vertices_joint_ids_array[vertex_i*3 + 2];
+                        vbo_vertices_joint_wheight_arr[(indice_index+i)*3    ] = vertices_joint_wheights_array[vertex_i*3    ];
+                        vbo_vertices_joint_wheight_arr[(indice_index+i)*3 + 1] = vertices_joint_wheights_array[vertex_i*3 + 1];
+                        vbo_vertices_joint_wheight_arr[(indice_index+i)*3 + 2] = vertices_joint_wheights_array[vertex_i*3 + 2];
+                    }
+                    
+                    // // normal cull face
+                    // indices_array[indice_index    ] = indice_index;
+                    // indices_array[indice_index + 1] = indice_index + 1;
+                    // indices_array[indice_index + 2] = indice_index + 2;
+                    
+                    // reverse cull face
+                    indices_array[indice_index    ] = indice_index + 1;
+                    indices_array[indice_index + 1] = indice_index;
+                    indices_array[indice_index + 2] = indice_index + 2;
+
+                    indice_index += 3;
+                }
+            }
+
+            
+            vbo_data_t vbo_datas_arr[5] = {
+                {
+                    .data_arr_size = sizeof(float)*triangles_count*3*3,
+                    .data_arr = (void*)vbo_vertices_position_arr,
+                    .size = 3,
+                    .type = GL_FLOAT,
+                    .stride = 3*sizeof(float),
+                    .divisor = 0
+                },
+                {
+                    .data_arr_size = sizeof(float)*triangles_count*3*2,
+                    .data_arr = (void*)vbo_vertices_texcoord_arr,
+                    .size = 2,
+                    .type = GL_FLOAT,
+                    .stride = 2*sizeof(float),
+                    .divisor = 0
+                },
+                {
+                    .data_arr_size = sizeof(float)*triangles_count*3*3,
+                    .data_arr = (void*)vbo_vertices_normal_arr,
+                    .size = 3,
+                    .type = GL_FLOAT,
+                    .stride = 3*sizeof(float),
+                    .divisor = 0
+                },
+                {
+                    .data_arr_size = sizeof(int32_t)*triangles_count*3*3,
+                    .data_arr = (void*)vbo_vertices_joint_id_arr,
+                    .size = 3,
+                    .type = GL_INT,
+                    .stride = 3*sizeof(int32_t),
+                    .divisor = 0
+                },
+                {
+                    .data_arr_size = sizeof(float)*triangles_count*3*3,
+                    .data_arr = (void*)vbo_vertices_joint_wheight_arr,
+                    .size = 3,
+                    .type = GL_FLOAT,
+                    .stride = 3*sizeof(float),
+                    .divisor = 0
+                }
+            };
+
+            mesh = generate_mesh(vbo_datas_arr, 5, indices_array, triangles_count*3);
+
+
+            // mesh->joints
+            str_i = str_find_substr(dae_str, "skin-joints-array\" count=\"");
+            str_i += strlen("skin-joints-array\" count=\"");
+            mesh->joints_amount = atoi(&(dae_str[str_i]));
+            str_i += str_find_substr(&(dae_str[str_i]), ">");
+            str_i += strlen(">");
+            mesh->joints = malloc(sizeof(joint_t)*mesh->joints_amount);
+            if (mesh->joints == NULL) {
+                // give up on joints :(
+                goto clean_and_return;
+            }
+            // joint names
+            for (i = 0; i < mesh->joints_amount; i++) {
+                mesh->joints[i].index = i;
+
+                dstr_i = int64min(str_find_substr(&(dae_str[str_i]), " "), str_find_substr(&(dae_str[str_i]), "</Name_array>"));
+                mesh->joints[i].name = malloc(sizeof(char)*(dstr_i+1));
+                if (mesh->joints[i].name != NULL) {
+                    memcpy(mesh->joints[i].name, &(dae_str[str_i]), dstr_i);
+                    mesh->joints[i].name[dstr_i] = '\0';
+                }
+                str_i += dstr_i+1;
+            }
+            // joint inverse bind matrices
+            str_i = str_find_substr(dae_str, "skin-bind_poses-array\" count=\"");
+            str_i += strlen("skin-bind_poses-array\" count=\"");
+            joints_inverse_bind_matrices_array_length = atoi(&(dae_str[str_i]));
+            str_i += str_find_substr(&(dae_str[str_i]), ">");
+            str_i += strlen(">");
+            joints_inverse_bind_matrices_array = str_to_float_array(&(dae_str[str_i]), joints_inverse_bind_matrices_array_length);
+            if (joints_inverse_bind_matrices_array == NULL) {
+                goto clean_and_return;
+            }
+            for (i = 0; i < mesh->joints_amount; i++) {
+                memcpy(mesh->joints[i].inverse_bind_transform_mat.mat, &(joints_inverse_bind_matrices_array[i*16]), sizeof(float)*16);
+                
+                // apply transform
+                // mesh->joints[i].inverse_bind_transform_mat = mat4_mul(mesh->joints[i].inverse_bind_transform_mat, transform_mat);
+            }
+            // joint hierarchy
+            mesh_from_collada_dae_joint_hierarchy(dae_str, mesh);
+
+
+            goto clean_and_return;
+            clean_and_return: {
+                if (dae_str != NULL)                            {free(dae_str);}
+                if (vertices_positions_array != NULL)           {free(vertices_positions_array);}
+                if (vertices_normals_array != NULL)             {free(vertices_normals_array);}
+                if (vertices_texcoords_array != NULL)           {free(vertices_texcoords_array);}
+                if (vertices_joint_ids_array != NULL)           {free(vertices_joint_ids_array);}
+                if (vertices_joint_wheights_array != NULL)      {free(vertices_joint_wheights_array);}
+                if (joints_data_count_array != NULL)            {free(joints_data_count_array);}
+                if (joints_data_array != NULL)                  {free(joints_data_array);}
+                if (joint_wheights_array != NULL)               {free(joint_wheights_array);}
+                if (indices_array != NULL)                      {free(indices_array);}
+                if (vbo_vertices_position_arr != NULL)          {free(vbo_vertices_position_arr);}
+                if (vbo_vertices_texcoord_arr != NULL)          {free(vbo_vertices_texcoord_arr);}
+                if (vbo_vertices_normal_arr != NULL)            {free(vbo_vertices_normal_arr);}
+                if (vbo_vertices_joint_id_arr != NULL)          {free(vbo_vertices_joint_id_arr);}
+                if (vbo_vertices_joint_wheight_arr != NULL)     {free(vbo_vertices_joint_wheight_arr);}
+                if (triangles_data_arr != NULL)                 {free(triangles_data_arr);}
+                if (joints_inverse_bind_matrices_array != NULL) {free(joints_inverse_bind_matrices_array);}
+                
+                return mesh;
+            }
+        }
+        mesh_t* mesh_from_collada_dae(const char* dae_file_path) {
+            quat_vec_vec_t transform_qvv = (quat_vec_vec_t){
+                .rot = (quat_t){
+                    .w = 1,
+                    .x = 0,
+                    .y = 0,
+                    .z = 0
+                },
+                .pos = (vec3_t){
+                    .x = 0,
+                    .y = 0,
+                    .z = 0,
+                },
+                .scale = (vec3_t){
+                    .x = 1,
+                    .y = 1,
+                    .z = 1,
+                }
+            };
+            return mesh_from_collada_dae_ext(dae_file_path, transform_qvv);
+        }
+        void draw_mesh(mesh_t* mesh) {
             glBindVertexArray(mesh->vao);
             glDrawElements(GL_TRIANGLES, mesh->indices_count, GL_UNSIGNED_INT, mesh->indices_array);
             return;
         }
-        void draw_instanced_with_mesh(mesh_t* mesh, uint32_t instance_count) {
+        void draw_instanced_mesh(mesh_t* mesh, uint32_t instance_count) {
             glBindVertexArray(mesh->vao);
             glDrawElementsInstanced(GL_TRIANGLES, mesh->indices_count, GL_UNSIGNED_INT, mesh->indices_array, instance_count);
         }
@@ -1859,19 +2551,293 @@ int32_t main(int32_t argc, char** argv) {
             clean_mesh(mesh);
         }
         void clean_mesh(mesh_t* mesh) {
-            //printf("\tdeleting mesh->vbos buffers with %u vbos_amount\n", mesh->vbos_amount);
             glDeleteBuffers(mesh->vbos_amount, mesh->vbos);
-            //printf("\tdeleting mesh->vao buffer\n");
             glDeleteBuffers(1, &mesh->vao);
-            //printf("\tfreeing mesh->vbos\n");
             free(mesh->vbos);
-            //printf("\tfreeing mesh->indices_array\n");
             free(mesh->indices_array);
-            //printf("\tfreeing mesh\n");
+            if (mesh->joints != NULL) {
+                for (uint32_t i = 0; i < mesh->joints_amount; i++) {
+                    if (mesh->joints[i].name != NULL) {
+                        free(mesh->joints[i].name);
+                    }
+                }
+                free(mesh->joints);
+            }
             free(mesh);
             return;
         }
-    // </mesh_t>
+        animation_t* animation_from_collada_dae_ext(const char* dae_file_path, joint_t* joints, uint32_t joints_amount, quat_vec_vec_t transform_qvv) {
+            if (animations_amount >= ANIMATIONS_MAX_AMOUNT) {
+                return NULL;
+            }
+
+            char* dae_str;
+            uint64_t file_length = load_file_contents(&dae_str,dae_file_path);
+            if (dae_str == NULL) {
+                return NULL;
+            }
+            
+            animation_t* anim;
+
+            uint32_t i;
+
+            int64_t str_i;
+            int64_t dstr_i;
+
+            char* name;
+            int32_t joint_i;
+
+            float* key_frames_time_stamp;
+
+            uint32_t key_frames_transform_matrices_array_length;
+            float* key_frames_transform_matrices_array;
+
+            mat4_t transform_mat = mat4_from_quat_vec_vec(transform_qvv);
+
+            
+            anim = malloc(sizeof(animation_t));
+            if (anim == NULL) {
+                printf("malloc failed at animation generation.\n");
+                free(dae_str);
+                return NULL;
+            }
+
+            anim->joints_amount = joints_amount;
+            anim->joints_key_frames = calloc(1,sizeof(joint_key_frame_t)*joints_amount);
+
+            // for every joint
+            str_i = 0;
+            while (1) {
+                // find joint name
+                dstr_i = str_find_substr(&(dae_str[str_i]), "<float_array id=\"Armature_ArmatureAction_001_");
+                if (dstr_i == -1) {
+                    break;
+                }
+                str_i += dstr_i;
+                str_i += strlen("<float_array id=\"Armature_ArmatureAction_001_");
+                dstr_i = str_find_substr(&(dae_str[str_i]), "_pose_matrix-input-array\" count=\"");
+                name = malloc(sizeof(char)*(dstr_i+1));
+                memcpy(name, &(dae_str[str_i]), dstr_i);
+                name[dstr_i] = '\0';
+                // find joint index from name
+                joint_i = -1;
+                for (i = 0; i < joints_amount; i++) {
+                    if (strcmp(name, joints[i].name) == 0) {
+                        joint_i = i;
+                        break;
+                    }
+                }
+                free(name);
+
+                if (joint_i == -1) {
+                    printf("could not find joint \"%s\"\n", name);
+                    continue;
+                }
+
+                // find joints' keyframes amount
+                str_i += dstr_i;
+                str_i += strlen("_pose_matrix-input-array\" count=\"");
+                anim->joints_key_frames[joint_i].key_frames_amount = atoi(&(dae_str[str_i]));
+                anim->joints_key_frames[joint_i].key_frames = malloc(sizeof(key_frame_t)*anim->joints_key_frames[joint_i].key_frames_amount);
+
+                str_i += str_find_substr(&(dae_str[str_i]), "\">");
+                key_frames_time_stamp = str_to_float_array(&(dae_str[str_i]), anim->joints_key_frames[joint_i].key_frames_amount);
+
+                for (i = 0; i < anim->joints_key_frames[joint_i].key_frames_amount; i++) {
+                    anim->joints_key_frames[joint_i].key_frames[i].time_stamp = key_frames_time_stamp[i];
+                }
+
+                free(key_frames_time_stamp);
+
+                // find joints' transforms
+                str_i += str_find_substr(&(dae_str[str_i]), "_pose_matrix-output-array\" count=\"");
+                str_i += strlen("_pose_matrix-output-array\" count=\"");
+                key_frames_transform_matrices_array_length = atoi(&(dae_str[str_i]));
+                str_i += str_find_substr(&(dae_str[str_i]), "\">");
+                str_i += strlen("\">");
+                key_frames_transform_matrices_array = str_to_float_array(&(dae_str[str_i]), key_frames_transform_matrices_array_length);
+                for (i = 0; i < anim->joints_key_frames[joint_i].key_frames_amount; i++) {
+                    memcpy(
+                        anim->joints_key_frames[joint_i].key_frames[i].joint_local_transform.mat,
+                        &(key_frames_transform_matrices_array[i*16]), sizeof(float)*16
+                    );
+
+                    // apply transform
+                    // anim->joints_key_frames[joint_i].key_frames[i].joint_local_transform = mat4_mul(anim->joints_key_frames[joint_i].key_frames[i].joint_local_transform, transform_mat);
+                    
+                    anim->joints_key_frames[joint_i].key_frames[i].joint_local_transform_qvv = quat_vec_vec_from_mat4(anim->joints_key_frames[joint_i].key_frames[i].joint_local_transform);
+                }
+                free(key_frames_transform_matrices_array);
+            }
+
+            // find local matrix for joints without animation
+            for (joint_i = 0; joint_i < joints_amount; joint_i++) {
+                if (anim->joints_key_frames[joint_i].key_frames_amount != 0) {
+                    continue;
+                }
+
+                str_i = str_find_substr(dae_str, "<visual_scene");
+                str_i += str_find_substr(&(dae_str[str_i]), joints[joint_i].name);
+                str_i += str_find_substr(&(dae_str[str_i]), "<matrix");
+                str_i += str_find_substr(&(dae_str[str_i]), ">");
+                str_i += strlen(">");
+                key_frames_transform_matrices_array = str_to_float_array(&(dae_str[str_i]), 16);
+                
+                anim->joints_key_frames[joint_i].key_frames_amount = 1;
+                anim->joints_key_frames[joint_i].key_frames = malloc(sizeof(key_frame_t)*anim->joints_key_frames[joint_i].key_frames_amount);
+
+                memcpy(
+                    anim->joints_key_frames[joint_i].key_frames[0].joint_local_transform.mat,
+                    key_frames_transform_matrices_array, sizeof(float)*16
+                );
+                
+                // apply transform
+                // anim->joints_key_frames[joint_i].key_frames[0].joint_local_transform = mat4_mul(anim->joints_key_frames[joint_i].key_frames[0].joint_local_transform, transform_mat);
+                
+                anim->joints_key_frames[joint_i].key_frames[0].joint_local_transform_qvv = quat_vec_vec_from_mat4(anim->joints_key_frames[joint_i].key_frames[0].joint_local_transform);
+                
+                free(key_frames_transform_matrices_array);
+            }
+
+            free(dae_str);
+
+            *((uint64_t*)&anim->animation_index) = animations_amount;
+            animations_list[animations_amount] = anim;
+            animations_amount += 1;
+            
+            return anim;
+        }
+        animation_t* animation_from_collada_dae(const char* dae_file_path, joint_t* joints, uint32_t joints_amount) {
+            quat_vec_vec_t transform_qvv = (quat_vec_vec_t){
+                .rot = (quat_t){
+                    .w = 1,
+                    .x = 0,
+                    .y = 0,
+                    .z = 0
+                },
+                .pos = (vec3_t){
+                    .x = 0,
+                    .y = 0,
+                    .z = 0,
+                },
+                .scale = (vec3_t){
+                    .x = 1,
+                    .y = 1,
+                    .z = 1,
+                }
+            };
+            return animation_from_collada_dae_ext(dae_file_path, joints, joints_amount, transform_qvv);
+        }
+        // translates keyframes to achive local transform mat
+        mat4_t static get_joint_local_transform_mat_at_time(animation_t* anim, uint32_t joint_i, float time_stamp) {
+            joint_key_frame_t* joint_key_frame = &(anim->joints_key_frames[joint_i]);
+
+            if (joint_key_frame->key_frames_amount == 0) {
+                return (mat4_t){
+                    .mat = {
+                        1, 0, 0, 0,
+                        0, 1, 0, 0,
+                        0, 0, 1, 0,
+                        0, 0, 0, 1
+                    }
+                };
+            }
+            
+            // under minimum time stamp
+            if (joint_key_frame->key_frames_amount == 1 || time_stamp < joint_key_frame->key_frames[0].time_stamp) {
+                return joint_key_frame->key_frames[0].joint_local_transform;
+            }
+            
+            uint32_t key_frame_prev = 0;
+            for (uint32_t i = 0; i < joint_key_frame->key_frames_amount; i++) {
+                if (time_stamp < joint_key_frame->key_frames[i].time_stamp) {
+                    break;
+                }
+                key_frame_prev = i;
+            }
+
+            // over maximum time stamp
+            if (key_frame_prev == joint_key_frame->key_frames_amount - 1) {
+                return joint_key_frame->key_frames[joint_key_frame->key_frames_amount - 1].joint_local_transform;
+            }
+
+            quat_vec_vec_t qvv1 = joint_key_frame->key_frames[key_frame_prev].joint_local_transform_qvv;
+            quat_vec_vec_t qvv2 = joint_key_frame->key_frames[key_frame_prev + 1].joint_local_transform_qvv;
+            float t_linear =
+                (time_stamp - joint_key_frame->key_frames[key_frame_prev].time_stamp) /
+                (joint_key_frame->key_frames[key_frame_prev + 1].time_stamp - joint_key_frame->key_frames[key_frame_prev].time_stamp);
+
+            quat_vec_vec_t qvv_interpolated;
+            qvv_interpolated.rot = quat_slerp(qvv1.rot, qvv2.rot, t_linear);
+            qvv_interpolated.pos.x = qvv1.pos.x*(1-t_linear) + qvv2.pos.x*(t_linear);
+            qvv_interpolated.pos.y = qvv1.pos.y*(1-t_linear) + qvv2.pos.y*(t_linear);
+            qvv_interpolated.pos.z = qvv1.pos.z*(1-t_linear) + qvv2.pos.z*(t_linear);
+            qvv_interpolated.scale.x = qvv1.scale.x*(1-t_linear) + qvv2.scale.x*(t_linear);
+            qvv_interpolated.scale.y = qvv1.scale.y*(1-t_linear) + qvv2.scale.y*(t_linear);
+            qvv_interpolated.scale.z = qvv1.scale.z*(1-t_linear) + qvv2.scale.z*(t_linear);
+
+            return mat4_from_quat_vec_vec(qvv_interpolated);
+        }
+        void draw_mesh_animated(mesh_t* mesh, animation_t* anim, float time_stamp) {
+            if (mesh->joints_amount != anim->joints_amount) {
+                draw_mesh(mesh);
+                return;
+            }
+
+            uint32_t joint_i;
+            joint_t* joint;
+            mat4_t final_joint_transform_mat;
+            float* final_joints_transform_matrices = malloc(sizeof(float)*16*anim->joints_amount);
+
+            for (joint_i = 0; joint_i < anim->joints_amount; joint_i++) {
+                joint = &(mesh->joints[joint_i]);
+                if (joint->parent == joint_i) {
+                    joint->model_transform_mat = get_joint_local_transform_mat_at_time(anim, joint_i, time_stamp);
+                }else {
+                    joint->model_transform_mat = mat4_mul(
+                        mesh->joints[joint->parent].model_transform_mat,
+                        get_joint_local_transform_mat_at_time(anim, joint_i, time_stamp)
+                    );
+                }
+                
+                final_joint_transform_mat = mat4_mul(joint->model_transform_mat, joint->inverse_bind_transform_mat);
+                // printf(
+                //     "joint %u \"%s\" (%u keyframes):\n",
+                //     joint_i, mesh->joints[joint_i].name, anim->joints_key_frames[joint_i].key_frames_amount
+                // );
+                // print_mat4(final_joint_transform_mat);
+                // print_quat_vec_vec(quat_vec_vec_from_mat4(final_joint_transform_mat));
+                
+
+                memcpy(&(final_joints_transform_matrices[joint_i*16]), final_joint_transform_mat.mat, sizeof(float)*16);
+            }
+            
+            glUniformMatrix4fv(shaders_list[current_shader]->u_joint_matrices_loc, anim->joints_amount, GL_FALSE, final_joints_transform_matrices);
+        
+            free(final_joints_transform_matrices);
+
+            draw_mesh(mesh);
+        };
+        void destroy_animation(animation_t* anim) {
+            animations_amount -= 1;
+
+            // move (animations_list[animations_amount]) to position (anim->animation_index) at (animations_list)
+            animation_t* last_anim = animations_list[animations_amount];
+            *((uint64_t*)&last_anim->animation_index) = anim->animation_index;
+            animations_list[anim->animation_index] = last_anim;
+
+            clean_animation(anim);
+        }
+        void clean_animation(animation_t* anim) {
+            for (uint32_t i = 0; i < anim->joints_amount; i++) {
+                if (anim->joints_key_frames[i].key_frames != NULL) {
+                    free(anim->joints_key_frames[i].key_frames);
+                }
+            }
+            free(anim->joints_key_frames);
+            free(anim);
+        }
+    // </meshes and animations>
 
     // <camera_t>
         camera_t* camera_create(float x, float y, float z,
@@ -1913,8 +2879,6 @@ int32_t main(int32_t argc, char** argv) {
             camera->viewport_w = viewport_w;
             camera->viewport_h = viewport_h;
 
-            camera->world_view_projection_matrix = matrix_create((uvec2_t){4,4});
-
             *((uint64_t*)(&camera->camera_index)) = cameras_amount;
             cameras_list[cameras_amount] = camera;
             cameras_amount += 1;
@@ -1948,7 +2912,6 @@ int32_t main(int32_t argc, char** argv) {
             camera_clean(camera);
         }
         void camera_clean(camera_t* camera) {
-            free(camera->world_view_projection_matrix.mat);
             free(camera);
             return;
         }
@@ -1964,67 +2927,45 @@ int32_t main(int32_t argc, char** argv) {
             #define cw camera->width
             #define ch camera->height
 
-            const mat_t rotation_x_matrix = (mat_t){
-                .size = (uvec2_t){
-                    .x = 4,
-                    .y = 4
-                },
-                .mat = (float[16]){
+            const mat4_t rotation_x_matrix = (mat4_t){
+                .mat = {
                     1, 0,         0,        0,
                     0, cos(crx), -sin(crx), 0,
                     0, sin(crx),  cos(crx), 0,
                     0, 0,         0,        1
                 }
             };
-            
-            const mat_t rotation_y_matrix = (mat_t){
-                .size = (uvec2_t){
-                    .x = 4,
-                    .y = 4
-                },
-                .mat = (float[16]){
+            const mat4_t rotation_y_matrix = (mat4_t){
+                .mat = {
                      cos(cry), 0, sin(cry), 0,
                      0,        1, 0,        0,
                     -sin(cry), 0, cos(cry), 0,
                      0,        0, 0,        1
                 }
             };
-            
-            const mat_t rotation_z_matrix = (mat_t){
-                .size = (uvec2_t){
-                    .x = 4,
-                    .y = 4
-                },
-                .mat = (float[16]){
+            const mat4_t rotation_z_matrix = (mat4_t){
+                .mat = {
                     cos(crz), -sin(crz), 0, 0,
                     sin(crz),  cos(crz), 0, 0,
                     0,         0,        1, 0,
                     0,         0,        0, 1
                 }
             };
-            
-            const mat_t world_matrix = (mat_t){
-                .size = (uvec2_t){
-                    .x = 4,
-                    .y = 4
-                },
-                .mat = (float[16]){
+
+            const mat4_t world_matrix = (mat4_t){
+                .mat = {
                     1, 0, 0, -cx,
                     0, 1, 0, -cy,
                     0, 0, 1, -cz,
                     0, 0, 0, 1
                 }
             };
-
-            mat_t projection_matrix;
+            
+            mat4_t projection_matrix;
             if (camera->is_prespective) {
                 const float _s_ = 1/tan(camera->fov*M_PI*0.5/180);
-                projection_matrix  = (mat_t){
-                    .size = (uvec2_t){
-                        .x = 4,
-                        .y = 4
-                    },
-                    .mat = (float[16]){
+                projection_matrix  = (mat4_t){
+                    .mat = {
                         _s_*ch/(cw+ch), 0,              0,           0,
                         0,              _s_*cw/(cw+ch), 0,           0,
                         0,              0,              cf/(cf-cn), -cf*cn/(cf-cn),
@@ -2032,12 +2973,8 @@ int32_t main(int32_t argc, char** argv) {
                     }
                 };
             }else{
-                projection_matrix  = (mat_t){
-                    .size = (uvec2_t){
-                        .x = 4,
-                        .y = 4
-                    },
-                    .mat = (float[16]){
+                projection_matrix  = (mat4_t){
+                    .mat = {
                         2.0/cw, 0,      0,            0,
                         0,      2.0/ch, 0,            0,
                         0,      0,      2.0/(cf-cn), -(cf+cn)/(cf-cn),
@@ -2045,11 +2982,6 @@ int32_t main(int32_t argc, char** argv) {
                     }
                 };
             }
-
-            mat_t view_matrix = matrix_create((uvec2_t){4,4});
-
-            mat_t ping_pong_matrix1 = matrix_create((uvec2_t){4,4});
-            mat_t ping_pong_matrix2 = matrix_create((uvec2_t){4,4});
             
             // rotation_x_matrix
             // rotation_y_matrix
@@ -2059,17 +2991,9 @@ int32_t main(int32_t argc, char** argv) {
             // world_matrix
             // view_matrix
 
-            matrix_multiply((mat_t*)&rotation_x_matrix, (mat_t*)&rotation_y_matrix, &ping_pong_matrix1);
-            matrix_multiply((mat_t*)&rotation_z_matrix, &ping_pong_matrix1, &view_matrix);
+            mat4_t view_matrix = mat4_mul(mat4_mul(rotation_z_matrix, rotation_x_matrix), rotation_y_matrix);
 
-            matrix_multiply((mat_t*)&view_matrix, (mat_t*)&world_matrix, &ping_pong_matrix1);
-            matrix_multiply(&projection_matrix, &ping_pong_matrix1, &ping_pong_matrix2);
-
-            memcpy(camera->world_view_projection_matrix.mat, ping_pong_matrix2.mat, sizeof(float)*16);
-
-            free(view_matrix.mat);
-            free(ping_pong_matrix1.mat);
-            free(ping_pong_matrix2.mat);
+            camera->world_view_projection_matrix = mat4_mul(mat4_mul(projection_matrix, view_matrix), world_matrix);
 
             #undef cx
             #undef cy
@@ -2085,58 +3009,359 @@ int32_t main(int32_t argc, char** argv) {
         }
     // </camera_t>
 
-    // <matrices>
-        mat_t inline matrix_create(uvec2_t size) {
-            return
-            (
-                (mat_t){
-                    .size = size,
-                    .mat = calloc(1,sizeof(float)*size.y*size.x)
-                }
-           );
+    // <matrices vectors and quaternions>
+        vec3_t vec3_mul(vec3_t vec1, vec3_t vec2) {
+            return (vec3_t){
+                .x = vec1.x*vec2.x,
+                .y = vec1.y*vec2.y,
+                .z = vec1.z*vec2.z
+            };
         }
-        void matrix_multiply(mat_t* mat1, mat_t* mat2, mat_t* restrict mat3) {
-            //  assumes:
-            //      mat1->size.x == mat2->size.y
-            //      mat3->size.x == mat2->size.x
-            //      mat3->size.y == mat1->size.y
-            
-            for (uint32_t i = 0; i < mat3->size.y; i++) {
-                for (uint32_t j = 0; j < mat3->size.x; j++) {
+        vec3_t vec3_add(vec3_t vec1, vec3_t vec2) {
+            return (vec3_t){
+                .x = vec1.x+vec2.x,
+                .y = vec1.y+vec2.y,
+                .z = vec1.z+vec2.z
+            };
+        }
+        float dot_product(vec3_t vec1, vec3_t vec2) {
+            return (vec1.x*vec2.x + vec1.y*vec2.y + vec1.z*vec2.z);
+        }
+        vec3_t cross_product(vec3_t vec1, vec3_t vec2) {
+            return (vec3_t){
+                .x = vec1.y*vec2.z - vec1.z*vec2.y,
+                .y = vec1.z*vec2.x - vec1.x*vec2.z,
+                .z = vec1.x*vec2.y - vec1.y*vec2.x
+            };
+        }
+        
+        mat4_t mat4_from_mat3(mat3_t mat) {
+            return (mat4_t){
+                .mat = {
+                    mat.mat[0], mat.mat[1], mat.mat[2], 0,
+                    mat.mat[3], mat.mat[4], mat.mat[5], 0,
+                    mat.mat[6], mat.mat[7], mat.mat[8], 0,
+                    0,          0,          0,          1
+                }
+            };
+        }
+        // discards coloumn 3 and row 3
+        mat3_t mat3_from_mat4(mat4_t mat) {
+            return (mat3_t){
+                mat.mat[0], mat.mat[1], mat.mat[2],
+                mat.mat[4], mat.mat[5], mat.mat[6],
+                mat.mat[8], mat.mat[9], mat.mat[10]
+            };
+        }
+        //  assumes:
+        //      mat1 width  = mat2 height = m
+        //      mat3 width  = mat2 width  = n
+        //      mat3 height = mat1 height = i
+        void mat_mul(float* mat1, float* mat2, float* restrict mat3, uint8_t m, uint8_t i, uint8_t n) {
+            // https://en.wikipedia.org/wiki/Matrix_multiplication
+            for (uint8_t j = 0; j < i; j++) {
+                for (uint8_t k = 0; k < n; k++) {
                     float sum = 0;
-                    for (uint32_t k = 0; k < mat1->size.x; k++) {
-                        sum += mat1->mat[i*mat1->size.x+k]*mat2->mat[k*mat2->size.x+j];
+                    for (uint8_t l = 0; l < m; l++) {
+                        sum += mat1[j*m+l]*mat2[l*n+k];
                     }
-                    mat3->mat[i*mat3->size.x+j] = sum;
-                }
-            }
-
-            return;
-        }
-        void matrix_multiply_by_scalar(mat_t* mat1, float scalar, mat_t* mat2) {
-            //  assumes:
-            //      mat1->size == mat2->size
-
-            for (uint32_t y = 0; y < mat1->size.y; y++) {
-                for (uint32_t x = 0; y < mat1->size.x; x++) {
-                    mat2->mat[y*mat1->size.x+x] = mat1->mat[y*mat1->size.x+x]*scalar;
+                    mat3[j*n+k] = sum;
                 }
             }
             return;
         }
-        void matrix_add(mat_t* mat1, mat_t* mat2, mat_t* mat3) {
-            //  assumes:
-            //      mat1->size == mat2->size
-            //      mat2->size == mat3->size
+        mat3_t mat3_mul(mat3_t mat1, mat3_t mat2) {
+            mat3_t res_mat;
+            mat_mul(mat1.mat, mat2.mat, res_mat.mat, 3, 3, 3);
+            return res_mat;
+        }
+        mat4_t mat4_mul(mat4_t mat1, mat4_t mat2) {
+            mat4_t res_mat;
+            mat_mul(mat1.mat, mat2.mat, res_mat.mat, 4, 4, 4);
+            return res_mat;
+        }
+        vec3_t vec3_mul_by_mat3(vec3_t vec, mat3_t mat) {
+            float vec_mat[3] = {
+                vec.x,
+                vec.y,
+                vec.z
+            };
 
-            for (uint32_t y = 0; y < mat1->size.y; y++) {
-                for (uint32_t x = 0; y < mat1->size.x; x++) {
-                    mat3->mat[y*mat1->size.x+x] = mat1->mat[y*mat1->size.x+x] + mat2->mat[y*mat1->size.x+x];
-                }
+            float res_mat[3];
+            mat_mul(mat.mat, vec_mat, res_mat, 3, 3, 1);
+            
+            return (vec3_t){
+                .x = res_mat[0],
+                .y = res_mat[1],
+                .z = res_mat[2]
+            };
+        }
+        mat3_t mat3_mul_by_scalar(mat3_t mat, float scalar) {
+            mat3_t res;
+            for (uint8_t i = 0; i < 9; i++) {
+                res.mat[i] = mat.mat[i]*scalar;
+            }
+            return res;
+        }
+        mat4_t mat4_mul_by_scalar(mat4_t mat, float scalar) {
+            mat4_t res;
+            for (uint8_t i = 0; i < 16; i++) {
+                res.mat[i] = mat.mat[i]*scalar;
+            }
+            return res;
+        }
+        //  assumes:
+        //      mat1 width  = mat2 width  = mat3 width  = w
+        //      mat1 height = mat3 height = mat3 height = h 
+        void mat_add(float* mat1, float* mat2, float* mat3, uint8_t w, uint8_t h) {
+            for (uint32_t i = 0; i < w*h; i++) {
+                mat3[i] = mat1[i]+mat2[i];
             }
             return;
         }
-    // </matrices>
+        mat3_t mat3_add(mat3_t mat1, mat3_t mat2) {
+            mat3_t res_mat;
+            mat_add(mat1.mat, mat2.mat, res_mat.mat, 3, 3);
+            return res_mat;
+        }
+        mat4_t mat4_add(mat4_t mat1, mat4_t mat2) {
+            mat4_t res_mat;
+            mat_add(mat1.mat, mat2.mat, res_mat.mat, 4, 4);
+            return res_mat;
+        }
+        // mat must be of size 3x3
+        mat3_t mat3_from_axis_angle(vec3_t axis, float ang) {
+            float cosa = cos(ang);
+            float sina = sin(ang);
+            float omca = (1-cosa); // 1-cos(a)
+
+            float xy = axis.x*axis.y;
+            float xz = axis.x*axis.z;
+            float yz = axis.y*axis.z;
+            
+            return (mat3_t){
+                .mat = {
+                    cosa+axis.x*axis.x*omca, xy*omca-axis.z*sina,     xz*omca+axis.y*sina,
+                    xy*omca+axis.z*sina,     cosa+axis.y*axis.y*omca, yz*omca-axis.x*sina,
+                    xz*omca-axis.y*sina,     yz*omca+axis.x*sina,     cosa+axis.z*axis.z*omca
+                }
+            };
+        }
+
+        quat_t quat_multiply(quat_t q1, quat_t q2) {
+            return (quat_t){
+                .w = (q1.w*q2.w - q1.x*q2.x - q1.y*q2.y - q1.z*q2.z),
+                .x = (q1.w*q2.x + q1.x*q2.w + q1.y*q2.z - q1.z*q2.y),
+                .y = (q1.w*q2.y - q1.x*q2.z + q1.y*q2.w + q1.z*q2.x),
+                .z = (q1.w*q2.z + q1.x*q2.y - q1.y*q2.x + q1.z*q2.w)
+            };
+        }
+        quat_t quat_conjugate(quat_t q) {
+            return (quat_t){
+                .w = q.w,
+                .x = -q.x,
+                .y = -q.y,
+                .z = -q.z
+            };
+        }
+        quat_t quat_slerp(quat_t q1, quat_t q2, float t) {
+            // https://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/index.htm
+            
+            // Calculate angle between them
+            float cos_half_theta = q1.w*q2.w + q1.x*q2.x + q1.y*q2.y + q1.z*q2.z;
+            
+            // if qa=qb or qa=-qb then theta = 0 and we can return qa
+            if (cos_half_theta >= 1) {
+                return q1;
+            }
+
+	        // Calculate temporary values
+            float half_theta = acos(cos_half_theta);
+            float sin_half_theta = sin(half_theta);
+            
+            // if theta = 180 degrees then result is not fully defined
+            // we could rotate around any axis normal to qa or qb
+            if (fabs(sin_half_theta) < 0.001){ // fabs is floating point absolute
+                return (quat_t) {
+                    .w = (q1.w*0.5 + q2.w*0.5),
+                    .x = (q1.x*0.5 + q2.x*0.5),
+                    .y = (q1.y*0.5 + q2.y*0.5),
+                    .z = (q1.z*0.5 + q2.z*0.5)
+                };
+            }
+
+            float ratio_a = sin((1 - t) * half_theta) / sin_half_theta;
+            float ratio_b = sin(t * half_theta) / sin_half_theta; 
+            //calculate Quaternion.
+            return (quat_t) {
+                .w = (q1.w*ratio_a + q2.w*ratio_b),
+                .x = (q1.x*ratio_a + q2.x*ratio_b),
+                .y = (q1.y*ratio_a + q2.y*ratio_b),
+                .z = (q1.z*ratio_a + q2.z*ratio_b)
+            };
+        }
+        quat_t quat_from_axis_angle(vec3_t vec, float ang) {
+            float sina = sin(ang*0.5);
+            float i_mag = 1/sqrt(vec.x*vec.x + vec.y*vec.y + vec.z*vec.z);
+            return (quat_t){
+                .w = cos(ang*0.5),
+                .x = vec.x*i_mag*sina,
+                .y = vec.y*i_mag*sina,
+                .z = vec.z*i_mag*sina,
+            };
+        }
+        quat_t quat_from_euler_angles(float roll, float pitch, float yaw) {
+            float sinroll = sin(roll*0.5);
+            float cosroll = cos(roll*0.5);
+            float sinpitch = sin(pitch*0.5);
+            float cospitch = cos(pitch*0.5);
+            float sinyaw = sin(yaw*0.5);
+            float cosyaw = cos(yaw*0.5);
+            return (quat_t){
+                .w = cosroll*cospitch*cosyaw + sinroll*sinpitch*sinyaw,
+                .x = sinroll*cospitch*cosyaw - cosroll*sinpitch*sinyaw,
+                .z = cosroll*sinpitch*cosyaw + sinroll*cospitch*sinyaw,
+                .y = cosroll*cospitch*sinyaw - sinroll*sinpitch*cosyaw
+            };
+        }
+        quat_t quat_from_axis_angles_yzx(float rx, float ry, float rz) {
+            quat_t qx = (quat_t){
+                .w = cos(rx*0.5),
+                .x = sin(rx*0.5),
+                .y = 0,
+                .z = 0
+            };
+            quat_t qy = (quat_t){
+                .w = cos(ry*0.5),
+                .x = 0,
+                .y = sin(ry*0.5),
+                .z = 0
+            };
+            quat_t qz = (quat_t){
+                .w = cos(rz*0.5),
+                .x = 0,
+                .y = 0,
+                .z = sin(rz*0.5)
+            };
+            return quat_multiply(qy,quat_multiply(qz,qx));
+        }
+        vec3_t rotate_vector(vec3_t vec, quat_t q) {
+            quat_t q_vec = (quat_t){
+                .w = 0,
+                .x = vec.x,
+                .y = vec.y,
+                .z = vec.z
+            };
+            quat_t q_res = quat_multiply(quat_multiply(q,q_vec),quat_conjugate(q));
+            return (vec3_t){
+                .x = q_res.x,
+                .y = q_res.y,
+                .z = q_res.z
+            };
+        }
+        vec3_t vec_scale_rotate_translate(vec3_t vec, quat_vec_vec_t qvv) {
+            return vec3_add(rotate_vector(vec3_mul(vec, qvv.scale),qvv.rot),qvv.pos);
+        }
+        mat3_t rot_mat3_from_quat(quat_t q) {
+            float wx = 2*q.w*q.x;
+            float wy = 2*q.w*q.y;
+            float wz = 2*q.w*q.z;
+            float xx = 2*q.x*q.x;
+            float xy = 2*q.x*q.y;
+            float xz = 2*q.x*q.z;
+            float yy = 2*q.y*q.y;
+            float yz = 2*q.y*q.z;
+            float zz = 2*q.z*q.z;
+
+            return (mat3_t){
+                .mat = {
+                    1-(yy+zz), xy-wz,     xz+wy,
+                    xy+wz,     1-(xx+zz), yz-wx,
+                    xz-wy,     yz+wx,     1-(xx+yy)
+                }
+            };
+        }
+        quat_t quat_from_rot_mat3(mat3_t mat) {
+            float w = sqrt(1 + mat.mat[0] + mat.mat[4] + mat.mat[8])*0.5;
+            float iw4 = 1/(4*w);
+
+            return (quat_t){
+                .w = w,
+                .x = (mat.mat[7] - mat.mat[5])*iw4,
+                .y = (mat.mat[2] - mat.mat[6])*iw4,
+                .z = (mat.mat[3] - mat.mat[1])*iw4,
+            };
+        }
+        quat_vec_vec_t quat_vec_vec_from_mat4(mat4_t mat) {
+            return (quat_vec_vec_t){
+                .pos = (vec3_t){
+                    .x = mat.mat[3],
+                    .y = mat.mat[7],
+                    .z = mat.mat[11]
+                },
+                .scale = (vec3_t){
+                    .x = sqrt(mat.mat[0]*mat.mat[0] + mat.mat[4]*mat.mat[4] + mat.mat[8]*mat.mat[8]),
+                    .y = sqrt(mat.mat[1]*mat.mat[1] + mat.mat[5]*mat.mat[5] + mat.mat[9]*mat.mat[9]),
+                    .z = sqrt(mat.mat[2]*mat.mat[2] + mat.mat[6]*mat.mat[6] + mat.mat[10]*mat.mat[10])
+                },
+                .rot = quat_from_rot_mat3(mat3_from_mat4(mat))
+            };
+        }
+        mat4_t mat4_from_quat_vec_vec(quat_vec_vec_t qvv) {
+            mat4_t rot = mat4_from_mat3(rot_mat3_from_quat(qvv.rot));
+            mat4_t pos = (mat4_t){
+                .mat = {
+                    1, 0, 0, qvv.pos.x,
+                    0, 1, 0, qvv.pos.y,
+                    0, 0, 1, qvv.pos.z,
+                    0, 0, 0, 1
+                }
+            };
+            mat4_t scale = (mat4_t){
+                .mat = {
+                    qvv.scale.x, 0, 0, 0,
+                    0, qvv.scale.y, 0, 0,
+                    0, 0, qvv.scale.z, 0,
+                    0, 0, 0, 1
+                }
+            };
+
+            return mat4_mul(mat4_mul(pos, rot), scale);
+        }
+
+        void print_mat3(mat3_t mat) {
+            printf(
+                "[\n\t%f\t%f\t%f\n\t%f\t%f\t%f\n\t%f\t%f\t%f\n]\n",
+                mat.mat[0], mat.mat[1], mat.mat[2],
+                mat.mat[3], mat.mat[4], mat.mat[5],
+                mat.mat[6], mat.mat[7], mat.mat[8]
+            );
+        }
+        void print_mat4(mat4_t mat) {
+            printf(
+                "[\n\t%f\t%f\t%f\t%f\n\t%f\t%f\t%f\t%f\n\t%f\t%f\t%f\t%f\n\t%f\t%f\t%f\t%f\n]\n",
+                mat.mat[0],  mat.mat[1],  mat.mat[2],  mat.mat[3],
+                mat.mat[4],  mat.mat[5],  mat.mat[6],  mat.mat[7],
+                mat.mat[8],  mat.mat[9],  mat.mat[10], mat.mat[11],
+                mat.mat[12], mat.mat[13], mat.mat[14], mat.mat[15]
+            );
+        }
+        void print_quat_vec_vec(quat_vec_vec_t qvv) {
+            printf(
+                "{\n\trot :\t%f\t%f\t%f\t%f\n\tscale :\t%f\t%f\t%f\n\tpos :\t%f\t%f\t%f\n}\n",
+                qvv.rot.w,
+                qvv.rot.x,
+                qvv.rot.y,
+                qvv.rot.z,
+                qvv.scale.x,
+                qvv.scale.y,
+                qvv.scale.z,
+                qvv.pos.x,
+                qvv.pos.y,
+                qvv.pos.z
+            );
+        }
+    // </matrices vectors and quats>
 
     // <simple draw module>
         void simple_draw_module_set_color(float r, float g, float b, float a) {
@@ -2160,7 +3385,7 @@ int32_t main(int32_t argc, char** argv) {
                 simple_draw_module_color_b,
                 simple_draw_module_color_a
            );
-            draw_with_mesh((mesh_t*)simple_draw_module_rectangle_mesh);
+            draw_mesh((mesh_t*)simple_draw_module_rectangle_mesh);
 
             glEnable(GL_CULL_FACE);
 
@@ -2181,7 +3406,7 @@ int32_t main(int32_t argc, char** argv) {
                 simple_draw_module_color_b,
                 simple_draw_module_color_a
             );
-            draw_with_mesh((mesh_t*)simple_draw_module_cube_mesh);
+            draw_mesh((mesh_t*)simple_draw_module_cube_mesh);
 
             glEnable(GL_CULL_FACE);
 
@@ -2202,7 +3427,7 @@ int32_t main(int32_t argc, char** argv) {
                 simple_draw_module_color_b,
                 simple_draw_module_color_a
            );
-            draw_with_mesh((mesh_t*)simple_draw_module_ball_mesh);
+            draw_mesh((mesh_t*)simple_draw_module_ball_mesh);
 
             glEnable(GL_CULL_FACE);
 

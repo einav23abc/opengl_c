@@ -1,6 +1,8 @@
 #include "game.h"
 
 void game_update() {
+    frames += delta_frames;
+
     player_update();
     player_camera_update();
     sun_shadow_map_update();
