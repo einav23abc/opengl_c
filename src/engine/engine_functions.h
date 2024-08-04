@@ -91,14 +91,15 @@ void clean();
     mesh_t* mesh_from_wavefront_obj(const char* obj_file_path);
     mesh_t* mesh_from_collada_dae_ext(const char* dae_file_path, quat_vec_vec_t transform_qvv);
     mesh_t* mesh_from_collada_dae(const char* dae_file_path);
-    void draw_mesh(mesh_t* mesh);
-    void draw_instanced_mesh(mesh_t* mesh, uint32_t instance_count);
-    void destroy_mesh(mesh_t* mesh);
-    void clean_mesh(mesh_t* mesh);
     animation_t* animation_from_collada_dae_ext(const char* dae_file_path, joint_t* joints, uint32_t joints_amount, quat_vec_vec_t transform_qvv);
     animation_t* animation_from_collada_dae(const char* dae_file_path, joint_t* joints, uint32_t joints_amount);
+    void draw_mesh(mesh_t* mesh);
+    void draw_mesh_instanced(mesh_t* mesh, uint32_t instance_count);
     void draw_mesh_animated(mesh_t* mesh, animation_t* anim, float time_stamp);
+    void draw_mesh_animated_instanced(mesh_t* mesh, animation_t* anim, float time_stamp, uint32_t instance_count);
+    void destroy_mesh(mesh_t* mesh);
     void destroy_animation(animation_t* anim);
+    void clean_mesh(mesh_t* mesh);
     void clean_animation(animation_t* anim);
 // </mesh>
 

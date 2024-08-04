@@ -26,11 +26,29 @@ uint8_t game_init() {
     // </man mesh>
 
     // <animation of man mesh>
-        anim = animation_from_collada_dae(
+        anim = animation_from_collada_dae_ext(
             "./src/game/models/man_rigged.dae",
             man_mesh->joints,
-            man_mesh->joints_amount
+            man_mesh->joints_amount,
+            (quat_vec_vec_t){
+                .rot = quat_from_axis_angles_yzx(M_PI*1.5, 0, 0),
+                .scale = (vec3_t){
+                    .x = 1,
+                    .y = 1,
+                    .z = 1
+                },
+                .pos = (vec3_t){
+                    .x = 0,
+                    .y = -4.3,
+                    .z = -0.3
+                }
+            }
         );
+        // anim = animation_from_collada_dae(
+        //     "./src/game/models/man_rigged.dae",
+        //     man_mesh->joints,
+        //     man_mesh->joints_amount
+        // );
         // for (uint32_t i = 0; i < anim->joints_amount; i++) {
         //     printf("joint %d \"%s\" :\n\t[\n", i, man_mesh->joints[i].name);
         //     for (uint32_t j = 0; j < anim->joints_key_frames[i].key_frames_amount; j++) {

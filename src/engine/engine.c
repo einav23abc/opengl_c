@@ -1391,6 +1391,8 @@ int32_t main(int32_t argc, char** argv) {
             }
             memcpy(mesh->indices_array, indices_array, sizeof(uint32_t)*mesh->indices_count);
 
+            // default joint values
+            mesh->joints_amount = 0;
             mesh->joints = NULL;
 
             *((uint64_t*)&mesh->mesh_index) = meshes_amount;
@@ -2479,14 +2481,11 @@ int32_t main(int32_t argc, char** argv) {
             }
             for (i = 0; i < mesh->joints_amount; i++) {
                 memcpy(mesh->joints[i].inverse_bind_transform_mat.mat, &(joints_inverse_bind_matrices_array[i*16]), sizeof(float)*16);
-                
-                // apply transform
-                // mesh->joints[i].inverse_bind_transform_mat = mat4_mul(mesh->joints[i].inverse_bind_transform_mat, transform_mat);
             }
             // joint hierarchy
             mesh_from_collada_dae_joint_hierarchy(dae_str, mesh);
 
-
+            
             goto clean_and_return;
             clean_and_return: {
                 if (dae_str != NULL)                            {free(dae_str);}
@@ -2530,41 +2529,6 @@ int32_t main(int32_t argc, char** argv) {
                 }
             };
             return mesh_from_collada_dae_ext(dae_file_path, transform_qvv);
-        }
-        void draw_mesh(mesh_t* mesh) {
-            glBindVertexArray(mesh->vao);
-            glDrawElements(GL_TRIANGLES, mesh->indices_count, GL_UNSIGNED_INT, mesh->indices_array);
-            return;
-        }
-        void draw_instanced_mesh(mesh_t* mesh, uint32_t instance_count) {
-            glBindVertexArray(mesh->vao);
-            glDrawElementsInstanced(GL_TRIANGLES, mesh->indices_count, GL_UNSIGNED_INT, mesh->indices_array, instance_count);
-        }
-        void destroy_mesh(mesh_t* mesh) {
-            meshes_amount -= 1;
-
-            // move (meshes_list[meshes_amount]) to position (mesh->mesh_index) at (meshes_list)
-            mesh_t* last_mesh = meshes_list[meshes_amount];
-            *((uint64_t*)&last_mesh->mesh_index) = mesh->mesh_index;
-            meshes_list[mesh->mesh_index] = last_mesh;
-
-            clean_mesh(mesh);
-        }
-        void clean_mesh(mesh_t* mesh) {
-            glDeleteBuffers(mesh->vbos_amount, mesh->vbos);
-            glDeleteBuffers(1, &mesh->vao);
-            free(mesh->vbos);
-            free(mesh->indices_array);
-            if (mesh->joints != NULL) {
-                for (uint32_t i = 0; i < mesh->joints_amount; i++) {
-                    if (mesh->joints[i].name != NULL) {
-                        free(mesh->joints[i].name);
-                    }
-                }
-                free(mesh->joints);
-            }
-            free(mesh);
-            return;
         }
         animation_t* animation_from_collada_dae_ext(const char* dae_file_path, joint_t* joints, uint32_t joints_amount, quat_vec_vec_t transform_qvv) {
             if (animations_amount >= ANIMATIONS_MAX_AMOUNT) {
@@ -2663,8 +2627,13 @@ int32_t main(int32_t argc, char** argv) {
                     );
 
                     // apply transform
-                    // anim->joints_key_frames[joint_i].key_frames[i].joint_local_transform = mat4_mul(anim->joints_key_frames[joint_i].key_frames[i].joint_local_transform, transform_mat);
-                    
+                    if (joint_i == 0) {
+                        anim->joints_key_frames[joint_i].key_frames[i].joint_local_transform = mat4_mul(
+                            anim->joints_key_frames[joint_i].key_frames[i].joint_local_transform,
+                            transform_mat
+                        );
+                    }
+
                     anim->joints_key_frames[joint_i].key_frames[i].joint_local_transform_qvv = quat_vec_vec_from_mat4(anim->joints_key_frames[joint_i].key_frames[i].joint_local_transform);
                 }
                 free(key_frames_transform_matrices_array);
@@ -2692,10 +2661,15 @@ int32_t main(int32_t argc, char** argv) {
                 );
                 
                 // apply transform
-                // anim->joints_key_frames[joint_i].key_frames[0].joint_local_transform = mat4_mul(anim->joints_key_frames[joint_i].key_frames[0].joint_local_transform, transform_mat);
+                if (joint_i == 0) {
+                    anim->joints_key_frames[joint_i].key_frames[0].joint_local_transform = mat4_mul(
+                        anim->joints_key_frames[joint_i].key_frames[0].joint_local_transform,
+                        transform_mat
+                    );
+                }
                 
                 anim->joints_key_frames[joint_i].key_frames[0].joint_local_transform_qvv = quat_vec_vec_from_mat4(anim->joints_key_frames[joint_i].key_frames[0].joint_local_transform);
-                
+
                 free(key_frames_transform_matrices_array);
             }
 
@@ -2778,7 +2752,54 @@ int32_t main(int32_t argc, char** argv) {
 
             return mat4_from_quat_vec_vec(qvv_interpolated);
         }
+        void draw_mesh(mesh_t* mesh) {
+            draw_mesh_instanced(mesh, 1);
+        }
+        void draw_mesh_instanced(mesh_t* mesh, uint32_t instance_count) {
+            // if mesh has joints -> set all joint_transform_matrices to identity mat4
+            if (mesh->joints_amount > 0) {
+                float* joints_transform_matrices = malloc(sizeof(float)*16*mesh->joints_amount);
+                if (joints_transform_matrices != NULL) {
+                    for (uint32_t joint_i = 0; joint_i < mesh->joints_amount; joint_i++) {
+                        joints_transform_matrices[joint_i*16    ] = 1;
+                        joints_transform_matrices[joint_i*16 + 1] = 0;
+                        joints_transform_matrices[joint_i*16 + 2] = 0;
+                        joints_transform_matrices[joint_i*16 + 3] = 0;
+                        
+                        joints_transform_matrices[joint_i*16 + 4] = 0;
+                        joints_transform_matrices[joint_i*16 + 5] = 1;
+                        joints_transform_matrices[joint_i*16 + 6] = 0;
+                        joints_transform_matrices[joint_i*16 + 7] = 0;
+                        
+                        joints_transform_matrices[joint_i*16 + 8] = 0;
+                        joints_transform_matrices[joint_i*16 + 9] = 0;
+                        joints_transform_matrices[joint_i*16 + 10] = 1;
+                        joints_transform_matrices[joint_i*16 + 11] = 0;
+                        
+                        joints_transform_matrices[joint_i*16 + 12] = 0;
+                        joints_transform_matrices[joint_i*16 + 13] = 0;
+                        joints_transform_matrices[joint_i*16 + 14] = 0;
+                        joints_transform_matrices[joint_i*16 + 15] = 1;
+                    }
+                    glUniformMatrix4fv(shaders_list[current_shader]->u_joint_matrices_loc, mesh->joints_amount, GL_FALSE, joints_transform_matrices);
+                    free(joints_transform_matrices);
+                }
+            }
+
+            // draw mesh
+            if (instance_count == 1) {
+                // draw not instanced
+                glBindVertexArray(mesh->vao);
+                glDrawElements(GL_TRIANGLES, mesh->indices_count, GL_UNSIGNED_INT, mesh->indices_array);
+            }else {
+                glBindVertexArray(mesh->vao);
+                glDrawElementsInstanced(GL_TRIANGLES, mesh->indices_count, GL_UNSIGNED_INT, mesh->indices_array, instance_count);
+            }
+        }
         void draw_mesh_animated(mesh_t* mesh, animation_t* anim, float time_stamp) {
+            draw_mesh_animated_instanced(mesh, anim, time_stamp, 1);
+        }
+        void draw_mesh_animated_instanced(mesh_t* mesh, animation_t* anim, float time_stamp, uint32_t instance_count) {
             if (mesh->joints_amount != anim->joints_amount) {
                 draw_mesh(mesh);
                 return;
@@ -2801,23 +2822,34 @@ int32_t main(int32_t argc, char** argv) {
                 }
                 
                 final_joint_transform_mat = mat4_mul(joint->model_transform_mat, joint->inverse_bind_transform_mat);
-                // printf(
-                //     "joint %u \"%s\" (%u keyframes):\n",
-                //     joint_i, mesh->joints[joint_i].name, anim->joints_key_frames[joint_i].key_frames_amount
-                // );
-                // print_mat4(final_joint_transform_mat);
-                // print_quat_vec_vec(quat_vec_vec_from_mat4(final_joint_transform_mat));
-                
 
                 memcpy(&(final_joints_transform_matrices[joint_i*16]), final_joint_transform_mat.mat, sizeof(float)*16);
             }
             
             glUniformMatrix4fv(shaders_list[current_shader]->u_joint_matrices_loc, anim->joints_amount, GL_FALSE, final_joints_transform_matrices);
-        
+
             free(final_joints_transform_matrices);
 
-            draw_mesh(mesh);
-        };
+            // draw mesh
+            if (instance_count == 1) {
+                // draw not instanced
+                glBindVertexArray(mesh->vao);
+                glDrawElements(GL_TRIANGLES, mesh->indices_count, GL_UNSIGNED_INT, mesh->indices_array);
+            }else {
+                glBindVertexArray(mesh->vao);
+                glDrawElementsInstanced(GL_TRIANGLES, mesh->indices_count, GL_UNSIGNED_INT, mesh->indices_array, instance_count);
+            }
+        }
+        void destroy_mesh(mesh_t* mesh) {
+            meshes_amount -= 1;
+
+            // move (meshes_list[meshes_amount]) to position (mesh->mesh_index) at (meshes_list)
+            mesh_t* last_mesh = meshes_list[meshes_amount];
+            *((uint64_t*)&last_mesh->mesh_index) = mesh->mesh_index;
+            meshes_list[mesh->mesh_index] = last_mesh;
+
+            clean_mesh(mesh);
+        }
         void destroy_animation(animation_t* anim) {
             animations_amount -= 1;
 
@@ -2827,6 +2859,22 @@ int32_t main(int32_t argc, char** argv) {
             animations_list[anim->animation_index] = last_anim;
 
             clean_animation(anim);
+        }
+        void clean_mesh(mesh_t* mesh) {
+            glDeleteBuffers(mesh->vbos_amount, mesh->vbos);
+            glDeleteBuffers(1, &mesh->vao);
+            free(mesh->vbos);
+            free(mesh->indices_array);
+            if (mesh->joints != NULL) {
+                for (uint32_t i = 0; i < mesh->joints_amount; i++) {
+                    if (mesh->joints[i].name != NULL) {
+                        free(mesh->joints[i].name);
+                    }
+                }
+                free(mesh->joints);
+            }
+            free(mesh);
+            return;
         }
         void clean_animation(animation_t* anim) {
             for (uint32_t i = 0; i < anim->joints_amount; i++) {
