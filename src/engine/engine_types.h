@@ -95,6 +95,9 @@ typedef struct joint_t {
 
 typedef struct mesh_t {
     const uint64_t mesh_index;
+
+    uint8_t unbinded; // 0 = binded ; non-zero = unbinded
+    vbo_data_t* vbo_datas_arr; // only relevent when unbinded
     
     uint32_t vao;
     uint32_t vbos_amount;

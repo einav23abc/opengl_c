@@ -1,13 +1,37 @@
 #include "game.h"
 
-void game_update() {
+void update() {
+    if (in_game) {
+        update_game();
+        return;
+    }
+
+    // wait for load_game to finish
+
+    int32_t load_game_exit_code = thread_get_exit_code(load_game_thread);
+    if (load_game_exit_code != STILL_ACTIVE) {
+        if (load_game_exit_code != 0) {
+            engine_clean();
+            return;
+        }
+        
+        thread_join(load_game_thread);
+        default_camera->active = 0;
+        in_game = 1;
+
+        bind_mesh(man_mesh);
+        bind_mesh(cube_mesh);
+    }
+
+    return;
+}
+
+void update_game() {
     frames += delta_frames;
 
     player_update();
     player_camera_update();
     sun_shadow_map_update();
-
-    return;
 }
 
 void player_update() {

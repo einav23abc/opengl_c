@@ -22,36 +22,43 @@ const float ENGINE_CONFIG_DEFAULT_PILLARBOX_COLOR_B = 0.1;
 // variable declarations
 float frames;
 
-texture_t* global_texture;
-shader_t* global_shader;
+uint8_t in_game;
+#define _LOAD_GAME_PROGRESS_MAX_ (10)
+uint32_t load_game_progress;
+thread_t load_game_thread;
 
-camera_t* player_camera;
-player_t player;
+camera_t* default_camera;
 
-mesh_t* man_mesh;
-animation_t* anim;
 
-mesh_t* cube_mesh;
-#define _CUBES_AMOUNT_ (3)
-cube_t cubes[_CUBES_AMOUNT_];
+// <game variables>
+    texture_t* global_texture;
+    shader_t* global_shader;
 
-float sun_vector_x;
-float sun_vector_y;
-float sun_vector_z;
-camera_t* sun_shadow_map_camera;
-fbo_t* sun_shadow_map_fbo;
-shader_t* sun_shadow_map_shader;
+    camera_t* player_camera;
+    player_t player;
+
+    mesh_t* man_mesh;
+    animation_t* anim;
+
+    mesh_t* cube_mesh;
+    #define _CUBES_AMOUNT_ (3)
+    cube_t cubes[_CUBES_AMOUNT_];
+
+    float sun_vector_x;
+    float sun_vector_y;
+    float sun_vector_z;
+    camera_t* sun_shadow_map_camera;
+    fbo_t* sun_shadow_map_fbo;
+    shader_t* sun_shadow_map_shader;
+// </game variables>
 
 
 // constants
+const uint32_t LOAD_GAME_PROGRESS_MAX = _LOAD_GAME_PROGRESS_MAX_;
 const uint64_t CUBES_AMOUNT = _CUBES_AMOUNT_;
 
 // functions
 void cube_update_aabb(cube_t* cube) {
-    // mat3_t rotation_x_matrix;
-    // mat3_t rotation_y_matrix;
-    // mat3_t rotation_z_matrix;
-    // mat3_t rotation_matrix;
     quat_t quat_rotation;
     vec3_t vert;
     vec3_t result;
@@ -64,28 +71,6 @@ void cube_update_aabb(cube_t* cube) {
     float max_z;
     uint8_t i;
     
-    // rotation_x_matrix = (mat3_t){
-    //     .mat = {
-    //         1, 0,               0,
-    //         0, cos(-cube->rx), -sin(-cube->rx),
-    //         0, sin(-cube->rx),  cos(-cube->rx),
-    //     }
-    // };
-    // rotation_y_matrix = (mat3_t){
-    //     .mat = {
-    //          cos(-cube->ry), 0, sin(-cube->ry),
-    //          0,              1, 0,
-    //         -sin(-cube->ry), 0, cos(-cube->ry),
-    //     }
-    // };
-    // rotation_z_matrix = (mat3_t){
-    //     .mat = {
-    //         cos(-cube->rz), -sin(-cube->rz), 0,
-    //         sin(-cube->rz),  cos(-cube->rz), 0,
-    //         0,               0,              1,
-    //     }
-    // };
-    // rotation_matrix = mat3_mul(mat3_mul(rotation_x_matrix, rotation_z_matrix), rotation_y_matrix);
     quat_rotation = quat_from_axis_angles_yzx(-cube->rx, -cube->ry, -cube->rz);
 
     for (i = 0; i < 8; i++) {
@@ -128,14 +113,6 @@ void cube_update_aabb(cube_t* cube) {
     cube->aabb_d = max_z-min_z;
 
     return;
-}
-
-vec3_t inline vec3_cross_product(vec3_t vec1, vec3_t vec2) {
-    return (vec3_t){
-        .x = vec1.y*vec2.z - vec1.z*vec2.y,
-        .y = vec1.z*vec2.x - vec1.x*vec2.z,
-        .z = vec1.x*vec2.y - vec1.y*vec2.x
-    };
 }
 
 // returns the collision resolution vector for cube1
@@ -205,15 +182,15 @@ vec3_t sat_cube_collision(cube_t* cube1, cube_t* cube2) {
             }
         };
         // 9 axes of cross products between cube1 axes and cube2 axes
-        axes[6]  = vec3_cross_product(axes[0],axes[3]);
-        axes[7]  = vec3_cross_product(axes[0],axes[4]);
-        axes[8]  = vec3_cross_product(axes[0],axes[5]);
-        axes[9]  = vec3_cross_product(axes[1],axes[3]);
-        axes[10] = vec3_cross_product(axes[1],axes[4]);
-        axes[11] = vec3_cross_product(axes[1],axes[5]);
-        axes[12] = vec3_cross_product(axes[2],axes[3]);
-        axes[13] = vec3_cross_product(axes[2],axes[4]);
-        axes[14] = vec3_cross_product(axes[2],axes[5]);
+        axes[6]  = cross_product(axes[0],axes[3]);
+        axes[7]  = cross_product(axes[0],axes[4]);
+        axes[8]  = cross_product(axes[0],axes[5]);
+        axes[9]  = cross_product(axes[1],axes[3]);
+        axes[10] = cross_product(axes[1],axes[4]);
+        axes[11] = cross_product(axes[1],axes[5]);
+        axes[12] = cross_product(axes[2],axes[3]);
+        axes[13] = cross_product(axes[2],axes[4]);
+        axes[14] = cross_product(axes[2],axes[5]);
 
         // normalize all axes
         for (i = 0; i < 15; i++) {

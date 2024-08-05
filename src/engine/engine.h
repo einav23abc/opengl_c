@@ -11,6 +11,7 @@
 
 #include "engine_types.h"
 #include "engine_functions.h"
+#include "threads/threads.h"
 
 // <externs>
     // <set by engine config>

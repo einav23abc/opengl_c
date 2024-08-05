@@ -1,12 +1,38 @@
 #include "game.h"
 
-void game_render() {
+void render() {
+    if (in_game) {
+        render_game();
+        return;
+    }
+    
+    render_load_game_screen();
+}
+
+void render_load_game_screen() {
+    camera_use(default_camera);
+
+    glDisable(GL_DEPTH_TEST);
+
+    sdm_set_color(1, 1, 1, 1);
+    sdm_draw_rect(0, 0, OUTPORT_WIDTH, OUTPORT_HEIGHT);
+    
+    sdm_set_color(0.2, 0.2, 0.2, 1);
+    sdm_draw_rect(OUTPORT_WIDTH*0.2, OUTPORT_HEIGHT*0.4, OUTPORT_WIDTH*0.6, OUTPORT_HEIGHT*0.2);
+    
+    sdm_set_color(0.8, 0.0, 0.0, 1);
+    sdm_draw_rect(OUTPORT_WIDTH*0.2, OUTPORT_HEIGHT*0.4, OUTPORT_WIDTH*0.6 * (((float)load_game_progress)/LOAD_GAME_PROGRESS_MAX), OUTPORT_HEIGHT*0.2);
+
+    glEnable(GL_DEPTH_TEST);
+}
+
+void render_game() {
     // <sun shadow map>
         use_fbo(sun_shadow_map_fbo);
         glClear(GL_DEPTH_BUFFER_BIT);
         camera_use(sun_shadow_map_camera);
         shader_use(sun_shadow_map_shader);
-        game_render_world();
+        render_game_world();
     // </sun shadow map>
     
     // <player camera>
@@ -28,7 +54,7 @@ void game_render() {
         // u_sun_shadow_map_texture
         bind_fbo_depth_stencil_texture(sun_shadow_map_fbo, global_shader->uniform_locations[6], 1);
 
-        game_render_world();
+        render_game_world();
         
         // <AABB>
         if (keys[SDL_SCANCODE_K]) {
@@ -51,10 +77,9 @@ void game_render() {
     // </player camera>
 
     shader_use((shader_t*)default_shader);
-    return;
 }
 
-void game_render_world() {
+void render_game_world() {
     quat_t quat_rotation;
 
     // <player>

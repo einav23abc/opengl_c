@@ -1,10 +1,10 @@
 #include "engine_types.h"
 
-uint32_t init();
-void handle_event();
-void update();
-void render();
-void clean();
+uint32_t engine_init();
+void engine_handle_event();
+void engine_update();
+void engine_render();
+void engine_clean();
 
 // <miscellaneous>
     uint32_t hash(uint32_t x);
@@ -39,7 +39,7 @@ void clean();
                         /*
                         0 = no color attachment
                         1 = texture
-                        2 = render buffer object
+                        2 = engine_render buffer object
                         */
                         uint8_t color_status,
                         // GL_RGB, GL_RGBA, etc ; only relevent for texture color attachment
@@ -53,9 +53,9 @@ void clean();
                         1 = texture
                         2 = texture, only depth
                         3 = texture, only stencil
-                        4 = render buffer object
-                        5 = render buffer object, only depth
-                        6 = render buffer object, only stencil
+                        4 = engine_render buffer object
+                        5 = engine_render buffer object, only depth
+                        6 = engine_render buffer object, only stencil
                         */
                         uint8_t depth_stencil_status,
                         // irrelevent if depth_stencil_status is not 1, 2 or 3
@@ -83,14 +83,15 @@ void clean();
 // </shader>
 
 // <mesh>
-    mesh_t* generate_mesh(vbo_data_t* vbo_datas_arr, uint32_t vbo_datas_arr_size, uint32_t* indices_array, uint32_t indices_count);
+    mesh_t* generate_mesh(vbo_data_t* vbo_datas_arr, uint32_t vbo_datas_arr_size, uint32_t* indices_array, uint32_t indices_count, uint8_t unbinded);
+    void bind_mesh(mesh_t* mesh);
     mesh_t* generate_2d_quad_mesh( float min_x, float max_x, float min_y, float max_y,
                                     float min_u, float max_u, float min_v, float max_v);
     mesh_t* mesh_generate_ball(uint32_t divisions);
-    mesh_t* mesh_from_wavefront_obj_ext(const char* obj_file_path, quat_vec_vec_t transform_qvv);
-    mesh_t* mesh_from_wavefront_obj(const char* obj_file_path);
-    mesh_t* mesh_from_collada_dae_ext(const char* dae_file_path, quat_vec_vec_t transform_qvv);
-    mesh_t* mesh_from_collada_dae(const char* dae_file_path);
+    mesh_t* mesh_from_wavefront_obj_ext(const char* obj_file_path, quat_vec_vec_t transform_qvv, uint8_t unbinded);
+    mesh_t* mesh_from_wavefront_obj(const char* obj_file_path, uint8_t unbinded);
+    mesh_t* mesh_from_collada_dae_ext(const char* dae_file_path, quat_vec_vec_t transform_qvv, uint8_t unbinded);
+    mesh_t* mesh_from_collada_dae(const char* dae_file_path, uint8_t unbinded);
     animation_t* animation_from_collada_dae_ext(const char* dae_file_path, joint_t* joints, uint32_t joints_amount, quat_vec_vec_t transform_qvv);
     animation_t* animation_from_collada_dae(const char* dae_file_path, joint_t* joints, uint32_t joints_amount);
     void draw_mesh(mesh_t* mesh);

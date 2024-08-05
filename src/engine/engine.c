@@ -6,10 +6,6 @@
 //      cd project8
 //      gcc src/engine/engine.c {game .c files} -o ./main.exe -l "mingw32" -l "SDL2main" -l "SDL2" -l "SDL2_image" -l "libpng16-16" -l "zlib1" -l "opengl32" -l "glew32"
 
-//  to do:
-//      simple draw functions (rectangles,lines,points)
-//      ui system
-
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <GL/glew.h>
@@ -20,6 +16,7 @@
 
 #include "engine_types.h"
 #include "engine_functions.h"
+#include "threads/threads.h"
 
 #define DEBUG_MODE
 
@@ -40,11 +37,11 @@
     extern __attribute__((weak)) const float ENGINE_CONFIG_DEFAULT_PILLARBOX_COLOR_G;
     extern __attribute__((weak)) const float ENGINE_CONFIG_DEFAULT_PILLARBOX_COLOR_B;
 
-    __attribute__((weak)) uint32_t game_init();
-    __attribute__((weak)) void game_update();
-    __attribute__((weak)) void game_render();
-    __attribute__((weak)) void game_handle_event();
-    __attribute__((weak)) void game_clean();
+    __attribute__((weak)) uint32_t init();
+    __attribute__((weak)) void update();
+    __attribute__((weak)) void render();
+    __attribute__((weak)) void handle_event();
+    __attribute__((weak)) void clean();
 // </externs>
 
 // <variables declaration>
@@ -146,24 +143,24 @@
 // </constants>
 
 int32_t main(int32_t argc, char** argv) {
-    if (game_init == NULL){
-        printf("game_init() does not exist\n");
+    if (init == NULL){
+        printf("init() does not exist\n");
     }
-    if (game_render == NULL){
-        printf("game_render() does not exist\n");
+    if (render == NULL){
+        printf("render() does not exist\n");
     }
-    if (game_update == NULL){
-        printf("game_update() does not exist\n");
+    if (update == NULL){
+        printf("update() does not exist\n");
     }
-    if (game_handle_event == NULL){
-        printf("game_handle() does not exist\n");
+    if (handle_event == NULL){
+        printf("handle_event() does not exist\n");
     }
-    if (game_clean == NULL){
-        printf("game_clean() does not exist\n");
+    if (clean == NULL){
+        printf("clean() does not exist\n");
     }
 
     
-    uint32_t init_result = init();
+    uint32_t init_result = engine_init();
     if (init_result != 0){
         return init_result;
     }
@@ -179,10 +176,10 @@ int32_t main(int32_t argc, char** argv) {
         frame_start_time = SDL_GetTicks();
 
         while (SDL_PollEvent((SDL_Event*)&event)){
-            handle_event();
+            engine_handle_event();
         }
-        update();
-        render();
+        engine_update();
+        engine_render();
 
         *((uint32_t*)&delta_time) = SDL_GetTicks() - frame_start_time;
         
@@ -197,7 +194,7 @@ int32_t main(int32_t argc, char** argv) {
         #endif
     }
     
-    clean();
+    engine_clean();
 
     #ifdef DEBUG_MODE
         printf("ended sucessfully");
@@ -354,7 +351,7 @@ int32_t main(int32_t argc, char** argv) {
     // </miscellaneous>
 
     // <app>
-        uint32_t init() {
+        uint32_t engine_init() {
             // <engine config inputs>
                 // <OUTPORT_WIDTH>
                     if (&ENGINE_CONFIG_OUTPORT_WIDTH == NULL){
@@ -567,7 +564,7 @@ int32_t main(int32_t argc, char** argv) {
                     2, 0, 3
                 };
 
-                screen_quad_mesh = generate_mesh(vbo_datas_arr, 1, indices_array, 6);
+                screen_quad_mesh = generate_mesh(vbo_datas_arr, 1, indices_array, 6, 0);
                 }
             // </screen_quad_mesh>
 
@@ -624,7 +621,7 @@ int32_t main(int32_t argc, char** argv) {
                         0, 2, 3
                     };
 
-                    simple_draw_module_rectangle_mesh = generate_mesh(vbo_datas_arr, 1, indices_array, 6);
+                    simple_draw_module_rectangle_mesh = generate_mesh(vbo_datas_arr, 1, indices_array, 6, 0);
                     }
                 // </simple_draw_module_rectangle_mesh>
 
@@ -674,7 +671,7 @@ int32_t main(int32_t argc, char** argv) {
                         4, 5, 7
                     };
 
-                    simple_draw_module_cube_mesh = generate_mesh(vbo_datas_arr, 1, indices_array, 6*6);
+                    simple_draw_module_cube_mesh = generate_mesh(vbo_datas_arr, 1, indices_array, 6*6, 0);
                     }
                 // </simple_draw_module_cube_mesh>
 
@@ -685,21 +682,21 @@ int32_t main(int32_t argc, char** argv) {
                 // </simple_draw_module_cube_mesh>
             // </simple draw module>
 
-            // <game_init>
-                if (game_init != NULL) {
-                    uint32_t game_init_res = game_init();
+            // <init>
+                if (init != NULL) {
+                    uint32_t game_init_res = init();
                     if (game_init_res != 0) {
-                        printf("game_init() failed with %u\n", game_init_res);
-                        clean();
+                        printf("init() failed with %u\n", game_init_res);
+                        engine_clean();
                         return game_init_res;
                     }
                 }
-            // </game_init>
+            // </init>
 
             return 0;
         }
         
-        void handle_event() {
+        void engine_handle_event() {
             SDL_Scancode scancode;
 
             switch(event.type) {
@@ -727,18 +724,18 @@ int32_t main(int32_t argc, char** argv) {
                     break;
             }
             
-            // <game_handle_event>
-                if (game_handle_event != NULL)
-                    game_handle_event();
-            // </game_handle_event>
+            // <handle_event>
+                if (handle_event != NULL)
+                    handle_event();
+            // </handle_event>
             return;
         }
 
-        void update() {
-            // <game_update>
-                if (game_update != NULL)
-                    game_update();
-            // </game_update>
+        void engine_update() {
+            // <update>
+                if (update != NULL)
+                    update();
+            // </update>
             
             // <keys>
                 // count time since press
@@ -757,7 +754,7 @@ int32_t main(int32_t argc, char** argv) {
 
         /*  Gets called by the function {main} for every frame
         
-            Calls the {game_render} function (if exists) after:
+            Calls the {render} function (if exists) after:
             1. The frame buffer was set to {outport_fbo}
             2. The color buffer and depth buffer have been cleared
             3. The shader was set to {default_shader}
@@ -765,10 +762,10 @@ int32_t main(int32_t argc, char** argv) {
             5. Depth test set to {less}
             6. Back faces culled and face culling enabled
             
-            After the {game_render} function was called:
+            After the {render} function was called:
             1. The {outport_fbo} frame buffer will be drawn to the screen
             2. The {current_camera} will be set to -1 */
-        void render() {
+        void engine_render() {
             use_fbo((fbo_t*)outport_fbo);
 
             // clear outport fbo
@@ -801,10 +798,10 @@ int32_t main(int32_t argc, char** argv) {
             
             shader_use((shader_t*)default_shader);
             
-            // <game_render>
-                if (game_render != NULL)
-                    game_render();
-            // </game_render>
+            // <render>
+                if (render != NULL)
+                    render();
+            // </render>
             
             current_camera = -1; // not in render period
             // </render for each camera>
@@ -832,10 +829,10 @@ int32_t main(int32_t argc, char** argv) {
             return;
         }
         
-        void clean() {
+        void engine_clean() {
             // <game clean>
-                if (game_clean)
-                    game_clean();
+                if (clean)
+                    clean();
             // </game clean>
             
             // <clean shaders>
@@ -1348,7 +1345,7 @@ int32_t main(int32_t argc, char** argv) {
     // </shaders>
 
     // <meshes and animations>
-        mesh_t* generate_mesh(vbo_data_t* vbo_datas_arr, uint32_t vbo_datas_arr_size, uint32_t* indices_array, uint32_t indices_count) {
+        mesh_t* generate_mesh(vbo_data_t* vbo_datas_arr, uint32_t vbo_datas_arr_size, uint32_t* indices_array, uint32_t indices_count, uint8_t unbinded) {
             if (meshes_amount >= MESHES_MAX_AMOUNT) {
                 return NULL;
             }
@@ -1359,9 +1356,12 @@ int32_t main(int32_t argc, char** argv) {
                 return NULL;
             }
             
-            // create the vertex array object
-            glGenVertexArrays(1, &mesh->vao);
-            glBindVertexArray(mesh->vao);
+            mesh->unbinded = unbinded;
+            if (unbinded == 0) {
+                // create the vertex array object
+                glGenVertexArrays(1, &mesh->vao);
+                glBindVertexArray(mesh->vao);
+            }
 
             mesh->vbos_amount = vbo_datas_arr_size;
             mesh->vbos = malloc(sizeof(uint32_t)*mesh->vbos_amount);
@@ -1370,17 +1370,34 @@ int32_t main(int32_t argc, char** argv) {
                 return mesh;
             }
             
-            for (uint32_t i = 0; i < mesh->vbos_amount; i++) {
-                glGenBuffers(1, &(mesh->vbos[i]));
-                glBindBuffer(GL_ARRAY_BUFFER, mesh->vbos[i]);
-                glBufferData(GL_ARRAY_BUFFER, vbo_datas_arr[i].data_arr_size, vbo_datas_arr[i].data_arr, GL_STATIC_DRAW);
-                if (vbo_datas_arr[i].type == GL_INT) {
-                    glVertexAttribIPointer(i, vbo_datas_arr[i].size, vbo_datas_arr[i].type, vbo_datas_arr[i].stride, (void*)0);
-                }else {
-                    glVertexAttribPointer(i, vbo_datas_arr[i].size, vbo_datas_arr[i].type, GL_FALSE, vbo_datas_arr[i].stride, (void*)0);
+            if (unbinded == 0) {
+                for (uint32_t i = 0; i < mesh->vbos_amount; i++) {
+                    glGenBuffers(1, &(mesh->vbos[i]));
+                    glBindBuffer(GL_ARRAY_BUFFER, mesh->vbos[i]);
+                    glBufferData(GL_ARRAY_BUFFER, vbo_datas_arr[i].data_arr_size, vbo_datas_arr[i].data_arr, GL_STATIC_DRAW);
+                    if (vbo_datas_arr[i].type == GL_INT) {
+                        glVertexAttribIPointer(i, vbo_datas_arr[i].size, vbo_datas_arr[i].type, vbo_datas_arr[i].stride, (void*)0);
+                    }else {
+                        glVertexAttribPointer(i, vbo_datas_arr[i].size, vbo_datas_arr[i].type, GL_FALSE, vbo_datas_arr[i].stride, (void*)0);
+                    }
+                    glEnableVertexAttribArray(i);
+                    glVertexAttribDivisor(i, vbo_datas_arr[i].divisor);
                 }
-                glEnableVertexAttribArray(i);
-                glVertexAttribDivisor(i, vbo_datas_arr[i].divisor);
+            }else {
+                mesh->vbo_datas_arr = malloc(sizeof(vbo_data_t)*mesh->vbos_amount);
+                if (mesh->vbo_datas_arr == NULL) {
+                    printf("malloc failed at mesh generation.\n");
+                    return mesh;
+                }
+                memcpy(mesh->vbo_datas_arr, vbo_datas_arr, sizeof(vbo_data_t)*mesh->vbos_amount);
+                for (uint32_t i = 0; i < mesh->vbos_amount; i++) {
+                    mesh->vbo_datas_arr[i].data_arr = malloc(mesh->vbo_datas_arr[i].data_arr_size);
+                    if (mesh->vbo_datas_arr[i].data_arr == NULL) {
+                        printf("malloc failed at mesh generation.\n");
+                        return mesh;
+                    }
+                    memcpy(mesh->vbo_datas_arr[i].data_arr, vbo_datas_arr[i].data_arr, mesh->vbo_datas_arr[i].data_arr_size);
+                }
             }
 
             mesh->indices_count = indices_count;
@@ -1400,6 +1417,35 @@ int32_t main(int32_t argc, char** argv) {
             meshes_amount += 1;
 
             return mesh;
+        }
+        void bind_mesh(mesh_t* mesh) {
+            if (mesh->unbinded == 0) {
+                return;
+            }
+
+            // create the vertex array object
+            glGenVertexArrays(1, &mesh->vao);
+            glBindVertexArray(mesh->vao);
+
+            for (uint32_t i = 0; i < mesh->vbos_amount; i++) {
+                glGenBuffers(1, &(mesh->vbos[i]));
+                glBindBuffer(GL_ARRAY_BUFFER, mesh->vbos[i]);
+                glBufferData(GL_ARRAY_BUFFER, mesh->vbo_datas_arr[i].data_arr_size, mesh->vbo_datas_arr[i].data_arr, GL_STATIC_DRAW);
+                if (mesh->vbo_datas_arr[i].type == GL_INT) {
+                    glVertexAttribIPointer(i, mesh->vbo_datas_arr[i].size, mesh->vbo_datas_arr[i].type, mesh->vbo_datas_arr[i].stride, (void*)0);
+                }else {
+                    glVertexAttribPointer(i, mesh->vbo_datas_arr[i].size, mesh->vbo_datas_arr[i].type, GL_FALSE, mesh->vbo_datas_arr[i].stride, (void*)0);
+                }
+                glEnableVertexAttribArray(i);
+                glVertexAttribDivisor(i, mesh->vbo_datas_arr[i].divisor);
+            }
+
+            for (uint32_t i = 0; i < mesh->vbos_amount; i++) {
+                free(mesh->vbo_datas_arr[i].data_arr);
+            }
+            free(mesh->vbo_datas_arr);
+
+            mesh->unbinded = 0;
         }
         mesh_t* generate_2d_quad_mesh(  float min_x, float max_x, float min_y, float max_y,
                                         float min_u, float max_u, float min_v, float max_v) {
@@ -1438,7 +1484,7 @@ int32_t main(int32_t argc, char** argv) {
                 0, 1, 2,
                 0, 2, 3
             };
-            return generate_mesh(vbo_datas_arr, 2, indices_array, 6);
+            return generate_mesh(vbo_datas_arr, 2, indices_array, 6, 0);
         }
         mesh_t* mesh_generate_ball(uint32_t divisions) {
             const float start_vertices_position_arr[] = {
@@ -1612,14 +1658,14 @@ int32_t main(int32_t argc, char** argv) {
                 }
             };
 
-            mesh_t* result = generate_mesh(vbo_datas_arr, 1, indices_array, polygons_amount*3);
+            mesh_t* result = generate_mesh(vbo_datas_arr, 1, indices_array, polygons_amount*3, 0);
 
             free(vertices_position_arr);
             free(indices_array);
 
             return result;
         }
-        mesh_t* mesh_from_wavefront_obj_ext(const char* obj_file_path, quat_vec_vec_t transform_qvv) {
+        mesh_t* mesh_from_wavefront_obj_ext(const char* obj_file_path, quat_vec_vec_t transform_qvv, uint8_t unbinded) {
             char* obj_str;
             uint64_t file_length = load_file_contents(&obj_str,obj_file_path);
             if (obj_str == NULL) {
@@ -1968,7 +2014,7 @@ int32_t main(int32_t argc, char** argv) {
                 }
             };
 
-            mesh = generate_mesh(vbo_datas_arr, 3, indices_array, polygons_count*3);
+            mesh = generate_mesh(vbo_datas_arr, 3, indices_array, polygons_count*3, unbinded);
 
             goto clean_and_return;
             clean_and_return: {
@@ -1984,7 +2030,7 @@ int32_t main(int32_t argc, char** argv) {
                 return mesh;
             }
         }
-        mesh_t* mesh_from_wavefront_obj(const char* obj_file_path) {
+        mesh_t* mesh_from_wavefront_obj(const char* obj_file_path, uint8_t unbinded) {
             quat_vec_vec_t transform_qvv = (quat_vec_vec_t){
                 .rot = (quat_t){
                     .w = 1,
@@ -2003,7 +2049,7 @@ int32_t main(int32_t argc, char** argv) {
                     .z = 1,
                 }
             };
-            return mesh_from_wavefront_obj_ext(obj_file_path, transform_qvv);
+            return mesh_from_wavefront_obj_ext(obj_file_path, transform_qvv, unbinded);
         }
         void static mesh_from_collada_dae_joint_hierarchy(char* dae_str, mesh_t* mesh) {
             uint32_t i;
@@ -2073,7 +2119,7 @@ int32_t main(int32_t argc, char** argv) {
             }
 
         }
-        mesh_t* mesh_from_collada_dae_ext(const char* dae_file_path, quat_vec_vec_t transform_qvv) {
+        mesh_t* mesh_from_collada_dae_ext(const char* dae_file_path, quat_vec_vec_t transform_qvv, uint8_t unbinded) {
             char* dae_str;
             uint64_t file_length = load_file_contents(&dae_str,dae_file_path);
             if (dae_str == NULL) {
@@ -2443,7 +2489,7 @@ int32_t main(int32_t argc, char** argv) {
                 }
             };
 
-            mesh = generate_mesh(vbo_datas_arr, 5, indices_array, triangles_count*3);
+            mesh = generate_mesh(vbo_datas_arr, 5, indices_array, triangles_count*3, unbinded);
 
 
             // mesh->joints
@@ -2509,7 +2555,7 @@ int32_t main(int32_t argc, char** argv) {
                 return mesh;
             }
         }
-        mesh_t* mesh_from_collada_dae(const char* dae_file_path) {
+        mesh_t* mesh_from_collada_dae(const char* dae_file_path, uint8_t unbinded) {
             quat_vec_vec_t transform_qvv = (quat_vec_vec_t){
                 .rot = (quat_t){
                     .w = 1,
@@ -2528,7 +2574,7 @@ int32_t main(int32_t argc, char** argv) {
                     .z = 1,
                 }
             };
-            return mesh_from_collada_dae_ext(dae_file_path, transform_qvv);
+            return mesh_from_collada_dae_ext(dae_file_path, transform_qvv, unbinded);
         }
         animation_t* animation_from_collada_dae_ext(const char* dae_file_path, joint_t* joints, uint32_t joints_amount, quat_vec_vec_t transform_qvv) {
             if (animations_amount >= ANIMATIONS_MAX_AMOUNT) {

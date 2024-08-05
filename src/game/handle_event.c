@@ -1,6 +1,6 @@
 #include "game.h"
 
-void game_handle_event() {
+void handle_event() {
     
     
 

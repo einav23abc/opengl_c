@@ -6,8 +6,7 @@
 #include <unistd.h>
 #include <string.h>
 
-uint64_t get_last_write_time(const char* path)
-{
+uint64_t get_last_write_time(const char* path) {
     HANDLE hFile = CreateFile( path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
     if (hFile == INVALID_HANDLE_VALUE)
     {
@@ -30,12 +29,11 @@ uint64_t get_last_write_time(const char* path)
     return time;
 }
 
-int main()
-{
+int main() {
     char* intended_cwd = "C:\\Users\\einav\\Desktop\\coding\\c\\opengl\\project8\\compile";
     SetCurrentDirectory( intended_cwd );
     char cwd[2048];
-    getcwd( cwd, 2048 );
+    getcwd(cwd, 2048);
     if( strcmp(cwd, intended_cwd) != 0 )
     {
         printf( "unintended current working directory:\n  \"%s\".\nshould be:\n  \"%s\".\ndid not compile.", cwd, intended_cwd );
@@ -46,6 +44,9 @@ int main()
     uint64_t wt_engine_h = get_last_write_time( "../src/engine/engine.h" );
     uint64_t wt_engine_types_h = get_last_write_time( "../src/engine/engine_types.h" );
     uint64_t wt_engine_functions_h = get_last_write_time( "../src/engine/engine_functions.h" );
+    
+    uint64_t wt_threads_c = get_last_write_time( "../src/engine/threads/threads.c" );
+    uint64_t wt_threads_h = get_last_write_time( "../src/engine/threads/threads.h" );
 
     uint64_t wt_game_c = get_last_write_time( "../src/game/game.c" );
     uint64_t wt_game_h = get_last_write_time( "../src/game/game.h" );
@@ -63,18 +64,20 @@ int main()
     if (
         wt_engine_h > last_compile_time ||
         wt_engine_types_h > last_compile_time ||
-        wt_engine_functions_h > last_compile_time
+        wt_engine_functions_h > last_compile_time ||
+        wt_threads_h > last_compile_time
     ){
         // recompile all .c files
         printf( "recompiling all\n" );
-        system( "gcc ../src/engine/engine.c ../src/game/game.c ../src/game/init.c ../src/game/update.c ../src/game/render.c ../src/game/handle_event.c ../src/game/clean.c -c -g" );
+        system( "gcc ../src/engine/engine.c ../src/engine/threads/threads.c ../src/game/game.c ../src/game/init.c ../src/game/update.c ../src/game/render.c ../src/game/handle_event.c ../src/game/clean.c -c -g" );
     }else{
         if (
-            wt_engine_c > last_compile_time
+            wt_engine_c > last_compile_time ||
+            wt_threads_c > last_compile_time
         ){
-            // recompile engine.c
-            printf( "recompiling engine.c\n" );
-            system( "gcc ../src/engine/engine.c -c -g" );
+            // recompile engine
+            printf( "recompiling engine\n" );
+            system( "gcc ../src/engine/engine.c ../src/engine/threads/threads.c -c -g" );
         }
 
         if (
@@ -138,7 +141,7 @@ int main()
 
     // link
     printf( "linking\n" );
-    system( "gcc engine.o game.o init.o update.o render.o handle_event.o clean.o -o ../main.exe -l \"mingw32\" -l \"SDL2main\" -l \"SDL2\" -l \"SDL2_image\" -l \"libpng16-16\" -l \"zlib1\" -l \"opengl32\" -l \"glew32\"" );
+    system( "gcc engine.o threads.o game.o init.o update.o render.o handle_event.o clean.o -o ../main.exe -l \"mingw32\" -l \"SDL2main\" -l \"SDL2\" -l \"SDL2_image\" -l \"libpng16-16\" -l \"zlib1\" -l \"opengl32\" -l \"glew32\"" );
     
     return 0;
 };

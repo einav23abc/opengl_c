@@ -1,6 +1,6 @@
 #include "game.h"
 
-void game_clean() {
+void clean() {
 
     return;
 }

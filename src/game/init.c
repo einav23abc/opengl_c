@@ -1,8 +1,66 @@
 #include "game.h"
 
-uint8_t game_init() {
+uint8_t init() {
     frames = 0;
 
+    default_camera = camera_create(
+        OUTPORT_WIDTH*0.5, OUTPORT_HEIGHT*0.5, 0,
+        0, 0, 0,
+        OUTPORT_WIDTH, OUTPORT_HEIGHT, 1600,
+        -32000, 32000,
+        0, 60,
+        0, 0, 320, 240
+    );
+
+
+    in_game = 0;
+    load_game_progress = 0;
+    thread_create(
+        &load_game_thread,
+        NULL,
+        (void*)&load_game,
+        NULL
+    );
+
+    
+    global_shader = shader_create_from_files(
+        "./src/game/shaders/global.vert",
+        "./src/game/shaders/global.frag",
+        "in_vertex_position\0in_vertex_texcoord\0in_vertex_normal\0in_vertex_joint_id\0in_vertex_joint_wheight", 5,
+        // "u_position\0u_scale\0u_rotation\0u_camera_position\0u_sun_vector\0u_sun_shadow_map_wvp_mat\0u_sun_shadow_map_texture", 7
+        "u_position\0u_scale\0u_quat_rotation\0u_camera_position\0u_sun_vector\0u_sun_shadow_map_wvp_mat\0u_sun_shadow_map_texture", 7
+    );
+    load_game_progress += 1;
+
+    global_texture = load_texture("./src/game/textures/global_texture.png");
+    load_game_progress += 1;
+
+    sun_shadow_map_fbo = create_fbo(
+        3240, 3240,
+        0, 0, NULL, 0,
+        2, NULL, 0
+    );
+    load_game_progress += 1;
+
+    sun_shadow_map_shader = shader_create_from_files(
+        "./src/game/shaders/sun_shadow_map.vert",
+        "./src/game/shaders/sun_shadow_map.frag",
+        "in_vertex_position\0in_vertex_texcoord\0in_vertex_normal\0in_vertex_joint_id\0in_vertex_joint_wheight", 5,
+        // "u_position\0u_scale\0u_rotation", 3
+        "u_position\0u_scale\0u_quat_rotation", 3
+    );
+    load_game_progress += 1;
+    
+    return 0;
+}
+
+
+void load_game() {
+    // create new opengl context
+    // each thread needs a unique context to call opengl functions
+    // the new context doesnt share 'container objects' with the main thread -
+    // - due to this, shaders and fbo arent loaded and all meshes are loaded unbinded and must be binded by the main thread
+    // the context is deleted before exiting the thread
 
     // <man mesh>
         // man_mesh = mesh_from_wavefront_obj("./src/game/models/man.obj");
@@ -22,8 +80,9 @@ uint8_t game_init() {
         //         }
         //     }
         // );
-        man_mesh = mesh_from_collada_dae("./src/game/models/man_rigged.dae");
+        man_mesh = mesh_from_collada_dae("./src/game/models/man_rigged.dae", 1);
     // </man mesh>
+    load_game_progress += 1;
 
     // <animation of man mesh>
         anim = animation_from_collada_dae_ext(
@@ -62,17 +121,8 @@ uint8_t game_init() {
         //     printf("\t]\n");
         // }
     // </animation of man mesh>
-
-
-    global_texture = load_texture("./src/game/textures/global_texture.png");
+    load_game_progress += 1;
     
-    global_shader = shader_create_from_files(
-        "./src/game/shaders/global.vert",
-        "./src/game/shaders/global.frag",
-        "in_vertex_position\0in_vertex_texcoord\0in_vertex_normal\0in_vertex_joint_id\0in_vertex_joint_wheight", 5,
-        // "u_position\0u_scale\0u_rotation\0u_camera_position\0u_sun_vector\0u_sun_shadow_map_wvp_mat\0u_sun_shadow_map_texture", 7
-        "u_position\0u_scale\0u_quat_rotation\0u_camera_position\0u_sun_vector\0u_sun_shadow_map_wvp_mat\0u_sun_shadow_map_texture", 7
-    );
 
     // <player>
         player = (player_t){
@@ -102,6 +152,7 @@ uint8_t game_init() {
             0, 0, 320, 240
         );
     // </player>
+    load_game_progress += 1;
     
     // <cube_mesh>
         if(1){
@@ -248,9 +299,10 @@ uint8_t game_init() {
             21,20,22,
             22,20,23,
         };
-        cube_mesh = generate_mesh(vbo_datas_arr, 3, indices_array, 36);
+        cube_mesh = generate_mesh(vbo_datas_arr, 3, indices_array, 36, 1);
         };
     // </cube_mesh>
+    load_game_progress += 1;
     
     // <cubes>
         cubes[0] = (cube_t){
@@ -273,6 +325,7 @@ uint8_t game_init() {
             cube_update_aabb(&(cubes[i]));
         }
     // </cubes>
+    load_game_progress += 1;
 
     // <sun shadow map>
         sun_shadow_map_camera = camera_create(
@@ -283,21 +336,9 @@ uint8_t game_init() {
             0, 45,
             0, 0, 3240, 3240
         );
-
-        sun_shadow_map_fbo = create_fbo(
-            3240, 3240,
-            0, 0, NULL, 0,
-            2, NULL, 0
-        );
-
-        sun_shadow_map_shader = shader_create_from_files(
-            "./src/game/shaders/sun_shadow_map.vert",
-            "./src/game/shaders/sun_shadow_map.frag",
-            "in_vertex_position\0in_vertex_texcoord\0in_vertex_normal\0in_vertex_joint_id\0in_vertex_joint_wheight", 5,
-            // "u_position\0u_scale\0u_rotation", 3
-            "u_position\0u_scale\0u_quat_rotation", 3
-        );
     // </sun shadow map>
-    
-    return 0;
+    load_game_progress += 1;
+
+
+    exit_thread(0);
 }
