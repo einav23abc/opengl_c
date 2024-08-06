@@ -1,29 +1,12 @@
 #include "game_types.h"
 #include "game_functions.h"
 
-// <engine config>
-const uint32_t ENGINE_CONFIG_OUTPORT_WIDTH = 320;
-const uint32_t ENGINE_CONFIG_OUTPORT_HEIGHT = 240;
-
-const uint32_t ENGINE_CONFIG_WINDOW_START_WIDTH = 320*3;
-const uint32_t ENGINE_CONFIG_WINDOW_START_HEIGHT = 240*3;
-
-const float ENGINE_CONFIG_TARGET_FRAME_DELAY = (1000/60);
-
-const float ENGINE_CONFIG_DEFAULT_BACKGROUND_COLOR_R = 0.2;
-const float ENGINE_CONFIG_DEFAULT_BACKGROUND_COLOR_G = 0.2;
-const float ENGINE_CONFIG_DEFAULT_BACKGROUND_COLOR_B = 0.3;
-
-const float ENGINE_CONFIG_DEFAULT_PILLARBOX_COLOR_R = 0.1;
-const float ENGINE_CONFIG_DEFAULT_PILLARBOX_COLOR_G = 0.1;
-const float ENGINE_CONFIG_DEFAULT_PILLARBOX_COLOR_B = 0.1;
-
 
 // variable declarations
 float frames;
 
 uint8_t in_game;
-#define _LOAD_GAME_PROGRESS_MAX_ (10)
+#define _LOAD_GAME_PROGRESS_MAX_ (12)
 uint32_t load_game_progress;
 thread_t load_game_thread;
 
@@ -38,7 +21,8 @@ camera_t* default_camera;
     player_t player;
 
     mesh_t* man_mesh;
-    animation_t* anim;
+    animation_t* man_anim_t_pose;
+    animation_t* man_anim_run;
 
     mesh_t* cube_mesh;
     #define _CUBES_AMOUNT_ (3)
@@ -50,6 +34,8 @@ camera_t* default_camera;
     camera_t* sun_shadow_map_camera;
     fbo_t* sun_shadow_map_fbo;
     shader_t* sun_shadow_map_shader;
+
+    sound_t* sound;
 // </game variables>
 
 

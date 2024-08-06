@@ -60,7 +60,7 @@ void render_game() {
         if (keys[SDL_SCANCODE_K]) {
             uint64_t i;
             uint8_t j;
-        
+
             glDepthFunc(GL_LEQUAL);
             
             // cubes
@@ -91,7 +91,9 @@ void render_game_world() {
         // u_quat_rotation
         quat_rotation = quat_from_axis_angles_yzx(0, -player.cube.ry, 0);
         glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
-        draw_mesh_animated(man_mesh, anim, 0);
+        pose_mesh_set_from_animation(man_mesh, player.last_anim, fmod(player.last_anim_frame*0.015, 0.75));
+        pose_mesh_mix_from_animation(man_mesh, player.current_anim, fmod(player.current_anim_frame*0.015, 0.75), (player.anim_transition_frame*0.015)/0.25);
+        draw_mesh_posed(man_mesh);
     // </player>
 
     // <cubes>
@@ -111,7 +113,8 @@ void render_game_world() {
         // u_quat_rotation
         quat_rotation = quat_from_axis_angles_yzx(0, 0, 0);
         glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
-        draw_mesh_animated(man_mesh, anim, frames*0.001);
+        pose_mesh_set_from_animation(man_mesh, man_anim_run, fmod(frames*0.015, 0.75));
+        draw_mesh_posed(man_mesh);
     // </man mesh>
 }
 

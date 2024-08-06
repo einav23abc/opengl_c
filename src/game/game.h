@@ -25,7 +25,8 @@ extern camera_t* default_camera;
     extern player_t player;
 
     extern mesh_t* man_mesh;
-    extern animation_t* anim;
+    extern animation_t* man_anim_t_pose;
+    extern animation_t* man_anim_run;
 
     extern mesh_t* cube_mesh;
     extern cube_t cubes[];
@@ -36,6 +37,8 @@ extern camera_t* default_camera;
     extern camera_t* sun_shadow_map_camera;
     extern fbo_t* sun_shadow_map_fbo;
     extern shader_t* sun_shadow_map_shader;
+
+    extern sound_t* sound;
 // </game variables>
 
 // constants

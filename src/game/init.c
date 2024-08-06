@@ -80,13 +80,13 @@ void load_game() {
         //         }
         //     }
         // );
-        man_mesh = mesh_from_collada_dae("./src/game/models/man_rigged.dae", 1);
+        man_mesh = mesh_from_collada_dae("./src/game/models/man_rigged_t_pose.dae", 1);
     // </man mesh>
     load_game_progress += 1;
 
     // <animation of man mesh>
-        anim = animation_from_collada_dae_ext(
-            "./src/game/models/man_rigged.dae",
+        man_anim_t_pose = animation_from_collada_dae_ext(
+            "./src/game/models/man_rigged_t_pose.dae",
             man_mesh->joints,
             man_mesh->joints_amount,
             (quat_vec_vec_t){
@@ -98,30 +98,34 @@ void load_game() {
                 },
                 .pos = (vec3_t){
                     .x = 0,
-                    .y = -4.3,
+                    .y = -3.9,
                     .z = -0.3
                 }
             }
         );
-        // anim = animation_from_collada_dae(
-        //     "./src/game/models/man_rigged.dae",
-        //     man_mesh->joints,
-        //     man_mesh->joints_amount
-        // );
-        // for (uint32_t i = 0; i < anim->joints_amount; i++) {
-        //     printf("joint %d \"%s\" :\n\t[\n", i, man_mesh->joints[i].name);
-        //     for (uint32_t j = 0; j < anim->joints_key_frames[i].key_frames_amount; j++) {
-        //         printf(
-        //             "\t\t%f :\n",
-        //             anim->joints_key_frames[i].key_frames[j].time_stamp
-        //         );
-        //         print_mat4(anim->joints_key_frames[i].key_frames[j].joint_local_transform);
-        //         print_quat_vec_vec(anim->joints_key_frames[i].key_frames[j].joint_local_transform_qvv);
-        //     }
-        //     printf("\t]\n");
-        // }
+        load_game_progress += 1;
+
+        
+        man_anim_run = animation_from_collada_dae_ext(
+            "./src/game/models/man_rigged_run.dae",
+            man_mesh->joints,
+            man_mesh->joints_amount,
+            (quat_vec_vec_t){
+                .rot = quat_from_axis_angles_yzx(M_PI*1.5, 0, 0),
+                .scale = (vec3_t){
+                    .x = 1,
+                    .y = 1,
+                    .z = 1
+                },
+                .pos = (vec3_t){
+                    .x = 0,
+                    .y = -3.9,
+                    .z = -0.3
+                }
+            }
+        );
+        load_game_progress += 1;
     // </animation of man mesh>
-    load_game_progress += 1;
     
 
     // <player>
@@ -140,7 +144,13 @@ void load_game() {
                 .d = 6
             },
             .can_jump_buffer = 0,
-            .vy = 0
+            .vy = 0,
+
+            .current_anim_frame = 0,
+            .last_anim_frame = 0,
+            .anim_transition_frame = 0,
+            .current_anim = man_anim_t_pose,
+            .last_anim = man_anim_t_pose
         };
 
         player_camera = camera_create(
@@ -339,6 +349,9 @@ void load_game() {
     // </sun shadow map>
     load_game_progress += 1;
 
+    sound = audio_sound_load("./src/game/sounds/taunt.wav");
+    audio_set_sound_volume(sound, 0.1);
+    load_game_progress += 1;
 
     exit_thread(0);
 }

@@ -64,6 +64,8 @@ void player_update() {
     if (keys[SDL_SCANCODE_SPACE] && player.can_jump_buffer > 0) {
         player.vy = 5;
         player.can_jump_buffer = 0;
+        // audio_sound_play_at_channel(0, sound);
+        audio_sound_play(sound);
     }
 
     // move
@@ -121,6 +123,26 @@ void player_update() {
         }
     }
     // </collision>
+
+    // <animating>
+    if (player.current_anim != man_anim_run && (player.vx || player.vz)) {
+        player.last_anim = player.current_anim;
+        player.current_anim = man_anim_run;
+        player.last_anim_frame = player.current_anim_frame;
+        player.current_anim_frame = 0;
+        player.anim_transition_frame = 0;
+    }
+    if (player.current_anim != man_anim_t_pose && (player.vx == 0 && player.vz == 0)) {
+        player.last_anim = player.current_anim;
+        player.current_anim = man_anim_t_pose;
+        player.last_anim_frame = player.current_anim_frame;
+        player.current_anim_frame = 0;
+        player.anim_transition_frame = 0;
+    }
+    // player.last_anim_frame += delta_frames;
+    player.current_anim_frame += delta_frames;
+    player.anim_transition_frame += delta_frames;
+    // </animating>
 }
 
 void player_camera_update() {

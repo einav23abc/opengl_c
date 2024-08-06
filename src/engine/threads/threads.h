@@ -1,8 +1,8 @@
 #ifndef THREADS_H
 #define THREADS_H
 
-#include <stdint.h>
 #include <windows.h>
+#include <stdint.h>
 
 // fix wierd defines in <windows.h>
 #ifdef near

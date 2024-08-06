@@ -4,102 +4,86 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <GL/glew.h>
+#include <stdlib.h>
 #include <stdio.h>
-#include <math.h>
 #include <string.h>
 #include <stdint.h>
+#include <math.h>
 
 #include "engine_types.h"
 #include "engine_functions.h"
+
 #include "threads/threads.h"
+#include "audio/audio.h"
+#include "utils/utils.h"
+#include "vec_mat_quat/vec_mat_quat.h"
+#include "cameras/cameras.h"
+#include "shaders/shaders.h"
+#include "simple_draw_module/simple_draw_module.h"
 
-// <externs>
-    // <set by engine config>
-        extern const uint32_t OUTPORT_WIDTH;
-        extern const uint32_t OUTPORT_HEIGHT;
-        extern const uint32_t OUTPORT_VIEWPORT_SIZE;
-        extern const int32_t OUTPORT_VIEWPORT_X;
-        extern const int32_t OUTPORT_VIEWPORT_Y;
 
-        extern const uint32_t WINDOW_START_WIDTH;
-        extern const uint32_t WINDOW_START_HEIGHT;
+// <engine configurables>
+extern const uint32_t OUTPORT_WIDTH;
+extern const uint32_t OUTPORT_HEIGHT;
 
-        const float DEFAULT_BACKGROUND_COLOR_R;
-        const float DEFAULT_BACKGROUND_COLOR_G;
-        const float DEFAULT_BACKGROUND_COLOR_B;
+extern const uint32_t WINDOW_START_WIDTH;
+extern const uint32_t WINDOW_START_HEIGHT;
 
-        const float DEFAULT_PILLARBOX_COLOR_R;
-        const float DEFAULT_PILLARBOX_COLOR_G;
-        const float DEFAULT_PILLARBOX_COLOR_B;
+const float DEFAULT_BACKGROUND_COLOR_R;
+const float DEFAULT_BACKGROUND_COLOR_G;
+const float DEFAULT_BACKGROUND_COLOR_B;
 
-        extern const float TARGET_FRAME_DELAY;
-    // </set by engine config>
+const float DEFAULT_PILLARBOX_COLOR_R;
+const float DEFAULT_PILLARBOX_COLOR_G;
+const float DEFAULT_PILLARBOX_COLOR_B;
 
-    extern const SDL_Event event;
+extern const float TARGET_FRAME_DELAY;
+// </engine configurables>
 
-    extern uint8_t keys[285];
 
-    extern uint8_t running;
-    extern uint32_t frame_start_time;
-    extern const uint32_t delta_time;
-    extern const float delta_frames;
-    extern uint32_t acum_frames_time;
-    extern uint32_t acum_frames_amount;
-    
-    extern SDL_Window* window;
-    extern int32_t window_width;
-    extern int32_t window_height;
-    extern fbo_t* window_fbo;
+extern const SDL_Event event;
 
-    extern const SDL_GLContext context;
+extern uint8_t keys[SDL_NUM_SCANCODES]; // time since key pressed; 0 if released
 
-    extern const fbo_t* outport_fbo;
-    extern const shader_t* screen_quad_mesh_shader;
-    extern const mesh_t* screen_quad_mesh;
+extern uint8_t running;
+extern uint32_t frame_start_time;
+extern const uint32_t delta_time;
+extern const float delta_frames;
+extern uint32_t acum_frames_time;
+extern uint32_t acum_frames_amount;
 
-    extern const shader_t* default_shader;
+extern SDL_Window* window;
+extern int32_t window_width;
+extern int32_t window_height;
+extern fbo_t* window_fbo;
 
-    extern const texture_t* default_texture;
+extern const SDL_GLContext context;
 
-    extern uint64_t shaders_amount;
-    extern int64_t current_shader;
-    extern shader_t* shaders_list[];
+extern const fbo_t* outport_fbo;
+extern const shader_t* screen_quad_mesh_shader;
+extern const mesh_t* screen_quad_mesh;
 
-    extern uint64_t cameras_amount;
-    extern int64_t current_camera;
-    extern camera_t* cameras_list[];
+extern const shader_t* default_shader;
 
-    extern uint64_t textures_amount;
-    extern texture_t* textures_list[];
-    
-    extern uint64_t meshes_amount;
-    extern mesh_t* meshes_list[];
+extern const texture_t* default_texture;
 
-    extern uint64_t fbos_amount;
-    extern uint64_t current_fbo;
-    extern fbo_t* fbos_list[];
+extern uint64_t textures_amount;
+extern texture_t* textures_list[];
 
-    
-    extern const uint32_t QUAD_VAO_INDICES_ARR[];
+extern uint64_t meshes_amount;
+extern mesh_t* meshes_list[];
 
-    extern const uint64_t SHADERS_MAX_AMOUNT;
-    extern const uint64_t CAMERAS_MAX_AMOUNT;
-    extern const uint64_t TEXTURES_MAX_AMOUNT;
-    extern const uint64_t OBJECT_TYPES_MAX_AMOUNT;
-    extern const uint64_t MESHES_MAX_AMOUNT;
-    extern const uint64_t ANIMATIONS_MAX_AMOUNT;
-    extern const uint64_t FBOS_MAX_AMOUNT;
+extern uint64_t fbos_amount;
+extern uint64_t current_fbo;
+extern fbo_t* fbos_list[];
 
-    // <simple draw module>
-    extern float simple_draw_module_color_r;
-    extern float simple_draw_module_color_g;
-    extern float simple_draw_module_color_b;
-    extern float simple_draw_module_color_a;
-    extern const shader_t* simple_draw_module_cube_shader;
-    extern const mesh_t* simple_draw_module_rectangle_mesh;
-    extern const mesh_t* simple_draw_module_cube_mesh;
-    extern const mesh_t* simple_draw_module_ball_mesh;
-    // </simple draw module>
-// </externs>
+
+extern const uint32_t QUAD_VAO_INDICES_ARR[];
+
+extern const uint64_t TEXTURES_MAX_AMOUNT;
+extern const uint64_t OBJECT_TYPES_MAX_AMOUNT;
+extern const uint64_t MESHES_MAX_AMOUNT;
+extern const uint64_t ANIMATIONS_MAX_AMOUNT;
+extern const uint64_t FBOS_MAX_AMOUNT;
 
 #endif

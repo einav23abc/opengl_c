@@ -32,6 +32,12 @@ typedef struct player_t {
     float vx;
     float vy;
     float vz;
+
+    float current_anim_frame;
+    float last_anim_frame;
+    float anim_transition_frame;
+    animation_t* current_anim;
+    animation_t* last_anim;
 } player_t;
 
 #endif
