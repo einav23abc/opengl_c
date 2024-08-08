@@ -27,23 +27,23 @@ typedef struct {
 int32_t thread_create(  thread_t* thread, const thread_attr_t* attr,
                         void* (*start_routine)(void*), void* arg);
 
-// returns the thread's previous suspend count
+// \returns The thread's previous suspend count
 int32_t thread_suspend(thread_t thread);
 
-// returns the thread's previous suspend count.
+// \returns The thread's previous suspend count.
 int32_t thread_resume(thread_t thread);
 
 void exit_thread(int32_t exit_code);
 
-// returns the thread's exit code
+// \returns The thread's exit code
 int32_t thread_join(thread_t thread);
 
 void thread_cancel(thread_t thread);
 
-// returns the thread's exit code or STILL_ACTIVE if thread did not exit
+// \returns The thread's exit code or STILL_ACTIVE if thread did not exit
 int32_t thread_get_exit_code(thread_t thread);
 
-// returns the current thread's id
+// \returns The current thread's id
 int32_t thread_self();
 
 void sleep(uint32_t ms);

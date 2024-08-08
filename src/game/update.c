@@ -7,6 +7,9 @@ void update() {
     }
 
     // wait for load_game to finish
+    
+    default_camera->viewport_w = window_drawable_width;
+    default_camera->viewport_h = window_drawable_height;
 
     int32_t load_game_exit_code = thread_get_exit_code(load_game_thread);
     if (load_game_exit_code != STILL_ACTIVE) {
@@ -64,8 +67,6 @@ void player_update() {
     if (keys[SDL_SCANCODE_SPACE] && player.can_jump_buffer > 0) {
         player.vy = 5;
         player.can_jump_buffer = 0;
-        // audio_sound_play_at_channel(0, sound);
-        audio_sound_play(sound);
     }
 
     // move

@@ -2,10 +2,13 @@
 #define CAMERAS_H
 
 #include <SDL2/SDL.h>
-#include <GL/glew.h>
+#include "../glad/glad.h"
 #include <stdio.h>
 #include <stdint.h>
+
 #include "../vec_mat_quat/vec_mat_quat.h"
+#include "../shaders/shaders.h"
+
 
 #ifndef M_PI
 #define M_PI		3.14159265358979323846
@@ -50,23 +53,29 @@ extern camera_t* cameras_list[];
 extern const uint64_t CAMERAS_MAX_AMOUNT;
 
 
-camera_t* camera_create(float x, float y, float z,
+camera_t* create_camera(float x, float y, float z,
                         float rx, float ry, float rz,
                         float width, float height, float depth,
                         float near, float far,
                         uint8_t is_prespective, float fov,
                         float viewport_x, float viewport_y, float viewport_w, float viewport_h);
-void camera_use(camera_t* camera);
-void camera_update_fbo_viewport(camera_t* camera);
-void camera_update_world_view_projection_matrix(camera_t* camera);
-#define camera_update_wvp_mat camera_update_world_view_projection_matrix
-// * Will not destroy the camera during render period (when `current_camera` is `-1`).
-// * \param camera the camera to destroy. This camera will not be usable after destruction.
-// * \returns `0` on success or `-1` on failure
-int32_t camera_destroy(camera_t* camera);
-// * Should be called before exiting.
-// * Destroys all created cameras.
-void cameras_clean();
+void use_camera(camera_t* camera);
+void update_camera_fbo_viewport(camera_t* camera);
+void update_camera_world_view_projection_matrix(camera_t* camera);
+#define update_camera_wvp_mat update_camera_world_view_projection_matrix
+/* Destroys a camera.
+ *
+ * The camera will not be usable after destruction.
+ *
+ * Will not destroy the camera during render period (when `current_camera` is `-1`).
+ * \param camera the camera to destroy.
+ * \returns `0` on success or `-1` on failure
+*/
+int32_t destoroy_camera(camera_t* camera);
+/* Called by the engine when exiting.
+ * Destroys all created cameras.
+*/
+void clean_cameras();
 
 
 #endif

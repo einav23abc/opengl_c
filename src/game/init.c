@@ -3,13 +3,13 @@
 uint8_t init() {
     frames = 0;
 
-    default_camera = camera_create(
-        OUTPORT_WIDTH*0.5, OUTPORT_HEIGHT*0.5, 0,
+    default_camera = create_camera(
+        _OUTPORT_WIDTH_*0.5, _OUTPORT_HEIGHT_*0.5, 0,
         0, 0, 0,
-        OUTPORT_WIDTH, OUTPORT_HEIGHT, 1600,
+        _OUTPORT_WIDTH_, _OUTPORT_HEIGHT_, 1600,
         -32000, 32000,
         0, 60,
-        0, 0, 320, 240
+        0, 0, _WINDOW_START_WIDTH_, _WINDOW_START_HEIGHT_
     );
 
 
@@ -22,8 +22,11 @@ uint8_t init() {
         NULL
     );
 
+
+    outport_fbo = create_fbo(_OUTPORT_WIDTH_, _OUTPORT_HEIGHT_, 1, GL_RGB, 4);
+    load_game_progress += 1;
     
-    global_shader = shader_create_from_files(
+    global_shader = create_shader_from_files(
         "./src/game/shaders/global.vert",
         "./src/game/shaders/global.frag",
         "in_vertex_position\0in_vertex_texcoord\0in_vertex_normal\0in_vertex_joint_id\0in_vertex_joint_wheight", 5,
@@ -35,14 +38,10 @@ uint8_t init() {
     global_texture = load_texture("./src/game/textures/global_texture.png");
     load_game_progress += 1;
 
-    sun_shadow_map_fbo = create_fbo(
-        3240, 3240,
-        0, 0, NULL, 0,
-        2, NULL, 0
-    );
+    sun_shadow_map_fbo = create_fbo(3240, 3240, 0, 0, 2);
     load_game_progress += 1;
 
-    sun_shadow_map_shader = shader_create_from_files(
+    sun_shadow_map_shader = create_shader_from_files(
         "./src/game/shaders/sun_shadow_map.vert",
         "./src/game/shaders/sun_shadow_map.frag",
         "in_vertex_position\0in_vertex_texcoord\0in_vertex_normal\0in_vertex_joint_id\0in_vertex_joint_wheight", 5,
@@ -50,18 +49,13 @@ uint8_t init() {
         "u_position\0u_scale\0u_quat_rotation", 3
     );
     load_game_progress += 1;
-    
+
+
     return 0;
 }
 
 
 void load_game() {
-    // create new opengl context
-    // each thread needs a unique context to call opengl functions
-    // the new context doesnt share 'container objects' with the main thread -
-    // - due to this, shaders and fbo arent loaded and all meshes are loaded unbinded and must be binded by the main thread
-    // the context is deleted before exiting the thread
-
     // <man mesh>
         // man_mesh = mesh_from_wavefront_obj("./src/game/models/man.obj");
         // man_mesh = mesh_from_collada_dae_ext(
@@ -98,7 +92,7 @@ void load_game() {
                 },
                 .pos = (vec3_t){
                     .x = 0,
-                    .y = -3.9,
+                    .y = -4.0,
                     .z = -0.3
                 }
             }
@@ -119,7 +113,7 @@ void load_game() {
                 },
                 .pos = (vec3_t){
                     .x = 0,
-                    .y = -3.9,
+                    .y = -4.0,
                     .z = -0.3
                 }
             }
@@ -153,13 +147,13 @@ void load_game() {
             .last_anim = man_anim_t_pose
         };
 
-        player_camera = camera_create(
+        player_camera = create_camera(
             0, 0, 0,
             0, 0, 0,
             320, 240, 1600,
             -32000, 32000,
             0, 60,
-            0, 0, 320, 240
+            0, 0, _OUTPORT_WIDTH_, _OUTPORT_HEIGHT_
         );
     // </player>
     load_game_progress += 1;
@@ -338,7 +332,7 @@ void load_game() {
     load_game_progress += 1;
 
     // <sun shadow map>
-        sun_shadow_map_camera = camera_create(
+        sun_shadow_map_camera = create_camera(
             0, 0, 0,
             M_PI*1.6, M_PI*0.3, 0,
             1080, 1080, 1600,
@@ -347,10 +341,6 @@ void load_game() {
             0, 0, 3240, 3240
         );
     // </sun shadow map>
-    load_game_progress += 1;
-
-    sound = audio_sound_load("./src/game/sounds/taunt.wav");
-    audio_set_sound_volume(sound, 0.1);
     load_game_progress += 1;
 
     exit_thread(0);

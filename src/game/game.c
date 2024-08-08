@@ -12,6 +12,8 @@ thread_t load_game_thread;
 
 camera_t* default_camera;
 
+fbo_t* outport_fbo;
+
 
 // <game variables>
     texture_t* global_texture;
@@ -34,8 +36,6 @@ camera_t* default_camera;
     camera_t* sun_shadow_map_camera;
     fbo_t* sun_shadow_map_fbo;
     shader_t* sun_shadow_map_shader;
-
-    sound_t* sound;
 // </game variables>
 
 

@@ -12,7 +12,7 @@ shader_t* shaders_list[_SHADERS_MAX_AMOUNT_];
 const uint64_t SHADERS_MAX_AMOUNT = _SHADERS_MAX_AMOUNT_;
 
 
-shader_t* shader_create(const char** vert_shader_str, const char** frag_shader_str,
+shader_t* create_shader(const char** vert_shader_str, const char** frag_shader_str,
                         const char* attribute_names , uint32_t attributes_count,
                         const char* uniform_names, uint32_t uniforms_count) {
     if (shaders_amount >= SHADERS_MAX_AMOUNT) return NULL;
@@ -107,7 +107,7 @@ shader_t* shader_create(const char** vert_shader_str, const char** frag_shader_s
 
     return shader;
 }
-shader_t* shader_create_from_files( const char* vert_shader_file_path, const char* frag_shader_file_path,
+shader_t* create_shader_from_files( const char* vert_shader_file_path, const char* frag_shader_file_path,
                                     const char* attribute_names , uint32_t attributes_count,
                                     const char* uniform_names, uint32_t uniforms_count) {
     char* vert_shader_str;
@@ -121,14 +121,14 @@ shader_t* shader_create_from_files( const char* vert_shader_file_path, const cha
         return NULL;
     }
 
-    shader_t* shader = shader_create((const char**)&vert_shader_str, (const char**)&frag_shader_str, attribute_names, attributes_count, uniform_names, uniforms_count);
+    shader_t* shader = create_shader((const char**)&vert_shader_str, (const char**)&frag_shader_str, attribute_names, attributes_count, uniform_names, uniforms_count);
     
     free(vert_shader_str);
     free(frag_shader_str);
 
     return shader;
 }
-void shader_use(shader_t* shader) {
+void use_shader(shader_t* shader) {
     if (shader->shader_index == current_shader) return;
     if (shader->shader_index < 0 || shader->shader_index >= shaders_amount) return;
 
@@ -136,10 +136,10 @@ void shader_use(shader_t* shader) {
     current_shader = shader->shader_index;
     
     if (shader->wvp_mat_camera_index == current_camera) return;
-    shader_update_camera_uniforms();
+    update_shader_camera_uniforms();
     shader->wvp_mat_camera_index = current_camera;
 }
-void shader_update_camera_uniforms() {
+void update_shader_camera_uniforms() {
     if (current_shader < 0 || current_shader >= shaders_amount) return;
     if (current_camera < 0 || current_camera >= cameras_amount) return;
 
@@ -147,7 +147,7 @@ void shader_update_camera_uniforms() {
 
     glUniformMatrix4fv(shaders_list[current_shader]->u_camera_wvp_mat_loc, 1, 0, cameras_list[current_camera]->wvp_mat.mat);
 }
-static void shader_clean(shader_t* shader) {
+static void clean_shader(shader_t* shader) {
     glDetachShader(shader->program, shader->vert_shader);
     glDetachShader(shader->program, shader->frag_shader);
     glDeleteProgram(shader->program);
@@ -156,7 +156,7 @@ static void shader_clean(shader_t* shader) {
     free(shader->uniform_locations);
     return;
 }
-int32_t shader_destroy(shader_t* shader) {
+int32_t destroy_shader(shader_t* shader) {
     if (current_shader == shader->shader_index) return -1;
     
     shaders_amount -= 1;
@@ -169,11 +169,11 @@ int32_t shader_destroy(shader_t* shader) {
     *((uint64_t*)&last_shader->shader_index) = shader->shader_index;
     shaders_list[shader->shader_index] = last_shader;
 
-    shader_clean(shader);
+    clean_shader(shader);
     return 0;
 }
-void shaders_clean() {
+void clean_shaders() {
     printf("cleaning %u shaders\n", shaders_amount);
-    for (uint64_t i = 0; i < shaders_amount; i++) shader_clean(shaders_list[i]);
+    for (uint64_t i = 0; i < shaders_amount; i++) clean_shader(shaders_list[i]);
     shaders_amount = 0;
 }

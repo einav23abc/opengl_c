@@ -10,41 +10,46 @@ void render() {
 }
 
 void render_load_game_screen() {
-    camera_use(default_camera);
+    use_camera(default_camera);
 
     glDisable(GL_DEPTH_TEST);
 
     sdm_set_color(1, 1, 1, 1);
-    sdm_draw_rect(0, 0, OUTPORT_WIDTH, OUTPORT_HEIGHT);
+    sdm_draw_rect(0, 0, _OUTPORT_WIDTH_, _OUTPORT_HEIGHT_);
     
     sdm_set_color(0.2, 0.2, 0.2, 1);
-    sdm_draw_rect(OUTPORT_WIDTH*0.2, OUTPORT_HEIGHT*0.4, OUTPORT_WIDTH*0.6, OUTPORT_HEIGHT*0.2);
+    sdm_draw_rect(_OUTPORT_WIDTH_*0.2, _OUTPORT_HEIGHT_*0.4, _OUTPORT_WIDTH_*0.6, _OUTPORT_HEIGHT_*0.2);
     
     sdm_set_color(0.8, 0.0, 0.0, 1);
-    sdm_draw_rect(OUTPORT_WIDTH*0.2, OUTPORT_HEIGHT*0.4, OUTPORT_WIDTH*0.6 * (((float)load_game_progress)/LOAD_GAME_PROGRESS_MAX), OUTPORT_HEIGHT*0.2);
-
+    sdm_draw_rect(_OUTPORT_WIDTH_*0.2, _OUTPORT_HEIGHT_*0.4, _OUTPORT_WIDTH_*0.6 * (((float)load_game_progress)/LOAD_GAME_PROGRESS_MAX), _OUTPORT_HEIGHT_*0.2);
+    
     glEnable(GL_DEPTH_TEST);
 }
 
 void render_game() {
+    // clear outport fbo
+    use_fbo(outport_fbo);
+    glClearColor(_OUTPORT_BACKGROUND_COLOR_R_, _OUTPORT_BACKGROUND_COLOR_G_, _OUTPORT_BACKGROUND_COLOR_B_, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
     // <sun shadow map>
         use_fbo(sun_shadow_map_fbo);
         glClear(GL_DEPTH_BUFFER_BIT);
-        camera_use(sun_shadow_map_camera);
-        shader_use(sun_shadow_map_shader);
+        use_camera(sun_shadow_map_camera);
+        use_shader(sun_shadow_map_shader);
         render_game_world();
     // </sun shadow map>
     
     // <player camera>
-        camera_use(player_camera);
-        use_fbo((fbo_t*)outport_fbo);
+        use_camera(player_camera);
+        use_fbo(outport_fbo);
 
         // if (player_camera->is_prespective == 0) {
         //     sdm_set_color(0, 1, 0, 1);
         //     sdm_draw_ball(player_camera->x, player_camera->y, player_camera->z, 5);
         // }
         
-        shader_use(global_shader);
+        use_shader(global_shader);
         // u_camera_position
         glUniform3f(global_shader->uniform_locations[3], player_camera->x, player_camera->y, player_camera->z);
         // u_sun_vector
@@ -75,8 +80,18 @@ void render_game() {
         }
         // </AABB>
     // </player camera>
+    
 
-    shader_use((shader_t*)default_shader);
+    // draw outport frame buffer to screen
+    use_default_fbo();
+
+    // float pixel_scale = fmin(((float)window_drawable_width)/_OUTPORT_WIDTH_, ((float)window_drawable_height)/_OUTPORT_HEIGHT_);
+    uint32_t pixel_scale = uintmin(window_drawable_width/_OUTPORT_WIDTH_, window_drawable_height/_OUTPORT_HEIGHT_);
+    uint32_t w = _OUTPORT_WIDTH_*pixel_scale;
+    uint32_t h = _OUTPORT_HEIGHT_*pixel_scale;
+    glViewport((window_drawable_width-w)*0.5,(window_drawable_height-h)*0.5,w,h);
+    
+    simple_draw_module_draw_fbo_color_texture(outport_fbo);
 }
 
 void render_game_world() {

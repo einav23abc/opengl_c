@@ -36,11 +36,15 @@ int main() {
         printf("unintended current working directory:\n  \"%s\".\nshould be:\n  \"%s\".\ndid not compile.", cwd, intended_cwd);
         return 1;
     }
+    
+    uint64_t wt_glad_c = get_last_write_time( "../src/engine/glad/glad.c");
+    uint64_t wt_glad_h = get_last_write_time( "../src/engine/glad/glad.h");
+    uint64_t wt_glad_khr_h = get_last_write_time( "../src/engine/glad/khrplatform.h");
 
     uint64_t wt_engine_c = get_last_write_time( "../src/engine/engine.c");
     uint64_t wt_engine_h = get_last_write_time( "../src/engine/engine.h");
-    uint64_t wt_engine_types_h = get_last_write_time( "../src/engine/engine_types.h");
-    uint64_t wt_engine_functions_h = get_last_write_time( "../src/engine/engine_functions.h");
+
+    uint64_t wt_engine_config_h = get_last_write_time( "../src/game/engine_config.h");
     
     uint64_t wt_threads_c = get_last_write_time( "../src/engine/threads/threads.c");
     uint64_t wt_threads_h = get_last_write_time( "../src/engine/threads/threads.h");
@@ -60,6 +64,15 @@ int main() {
     uint64_t wt_shaders_c = get_last_write_time( "../src/engine/shaders/shaders.c");
     uint64_t wt_shaders_h = get_last_write_time( "../src/engine/shaders/shaders.h");
     
+    uint64_t wt_textures_c = get_last_write_time( "../src/engine/textures/textures.c");
+    uint64_t wt_textures_h = get_last_write_time( "../src/engine/textures/textures.h");
+
+    uint64_t wt_fbos_c = get_last_write_time( "../src/engine/frame_buffer_objects/frame_buffer_objects.c");
+    uint64_t wt_fbos_h = get_last_write_time( "../src/engine/frame_buffer_objects/frame_buffer_objects.h");
+    
+    uint64_t wt_mesh_anim_c = get_last_write_time( "../src/engine/meshes_and_animations/meshes_and_animations.c");
+    uint64_t wt_mesh_anim_h = get_last_write_time( "../src/engine/meshes_and_animations/meshes_and_animations.h");
+    
     uint64_t wt_sdm_c = get_last_write_time( "../src/engine/simple_draw_module/simple_draw_module.c");
     uint64_t wt_sdm_h = get_last_write_time( "../src/engine/simple_draw_module/simple_draw_module.h");
 
@@ -77,21 +90,26 @@ int main() {
     uint64_t last_compile_time = get_last_write_time( "../main.exe");
     
     if (
+        wt_glad_h                   > last_compile_time ||
+        wt_glad_khr_h               > last_compile_time ||
         wt_engine_h                 > last_compile_time ||
-        wt_engine_types_h           > last_compile_time ||
-        wt_engine_functions_h       > last_compile_time ||
+        wt_engine_config_h          > last_compile_time ||
         wt_threads_h                > last_compile_time ||
         wt_audio_h                  > last_compile_time ||
         wt_utils_h                  > last_compile_time ||
         wt_vmq_h                    > last_compile_time ||
         wt_cameras_h                > last_compile_time ||
         wt_shaders_h                > last_compile_time ||
+        wt_textures_h               > last_compile_time ||
+        wt_fbos_h                   > last_compile_time ||
+        wt_mesh_anim_h              > last_compile_time ||
         wt_sdm_h                    > last_compile_time
     ){
         // recompile all .c files
         printf("recompiling all\n");
         system(
             "gcc "
+            "../src/engine/glad/glad.c "
             "../src/engine/engine.c "
             "../src/engine/threads/threads.c "
             "../src/engine/audio/audio.c "
@@ -99,6 +117,9 @@ int main() {
             "../src/engine/vec_mat_quat/vec_mat_quat.c "
             "../src/engine/cameras/cameras.c "
             "../src/engine/shaders/shaders.c "
+            "../src/engine/textures/textures.c "
+            "../src/engine/frame_buffer_objects/frame_buffer_objects.c "
+            "../src/engine/meshes_and_animations/meshes_and_animations.c "
             "../src/engine/simple_draw_module/simple_draw_module.c "
             "../src/game/game.c "
             "../src/game/init.c "
@@ -110,6 +131,7 @@ int main() {
         );
     }else{
         if (
+            wt_glad_c               > last_compile_time ||
             wt_engine_c             > last_compile_time ||
             wt_threads_c            > last_compile_time ||
             wt_audio_c              > last_compile_time ||
@@ -117,12 +139,16 @@ int main() {
             wt_vmq_c                > last_compile_time ||
             wt_cameras_c            > last_compile_time ||
             wt_shaders_c            > last_compile_time ||
+            wt_textures_c           > last_compile_time ||
+            wt_fbos_c               > last_compile_time ||
+            wt_mesh_anim_c          > last_compile_time ||
             wt_sdm_c                > last_compile_time
         ){
             // recompile engine
             printf("recompiling engine\n");
             system(
                 "gcc "
+                "../src/engine/glad/glad.c "
                 "../src/engine/engine.c "
                 "../src/engine/threads/threads.c "
                 "../src/engine/audio/audio.c "
@@ -130,6 +156,9 @@ int main() {
                 "../src/engine/vec_mat_quat/vec_mat_quat.c "
                 "../src/engine/cameras/cameras.c "
                 "../src/engine/shaders/shaders.c "
+                "../src/engine/textures/textures.c "
+                "../src/engine/frame_buffer_objects/frame_buffer_objects.c "
+                "../src/engine/meshes_and_animations/meshes_and_animations.c "
                 "../src/engine/simple_draw_module/simple_draw_module.c "
                 "-c -g"
             );
@@ -186,6 +215,7 @@ int main() {
     printf("linking\n");
     system(
         "gcc "
+        "glad.o "
         "engine.o "
         "threads.o "
         "audio.o "
@@ -193,6 +223,9 @@ int main() {
         "vec_mat_quat.o "
         "cameras.o "
         "shaders.o "
+        "textures.o "
+        "frame_buffer_objects.o "
+        "meshes_and_animations.o "
         "simple_draw_module.o "
         "game.o "
         "init.o "
@@ -204,12 +237,10 @@ int main() {
         "-l \"mingw32\" "
         "-l \"SDL2main\" "
         "-l \"SDL2\" "
+        "-l \"opengl32\" "
         "-l \"SDL2_image\" "
         "-l \"SDL2_mixer\" "
         "-l \"libpng16-16\" "
-        "-l \"zlib1\" "
-        "-l \"opengl32\" "
-        "-l \"glew32\""
     );
     
     return 0;

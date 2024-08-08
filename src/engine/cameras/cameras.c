@@ -12,7 +12,7 @@ camera_t* cameras_list[_CAMERAS_MAX_AMOUNT_];
 const uint64_t CAMERAS_MAX_AMOUNT = _CAMERAS_MAX_AMOUNT_;
 
 
-camera_t* camera_create(float x, float y, float z,
+camera_t* create_camera(float x, float y, float z,
                         float rx, float ry, float rz,
                         float width, float height, float depth,
                         float near, float far,
@@ -57,11 +57,15 @@ camera_t* camera_create(float x, float y, float z,
 
     return camera;
 }
-void camera_use(camera_t* camera) {
+void use_camera(camera_t* camera) {
     current_camera = camera->camera_index;
-    camera_update_fbo_viewport(camera);
+    update_camera_fbo_viewport(camera);
+
+    if (shaders_list[current_shader]->wvp_mat_camera_index == current_camera) return;
+    update_shader_camera_uniforms();
+    shaders_list[current_shader]->wvp_mat_camera_index = current_camera;
 }
-void camera_update_fbo_viewport(camera_t* camera) {
+void update_camera_fbo_viewport(camera_t* camera) {
     glViewport(
         camera->viewport_x,
         camera->viewport_y,
@@ -69,7 +73,7 @@ void camera_update_fbo_viewport(camera_t* camera) {
         camera->viewport_h
     );
 }
-void camera_update_world_view_projection_matrix(camera_t* camera) {
+void update_camera_world_view_projection_matrix(camera_t* camera) {
     #define cx camera->x
     #define cy camera->y
     #define cz camera->z
@@ -162,14 +166,16 @@ void camera_update_world_view_projection_matrix(camera_t* camera) {
     return;
 }
 
-static void camera_clean(camera_t* camera) {
+static void clean_camera(camera_t* camera) {
     free(camera);
 }
-int32_t camera_destroy(camera_t* camera) {
+int32_t destoroy_camera(camera_t* camera) {
     if (current_camera != -1){
         printf("cannot destroy a camera during render period!\n");
         return -1;
     }
+
+    // shader->wvp_mat_camera_index
 
     cameras_amount -= 1;
 
@@ -178,11 +184,11 @@ int32_t camera_destroy(camera_t* camera) {
     *((uint64_t*)&last_cameras->camera_index) = camera->camera_index;
     cameras_list[camera->camera_index] = last_cameras;
 
-    camera_clean(camera);
+    clean_camera(camera);
     return 0;
 }
-void cameras_clean() {
+void clean_cameras() {
     printf("cleaning %u cameras\n", cameras_amount);
-    for (uint64_t i = 0; i < cameras_amount; i++) camera_clean(cameras_list[i]);
+    for (uint64_t i = 0; i < cameras_amount; i++) clean_camera(cameras_list[i]);
     cameras_amount = 0;
 }
