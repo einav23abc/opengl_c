@@ -1,8 +1,8 @@
 #ifndef THREADS_H
 #define THREADS_H
 
-#include <windows.h>
 #include <stdint.h>
+#include <windows.h>
 
 // fix wierd defines in <windows.h>
 #ifdef near
@@ -24,26 +24,42 @@ typedef struct {
 } thread_attr_t;
 
 
-int32_t thread_create(  thread_t* thread, const thread_attr_t* attr,
+
+/* \brief Create a new thread that will run `start_routine`.
+ * 
+ * \param thread A pointer to a `thread_t` where the thread's data will be stored.
+ * 
+ * \param attr A pointer to a `thread_attr_t` which dictates the thread's attributes. Or `NULL` for no attributes.
+ * 
+ * \param start_routine A pointer to a function that the thread will run.
+ * 
+ * \param arg A pointer to the `start_routine`'s argument.
+ * 
+ * \returns 0 on success or an error code.
+ */
+int32_t create_thread(  thread_t* thread, const thread_attr_t* attr,
                         void* (*start_routine)(void*), void* arg);
 
-// \returns The thread's previous suspend count
-int32_t thread_suspend(thread_t thread);
+// returns the thread's previous suspend count
+int32_t suspend_thread(thread_t thread);
 
-// \returns The thread's previous suspend count.
-int32_t thread_resume(thread_t thread);
+// returns the thread's previous suspend count.
+int32_t resume_thread(thread_t thread);
 
 void exit_thread(int32_t exit_code);
 
-// \returns The thread's exit code
-int32_t thread_join(thread_t thread);
+// returns the thread's exit code
+int32_t join_thread(thread_t thread);
 
-void thread_cancel(thread_t thread);
+void terminate_thread(thread_t thread);
 
-// \returns The thread's exit code or STILL_ACTIVE if thread did not exit
-int32_t thread_get_exit_code(thread_t thread);
+// \returns The thread's exit code or `STILL_ACTIVE` if thread did not exit
+int32_t get_thread_exit_code(thread_t thread);
 
-// \returns The current thread's id
+// \returns The thread's exit code, `0x104` if doesnt exist or `STILL_ACTIVE` if thread did not exit.
+int32_t get_thread_exit_code_from_id(int32_t thread_id);
+
+// returns the current thread's id
 int32_t thread_self();
 
 void sleep(uint32_t ms);

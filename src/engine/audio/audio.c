@@ -1,5 +1,4 @@
 #include "audio.h"
-#include "../../game/engine_config.h"
 
 // pretty much just a wraper for SDL2_mixer
 // https://wiki.libsdl.org/SDL2_mixer/CategoryAPI

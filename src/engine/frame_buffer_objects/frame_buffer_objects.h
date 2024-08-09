@@ -72,7 +72,7 @@ extern const uint32_t FBOS_MAX_AMOUNT;
  * \param depth_stencil_texture_param_func Only relevent for texture depth-stencil attachments. Null can be passed for no function.
  * 
  * \returns A pointer to an allocated fbo_t or `NULL` on failure.
-*/
+ */
 fbo_t* create_fbo_ext_param(uint32_t width, uint32_t height,
                             uint8_t color_status,
                             GLint color_format,
@@ -103,7 +103,7 @@ fbo_t* create_fbo_ext_param(uint32_t width, uint32_t height,
  * `6` - render buffer object, only stencil.
  * 
  * \returns A pointer to an allocated fbo_t or `NULL` on failure.
-*/
+ */
 fbo_t* create_fbo(  uint32_t width, uint32_t height,
                     uint8_t color_status,
                     GLint color_format,
@@ -112,7 +112,7 @@ fbo_t* create_fbo(  uint32_t width, uint32_t height,
 /* Sets the fbo that will be used for all draw functions to the defaule fbo (the window), Until a diffrent fbo is used.
  *
  * Updates the fbo's viewport by calling `camera_update_fbo_viewport()` with the `current_camera`,
-*/
+ */
 void use_default_fbo();
 
 /* Sets the fbo that will be used for all draw functions, Until a diffrent fbo is used.
@@ -120,7 +120,7 @@ void use_default_fbo();
  * Updates the fbo's viewport by calling `camera_update_fbo_viewport()` with the `current_camera`,
  * 
  * \param fbo The fbo to use.
-*/
+ */
 void use_fbo(fbo_t* fbo);
 void bind_fbo_color_texture(fbo_t* fbo, int32_t uniform, uint8_t texture_num);
 void bind_fbo_depth_stencil_texture(fbo_t* fbo, int32_t uniform, uint8_t texture_num);
@@ -130,7 +130,7 @@ void bind_fbo_depth_stencil_texture(fbo_t* fbo, int32_t uniform, uint8_t texture
 int32_t destroy_fbo(fbo_t* fbo);
 /* Called by the engine when exiting.
  * Destroys all created fbos.
-*/
+ */
 void clean_fbos();
 
 #endif

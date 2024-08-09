@@ -1,5 +1,4 @@
-#include "game_types.h"
-#include "game_functions.h"
+#include "game.h"
 
 
 // variable declarations

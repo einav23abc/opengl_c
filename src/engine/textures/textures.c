@@ -1,7 +1,5 @@
 #include "textures.h"
 
-#include "../../game/engine_config.h"
-
 
 #ifndef _TEXTURES_MAX_AMOUNT_
 #define _TEXTURES_MAX_AMOUNT_ (128)

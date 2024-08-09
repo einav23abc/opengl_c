@@ -1,7 +1,5 @@
 #include "frame_buffer_objects.h"
 
-#include "../../game/engine_config.h"
-
 // https://learnopengl.com/Advanced-OpenGL/Framebuffers
 
 

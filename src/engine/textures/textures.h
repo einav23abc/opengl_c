@@ -27,16 +27,16 @@ extern const uint64_t TEXTURES_MAX_AMOUNT;
 texture_t* load_texture_ext_params(const char* file_path, void(*param_func)());
 texture_t* load_texture(const char* file_path);
 void bind_texture(texture_t* texture, int32_t uniform, uint8_t texture_num);
-/* Destroys a texture.
+/* \brief Destroys a texture.
  *
  * The texture will not be usable after destruction.
  *
  * \param texture the texture to destroy.
-*/
+ */
 void destroy_texture(texture_t* texture);
 /* Called by the engine when exiting.
  * Destroys all created textures.
-*/
+ */
 void clean_textures();
 
 #endif

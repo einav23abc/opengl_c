@@ -78,8 +78,6 @@ int main() {
 
     uint64_t wt_game_c = get_last_write_time( "../src/game/game.c");
     uint64_t wt_game_h = get_last_write_time( "../src/game/game.h");
-    uint64_t wt_game_types_h = get_last_write_time( "../src/game/game_types.h");
-    uint64_t wt_game_functions_h = get_last_write_time( "../src/game/game_functions.h");
 
     uint64_t wt_init_c = get_last_write_time( "../src/game/init.c");
     uint64_t wt_update_c = get_last_write_time( "../src/game/update.c");
@@ -127,6 +125,7 @@ int main() {
             "../src/game/render.c "
             "../src/game/handle_event.c "
             "../src/game/clean.c "
+            "-include ../src/game/engine_config.h "
             "-c -g"
         );
     }else{
@@ -160,53 +159,92 @@ int main() {
                 "../src/engine/frame_buffer_objects/frame_buffer_objects.c "
                 "../src/engine/meshes_and_animations/meshes_and_animations.c "
                 "../src/engine/simple_draw_module/simple_draw_module.c "
+                "-include ../src/game/engine_config.h "
                 "-c -g"
             );
         }
 
         if (
-            wt_game_h               > last_compile_time ||
-            wt_game_types_h         > last_compile_time ||
-            wt_game_functions_h     > last_compile_time
+            wt_game_h               > last_compile_time
         ){
             // recompile all game files
             printf("recompiling all game files\n");
-            system("gcc ../src/game/game.c ../src/game/init.c ../src/game/update.c ../src/game/render.c ../src/game/handle_event.c ../src/game/clean.c -c -g");
+            system(
+                "gcc "
+                "../src/game/game.c "
+                "../src/game/init.c "
+                "../src/game/update.c "
+                "../src/game/render.c "
+                "../src/game/handle_event.c "
+                "../src/game/clean.c "
+                "-include ../src/game/engine_config.h "
+                "-c -g"
+            );
         }else{
             if (wt_game_c           > last_compile_time){
                 // recompile game.c
                 printf("recompiling game.c\n");
-                system("gcc ../src/game/game.c -c -g");
+                system(
+                    "gcc "
+                    "../src/game/game.c "
+                    "-include ../src/game/engine_config.h "
+                    "-c -g"
+                );
             }
             
             if (wt_init_c           > last_compile_time){
                 // recompile init.c
                 printf("recompiling init.c\n");
-                system("gcc ../src/game/init.c -c -g");
+                system(
+                    "gcc "
+                    "../src/game/init.c "
+                    "-include ../src/game/engine_config.h "
+                    "-c -g"
+                );
             }
             
             if (wt_update_c         > last_compile_time){
                 // recompile update.c
                 printf("recompiling update.c\n");
-                system("gcc ../src/game/update.c -c -g");
+                system(
+                    "gcc "
+                    "../src/game/update.c "
+                    "-include ../src/game/engine_config.h "
+                    "-c -g"
+                );
             }
             
             if (wt_render_c         > last_compile_time){
                 // recompile render.c
                 printf("recompiling render.c\n");
-                system("gcc ../src/game/render.c -c -g");
+                system(
+                    "gcc "
+                    "../src/game/render.c "
+                    "-include ../src/game/engine_config.h "
+                    "-c -g"
+                );
             }
             
             if (wt_handle_event_c   > last_compile_time){
                 // recompile handle_event.c
                 printf("recompiling handle_event.c\n");
-                system("gcc ../src/game/handle_event.c -c -g");
+                system(
+                    "gcc "
+                    "../src/game/handle_event.c "
+                    "-include ../src/game/engine_config.h "
+                    "-c -g"
+                );
             }
             
             if (wt_clean_c          > last_compile_time){
                 // recompile clean.c
                 printf("recompiling clean.c\n");
-                system("gcc ../src/game/clean.c -c -g");
+                system(
+                    "gcc "
+                    "../src/game/clean.c "
+                    "-include ../src/game/engine_config.h "
+                    "-c -g"
+                );
             }
         }
     }

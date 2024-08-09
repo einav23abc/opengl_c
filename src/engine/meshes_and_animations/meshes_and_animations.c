@@ -1,7 +1,5 @@
 #include "meshes_and_animations.h"
 
-#include "../../game/engine_config.h"
-
 
 #ifndef _MESHES_MAX_AMOUNT_
 #define _MESHES_MAX_AMOUNT_ (128)

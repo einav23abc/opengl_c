@@ -1,7 +1,5 @@
 #include "shaders.h"
 
-#include "../../game/engine_config.h"
-
 
 #ifndef _SHADERS_MAX_AMOUNT
 #define _SHADERS_MAX_AMOUNT_ (128)

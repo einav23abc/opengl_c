@@ -1,6 +1,6 @@
 #define DEBUG_MODE
 
-#define _WINDOW_TITLE_ "title"
+#define _WINDOW_TITLE_ "My title in engine config"
 #define _WINDOW_START_X_ (100)
 #define _WINDOW_START_Y_ (50)
 #define _WINDOW_START_WIDTH_ (320*3)

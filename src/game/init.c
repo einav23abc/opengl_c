@@ -15,7 +15,7 @@ uint8_t init() {
 
     in_game = 0;
     load_game_progress = 0;
-    thread_create(
+    create_thread(
         &load_game_thread,
         NULL,
         (void*)&load_game,

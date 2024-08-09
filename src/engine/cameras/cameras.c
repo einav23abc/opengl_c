@@ -1,7 +1,5 @@
 #include "cameras.h"
 
-#include "../../game/engine_config.h"
-
 
 #ifndef _CAMERAS_MAX_AMOUNT_
 #define _CAMERAS_MAX_AMOUNT_ (128)

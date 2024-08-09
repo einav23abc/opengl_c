@@ -22,8 +22,6 @@
 #include "meshes_and_animations/meshes_and_animations.h"
 #include "simple_draw_module/simple_draw_module.h"
 
-#include "../game/engine_config.h"
-
 
 // <engine configurables>
 #ifndef _WINDOW_TITLE_
@@ -90,21 +88,16 @@ uint32_t backend_init();
 uint32_t engine_init();
 void engine_handle_event();
 void engine_update();
-/*
- * Gets called by the function {main} for every frame
+/* Gets called by the function `main` for every frame.
  *
- * Calls the {render} function (if exists) after:
- *  1. The frame buffer was set to {outport_fbo}
- *  2. The color buffer and depth buffer have been cleared
- *  3. The shader was set to {default_shader}
- *  4. Every active camera's wvp_mat was updated
- *  5. Depth test set to {less}
- *  6. Back faces culled and face culling enabled
- * 
- * After the {render} function was called:
- *  1. The {outport_fbo} frame buffer will be drawn to the screen
- *  2. The {current_camera} will be set to -1
-*/
+ * Calls the `render` function (if exists) after:
+ *  1. The frame buffer was set to default.
+ *  2. The color buffer and depth buffer have been cleared.
+ *  3. The shader was set to `default_shader`.
+ *  4. Every active camera's wvp_mat was updated.
+ *  5. Depth test set to `less`.
+ *  6. Back faces culled and face culling enabled.
+ */
 void engine_render();
 void engine_clean();
 

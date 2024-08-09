@@ -269,9 +269,8 @@ void engine_update() {
 }
 
 void engine_render() {
-    use_default_fbo();
-
     // clear window
+    use_default_fbo();
     glClearColor(_BACKGROUND_COLOR_R_, _BACKGROUND_COLOR_G_, _BACKGROUND_COLOR_B_, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -286,7 +285,7 @@ void engine_render() {
     // set all shaders to have not been updated by any camera yet
     for (uint64_t s = 0; s < shaders_amount; s++) shaders_list[s]->wvp_mat_camera_index = -1;
 
-    // <update every active camera's world_view_projection_matrix>
+    // update every active camera's world_view_projection_matrix
     for (uint64_t c = 0; c < cameras_amount; c++) {
         // skip non active cameras
         if (cameras_list[c]->active == 0) continue;
@@ -300,7 +299,8 @@ void engine_render() {
     if (render != NULL)
         render();
     
-    current_camera = -1; // not in render period
+    // not in render period
+    current_camera = -1;
     
     // show drawn image
     SDL_GL_SwapWindow(window);
