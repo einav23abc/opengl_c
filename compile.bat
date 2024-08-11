@@ -4,6 +4,9 @@ gcc ^
     src/engine/glad/glad.c ^
     src/engine/engine.c ^
     src/engine/threads/threads.c ^
+    src/engine/sockets/sockets.c ^
+    src/engine/netframe/netframe_client.c ^
+    src/engine/netframe/netframe_server.c ^
     src/engine/audio/audio.c ^
     src/engine/utils/utils.c ^
     src/engine/vec_mat_quat/vec_mat_quat.c ^
@@ -19,7 +22,7 @@ gcc ^
     src/game/render.c ^
     src/game/handle_event.c ^
     src/game/clean.c ^
-    -include ../src/game/engine_config.h ^
+    -include src/game/config.h ^
     -o ./main.exe ^
     -l "mingw32" ^
     -l "SDL2main" ^
@@ -28,4 +31,5 @@ gcc ^
     -l "SDL2_image" ^
     -l "SDL2_mixer" ^
     -l "libpng16-16" ^
+    -l "Ws2_32" ^
     -g

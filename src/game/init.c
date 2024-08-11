@@ -2,6 +2,7 @@
 
 uint8_t init() {
     frames = 0;
+    update_packet_delta_frames = 0;
 
     default_camera = create_camera(
         _OUTPORT_WIDTH_*0.5, _OUTPORT_HEIGHT_*0.5, 0,
@@ -75,10 +76,11 @@ void load_game() {
         //     }
         // );
         man_mesh = mesh_from_collada_dae("./src/game/models/man_rigged_t_pose.dae", 1);
+        if (man_mesh == NULL) exit_thread(1);
     // </man mesh>
     load_game_progress += 1;
 
-    // <animation of man mesh>
+    // <animations of man mesh>
         man_anim_t_pose = animation_from_collada_dae_ext(
             "./src/game/models/man_rigged_t_pose.dae",
             man_mesh->joints,
@@ -97,6 +99,7 @@ void load_game() {
                 }
             }
         );
+        if (man_anim_t_pose == NULL) exit_thread(1);
         load_game_progress += 1;
 
         
@@ -118,34 +121,13 @@ void load_game() {
                 }
             }
         );
+        if (man_anim_run == NULL) exit_thread(1);
         load_game_progress += 1;
-    // </animation of man mesh>
+    // </animations of man mesh>
     
 
-    // <player>
-        player = (player_t){
-            .cube = (cube_t){
-                .x = 0,
-                .y = 80,
-                .z = 0,
-
-                .rx = 0,
-                .ry = 0,
-                .rz = 0,
-
-                .w = 10,
-                .h = 40,
-                .d = 6
-            },
-            .can_jump_buffer = 0,
-            .vy = 0,
-
-            .current_anim_frame = 0,
-            .last_anim_frame = 0,
-            .anim_transition_frame = 0,
-            .current_anim = man_anim_t_pose,
-            .last_anim = man_anim_t_pose
-        };
+    // <player(s)>
+        init_shared_object_players();
 
         player_camera = create_camera(
             0, 0, 0,
@@ -155,7 +137,7 @@ void load_game() {
             0, 60,
             0, 0, _OUTPORT_WIDTH_, _OUTPORT_HEIGHT_
         );
-    // </player>
+    // </player(s)>
     load_game_progress += 1;
     
     // <cube_mesh>

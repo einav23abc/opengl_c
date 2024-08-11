@@ -5,9 +5,14 @@
 #include <stdint.h>
 
 #include "../engine/engine.h"
+#include "config.h"
+
+#ifdef DEBUG_MODE
+#define DEBUG_SOFT_MODE
+#endif
 
 
-typedef struct cube_t {
+typedef struct {
     float x;
     float y;
     float z;
@@ -29,7 +34,9 @@ typedef struct cube_t {
     float aabb_d;
 } cube_t;
 
-typedef struct player_t {
+typedef struct {
+    uint8_t connected;
+
     cube_t cube;
 
     float can_jump_buffer;
@@ -44,14 +51,19 @@ typedef struct player_t {
     animation_t* last_anim;
 } player_t;
 
-
-
-#define _OUTPORT_WIDTH_ (320*3)
-#define _OUTPORT_HEIGHT_ (240*3)
-
-#define _OUTPORT_BACKGROUND_COLOR_R_ (0.2)
-#define _OUTPORT_BACKGROUND_COLOR_G_ (0.2)
-#define _OUTPORT_BACKGROUND_COLOR_B_ (0.3)
+#pragma pack(1)
+typedef struct {
+    float x;
+    float y;
+    float z;
+    float rx;
+    float ry;
+    float rz;
+    float vx;
+    float vy;
+    float vz;
+} update_packet_body_t;
+#pragma pack()
 
 
 extern float frames;
@@ -69,8 +81,14 @@ extern fbo_t* outport_fbo;
     extern texture_t* global_texture;
     extern shader_t* global_shader;
 
+    extern int32_t client_id;
+    extern int8_t is_server_host;
+    extern float update_packet_delta_frames;
+
     extern camera_t* player_camera;
-    extern player_t player;
+    extern int32_t player_id;
+    extern player_t players[_PLAYERS_MAX_AMOUNT_]; // the netframe shared object
+    extern player_t* player;
 
     extern mesh_t* man_mesh;
     extern animation_t* man_anim_t_pose;
@@ -93,30 +111,36 @@ extern const uint64_t CUBES_AMOUNT;
 
 
 
-
+uint8_t init();
 void load_game();
+void init_shared_object_players();
+void init_player_data(int32_t player_id);
 
+void handle_event();
+
+void update();
 void update_game();
-void render_game();
-
-
+void load_game_update();
 vec3_t sat_cube_collision(cube_t* cube1, cube_t* cube2);
-
-
 void cube_update_aabb(cube_t* cube);
-
+void players_update();
 void player_camera_update();
-void player_update();
-
 void sun_shadow_map_update();
 
-
+void render();
+void render_game();
 void render_load_game_screen();
-
 void render_game_world();
-
 void cube_draw(cube_t* cube);
 void cube_debug_draw_vertices(cube_t* cube);
+
+// netframe functions in game.c
+server_packet_t generate_state_packet();
+void parse_state_packet(server_packet_t packet);
+void parse_update_packet(server_packet_t packet);
+void handle_client_connect(int32_t client_id);
+void handle_client_disconnect(int32_t client_id);
+void handle_disconnect_as_client();
 
 
 

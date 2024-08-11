@@ -4,14 +4,6 @@
 #include <stdint.h>
 #include <windows.h>
 
-// fix wierd defines in <windows.h>
-#ifdef near
-#undef near
-#endif
-#ifdef far
-#undef far
-#endif
-
 
 typedef struct {
     int32_t thread_id;

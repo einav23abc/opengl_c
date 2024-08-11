@@ -73,8 +73,12 @@ void render_game() {
                 cube_debug_draw_vertices(&(cubes[i]));
             }
             
-            // player
-            cube_debug_draw_vertices(&(player.cube));
+            // players
+            for (int32_t i = 0; i <_PLAYERS_MAX_AMOUNT_; i++) {
+                if (players[i].connected == 0) continue;
+                
+                cube_debug_draw_vertices(&(players[i].cube));
+            }
 
             glDepthFunc(GL_LESS);
         }
@@ -97,19 +101,26 @@ void render_game() {
 void render_game_world() {
     quat_t quat_rotation;
 
-    // <player>
-        bind_texture(global_texture, shaders_list[current_shader]->u_texture_loc, 0);
-        // u_position
-        glUniform3f(shaders_list[current_shader]->uniform_locations[0], player.cube.x, player.cube.y, player.cube.z);
-        // u_scale
-        glUniform3f(shaders_list[current_shader]->uniform_locations[1], 5, 5, 5);
-        // u_quat_rotation
-        quat_rotation = quat_from_axis_angles_yzx(0, -player.cube.ry, 0);
-        glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
-        pose_mesh_set_from_animation(man_mesh, player.last_anim, fmod(player.last_anim_frame*0.015, 0.75));
-        pose_mesh_mix_from_animation(man_mesh, player.current_anim, fmod(player.current_anim_frame*0.015, 0.75), (player.anim_transition_frame*0.015)/0.25);
-        draw_mesh_posed(man_mesh);
-    // </player>
+    // <players>
+        for (int32_t i = 0; i < _PLAYERS_MAX_AMOUNT_; i++) {
+            if (players[i].connected == 0) continue;
+
+            bind_texture(global_texture, shaders_list[current_shader]->u_texture_loc, 0);
+            // u_position
+            glUniform3f(shaders_list[current_shader]->uniform_locations[0], players[i].cube.x, players[i].cube.y, players[i].cube.z);
+            // u_scale
+            glUniform3f(shaders_list[current_shader]->uniform_locations[1], 5, 5, 5);
+            // u_quat_rotation
+            quat_rotation = quat_from_axis_angles_yzx(0, -players[i].cube.ry, 0);
+            glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
+            pose_mesh_set_from_animation(man_mesh, players[i].last_anim, fmod(players[i].last_anim_frame*0.015, 0.75));
+            pose_mesh_mix_from_animation(man_mesh, players[i].current_anim, fmod(players[i].current_anim_frame*0.015, 0.75), (players[i].anim_transition_frame*0.015)/0.25);
+            
+            // pose_mesh_set_from_animation(man_mesh, man_anim_t_pose, 0);
+            draw_mesh_posed(man_mesh);
+            // draw_mesh(man_mesh);
+        }
+    // </players>
 
     // <cubes>
         // u_texture
@@ -118,19 +129,6 @@ void render_game_world() {
             cube_draw(&(cubes[i]));
         }
     // </cubes>
-
-    // <man mesh>
-        bind_texture(global_texture, shaders_list[current_shader]->u_texture_loc, 0);
-        // u_position
-        glUniform3f(shaders_list[current_shader]->uniform_locations[0], 0, 80, -60);
-        // u_scale
-        glUniform3f(shaders_list[current_shader]->uniform_locations[1], 20, 20, 20);
-        // u_quat_rotation
-        quat_rotation = quat_from_axis_angles_yzx(0, 0, 0);
-        glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
-        pose_mesh_set_from_animation(man_mesh, man_anim_run, fmod(frames*0.015, 0.75));
-        draw_mesh_posed(man_mesh);
-    // </man mesh>
 }
 
 void cube_draw(cube_t* cube) {

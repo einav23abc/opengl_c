@@ -28,7 +28,7 @@ uint64_t get_last_write_time(const char* path) {
 }
 
 int main() {
-    char* intended_cwd = "C:\\Users\\einav\\Desktop\\coding\\c\\opengl\\project8\\compile";
+    char* intended_cwd = "C:\\Users\\einav\\Desktop\\coding\\c\\opengl\\project10\\compile";
     SetCurrentDirectory(intended_cwd);
     char cwd[2048];
     getcwd(cwd, 2048);
@@ -44,10 +44,17 @@ int main() {
     uint64_t wt_engine_c = get_last_write_time( "../src/engine/engine.c");
     uint64_t wt_engine_h = get_last_write_time( "../src/engine/engine.h");
 
-    uint64_t wt_engine_config_h = get_last_write_time( "../src/game/engine_config.h");
+    uint64_t wt_config_h = get_last_write_time( "../src/game/config.h");
     
     uint64_t wt_threads_c = get_last_write_time( "../src/engine/threads/threads.c");
     uint64_t wt_threads_h = get_last_write_time( "../src/engine/threads/threads.h");
+    
+    uint64_t wt_sockets_c = get_last_write_time( "../src/engine/sockets/sockets.c");
+    uint64_t wt_sockets_h = get_last_write_time( "../src/engine/sockets/sockets.h");
+    
+    uint64_t wt_netframe_client_c = get_last_write_time( "../src/engine/netframe/netframe_client.c");
+    uint64_t wt_netframe_server_c = get_last_write_time( "../src/engine/netframe/netframe_server.c");
+    uint64_t wt_netframe_h = get_last_write_time( "../src/engine/netframe/netframe.h");
     
     uint64_t wt_audio_c = get_last_write_time( "../src/engine/audio/audio.c");
     uint64_t wt_audio_h = get_last_write_time( "../src/engine/audio/audio.h");
@@ -91,8 +98,10 @@ int main() {
         wt_glad_h                   > last_compile_time ||
         wt_glad_khr_h               > last_compile_time ||
         wt_engine_h                 > last_compile_time ||
-        wt_engine_config_h          > last_compile_time ||
+        wt_config_h                 > last_compile_time ||
         wt_threads_h                > last_compile_time ||
+        wt_sockets_h                > last_compile_time ||
+        wt_netframe_h               > last_compile_time ||
         wt_audio_h                  > last_compile_time ||
         wt_utils_h                  > last_compile_time ||
         wt_vmq_h                    > last_compile_time ||
@@ -110,6 +119,9 @@ int main() {
             "../src/engine/glad/glad.c "
             "../src/engine/engine.c "
             "../src/engine/threads/threads.c "
+            "../src/engine/sockets/sockets.c "
+            "../src/engine/netframe/netframe_client.c "
+            "../src/engine/netframe/netframe_server.c "
             "../src/engine/audio/audio.c "
             "../src/engine/utils/utils.c "
             "../src/engine/vec_mat_quat/vec_mat_quat.c "
@@ -125,7 +137,7 @@ int main() {
             "../src/game/render.c "
             "../src/game/handle_event.c "
             "../src/game/clean.c "
-            "-include ../src/game/engine_config.h "
+            "-include ../src/game/config.h "
             "-c -g"
         );
     }else{
@@ -133,6 +145,9 @@ int main() {
             wt_glad_c               > last_compile_time ||
             wt_engine_c             > last_compile_time ||
             wt_threads_c            > last_compile_time ||
+            wt_sockets_c            > last_compile_time ||
+            wt_netframe_client_c    > last_compile_time ||
+            wt_netframe_server_c    > last_compile_time ||
             wt_audio_c              > last_compile_time ||
             wt_utils_c              > last_compile_time ||
             wt_vmq_c                > last_compile_time ||
@@ -150,6 +165,9 @@ int main() {
                 "../src/engine/glad/glad.c "
                 "../src/engine/engine.c "
                 "../src/engine/threads/threads.c "
+                "../src/engine/sockets/sockets.c "
+                "../src/engine/netframe/netframe_client.c "
+                "../src/engine/netframe/netframe_server.c "
                 "../src/engine/audio/audio.c "
                 "../src/engine/utils/utils.c "
                 "../src/engine/vec_mat_quat/vec_mat_quat.c "
@@ -159,7 +177,7 @@ int main() {
                 "../src/engine/frame_buffer_objects/frame_buffer_objects.c "
                 "../src/engine/meshes_and_animations/meshes_and_animations.c "
                 "../src/engine/simple_draw_module/simple_draw_module.c "
-                "-include ../src/game/engine_config.h "
+                "-include ../src/game/config.h "
                 "-c -g"
             );
         }
@@ -177,7 +195,7 @@ int main() {
                 "../src/game/render.c "
                 "../src/game/handle_event.c "
                 "../src/game/clean.c "
-                "-include ../src/game/engine_config.h "
+                "-include ../src/game/config.h "
                 "-c -g"
             );
         }else{
@@ -187,7 +205,7 @@ int main() {
                 system(
                     "gcc "
                     "../src/game/game.c "
-                    "-include ../src/game/engine_config.h "
+                    "-include ../src/game/config.h "
                     "-c -g"
                 );
             }
@@ -198,7 +216,7 @@ int main() {
                 system(
                     "gcc "
                     "../src/game/init.c "
-                    "-include ../src/game/engine_config.h "
+                    "-include ../src/game/config.h "
                     "-c -g"
                 );
             }
@@ -209,7 +227,7 @@ int main() {
                 system(
                     "gcc "
                     "../src/game/update.c "
-                    "-include ../src/game/engine_config.h "
+                    "-include ../src/game/config.h "
                     "-c -g"
                 );
             }
@@ -220,7 +238,7 @@ int main() {
                 system(
                     "gcc "
                     "../src/game/render.c "
-                    "-include ../src/game/engine_config.h "
+                    "-include ../src/game/config.h "
                     "-c -g"
                 );
             }
@@ -231,7 +249,7 @@ int main() {
                 system(
                     "gcc "
                     "../src/game/handle_event.c "
-                    "-include ../src/game/engine_config.h "
+                    "-include ../src/game/config.h "
                     "-c -g"
                 );
             }
@@ -242,7 +260,7 @@ int main() {
                 system(
                     "gcc "
                     "../src/game/clean.c "
-                    "-include ../src/game/engine_config.h "
+                    "-include ../src/game/config.h "
                     "-c -g"
                 );
             }
@@ -256,6 +274,9 @@ int main() {
         "glad.o "
         "engine.o "
         "threads.o "
+        "sockets.o "
+        "netframe_client.o "
+        "netframe_server.o "
         "audio.o "
         "utils.o "
         "vec_mat_quat.o "
@@ -279,6 +300,7 @@ int main() {
         "-l \"SDL2_image\" "
         "-l \"SDL2_mixer\" "
         "-l \"libpng16-16\" "
+        "-l \"Ws2_32\" "
     );
     
     return 0;

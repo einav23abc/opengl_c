@@ -9,6 +9,14 @@
 #include "../vec_mat_quat/vec_mat_quat.h"
 #include "../shaders/shaders.h"
 
+// fix wierd defines in <windows.h>
+#ifdef near
+#undef near
+#endif
+#ifdef far
+#undef far
+#endif
+
 
 #ifndef M_PI
 #define M_PI		3.14159265358979323846

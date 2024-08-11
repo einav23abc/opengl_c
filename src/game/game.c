@@ -18,8 +18,14 @@ fbo_t* outport_fbo;
     texture_t* global_texture;
     shader_t* global_shader;
 
+    int32_t client_id;
+    int8_t is_server_host;
+    float update_packet_delta_frames;
+
     camera_t* player_camera;
-    player_t player;
+    int32_t player_id;
+    player_t players[_PLAYERS_MAX_AMOUNT_];
+    player_t* player;
 
     mesh_t* man_mesh;
     animation_t* man_anim_t_pose;
@@ -274,4 +280,144 @@ vec3_t sat_cube_collision(cube_t* cube1, cube_t* cube2) {
         .y = axes[min_overlap_axis].y*min_overlap,
         .z = axes[min_overlap_axis].z*min_overlap
     };
+}
+
+void init_shared_object_players() {
+    for (int32_t i = 0; i < _PLAYERS_MAX_AMOUNT_; i++) {
+        players[i].connected = 0;
+        players[i].current_anim = man_anim_t_pose;
+        players[i].last_anim = man_anim_t_pose;
+    }
+}
+
+void init_player_data(int32_t player_id) {
+    if (player_id < 0 || player_id >= _PLAYERS_MAX_AMOUNT_) return;
+
+    players[player_id] = (player_t){
+        .connected = 1,
+
+        .cube = (cube_t){
+            .x = 20,
+            .y = 80,
+            .z = 20,
+
+            .rx = 0,
+            .ry = 0,
+            .rz = 0,
+
+            .w = 10,
+            .h = 40,
+            .d = 6
+        },
+        .can_jump_buffer = 0,
+        .vy = 0,
+
+        .current_anim_frame = 0,
+        .last_anim_frame = 0,
+        .anim_transition_frame = 0,
+        .current_anim = man_anim_t_pose,
+        .last_anim = man_anim_t_pose
+    };
+}
+
+// netframe functions
+server_packet_t generate_state_packet() {
+    server_packet_t packet = (server_packet_t){
+        .packet_len = 2,
+        .packet_type = SERVER_STATE,
+        .client_id = -1
+    };
+    int32_t body_index = 0;
+    for (int32_t i = 0; i < _PLAYERS_MAX_AMOUNT_; i++) {
+        packet.packet_body[body_index    ] = players[i].connected;
+        body_index += 1;
+
+        if (players[i].connected == 0) continue;
+
+        *((update_packet_body_t*)&(packet.packet_body[body_index])) = (update_packet_body_t){
+            .x = players[i].cube.x,
+            .y = players[i].cube.y,
+            .z = players[i].cube.z,
+            .rx = players[i].cube.rx,
+            .ry = players[i].cube.ry,
+            .rz = players[i].cube.rz,
+            .vx = players[i].vx,
+            .vy = players[i].vy,
+            .vz = players[i].vz
+        };
+        body_index += sizeof(update_packet_body_t);
+    }
+    packet.packet_len += body_index;
+    
+    return packet;
+}
+void parse_state_packet(server_packet_t packet) {
+    int32_t body_index = 0;
+    for (int32_t i = 0; i < _PLAYERS_MAX_AMOUNT_; i++) {
+        players[i].connected = (uint8_t)packet.packet_body[body_index];
+        body_index += 1;
+
+        if (players[i].connected == 0) continue;
+
+        init_player_data(i);
+
+        players[i].cube.x =  ((update_packet_body_t*)&(packet.packet_body[body_index]))->x;
+        players[i].cube.y =  ((update_packet_body_t*)&(packet.packet_body[body_index]))->y;
+        players[i].cube.z =  ((update_packet_body_t*)&(packet.packet_body[body_index]))->z;
+        players[i].cube.rx = ((update_packet_body_t*)&(packet.packet_body[body_index]))->rx;
+        players[i].cube.ry = ((update_packet_body_t*)&(packet.packet_body[body_index]))->ry;
+        players[i].cube.rz = ((update_packet_body_t*)&(packet.packet_body[body_index]))->rz;
+        players[i].vx =      ((update_packet_body_t*)&(packet.packet_body[body_index]))->vx;
+        players[i].vy =      ((update_packet_body_t*)&(packet.packet_body[body_index]))->vy;
+        players[i].vz =      ((update_packet_body_t*)&(packet.packet_body[body_index]))->vz;
+        body_index += sizeof(update_packet_body_t);
+
+        cube_update_aabb(&(players[i].cube));
+    }
+}
+void parse_update_packet(server_packet_t packet) {
+    int32_t packet_player_id = packet.client_id;
+    if (packet_player_id == -1) packet_player_id = _PLAYERS_MAX_AMOUNT_-1;
+
+    // if (packet_player_id == player_id) return;
+
+    if (packet_player_id < 0 || packet_player_id >= _PLAYERS_MAX_AMOUNT_) {
+        #ifdef DEBUG_SOFT_MODE
+        printf("update packet received from bad player id\n");
+        #endif
+        return;
+    }
+    if (players[packet_player_id].connected == 0) {
+        #ifdef DEBUG_SOFT_MODE
+        printf("update packet received from disconnected player\n");
+        #endif
+        return;
+    }
+
+    players[packet_player_id].cube.x =  ((update_packet_body_t*)&packet.packet_body)->x;
+    players[packet_player_id].cube.y =  ((update_packet_body_t*)&packet.packet_body)->y;
+    players[packet_player_id].cube.z =  ((update_packet_body_t*)&packet.packet_body)->z;
+    players[packet_player_id].cube.rx = ((update_packet_body_t*)&packet.packet_body)->rx;
+    players[packet_player_id].cube.ry = ((update_packet_body_t*)&packet.packet_body)->ry;
+    players[packet_player_id].cube.rz = ((update_packet_body_t*)&packet.packet_body)->rz;
+    players[packet_player_id].vx =      ((update_packet_body_t*)&packet.packet_body)->vx;
+    players[packet_player_id].vy =      ((update_packet_body_t*)&packet.packet_body)->vy;
+    players[packet_player_id].vz =      ((update_packet_body_t*)&packet.packet_body)->vz;
+    cube_update_aabb(&(players[packet_player_id].cube));
+}
+void handle_client_connect(int32_t client_id) {
+    int32_t as_player_id = client_id;
+    if (as_player_id == -1) as_player_id = _PLAYERS_MAX_AMOUNT_-1;
+    init_player_data(as_player_id);
+}
+void handle_client_disconnect(int32_t client_id) {
+    int32_t as_player_id = client_id;
+    if (as_player_id == -1) as_player_id = _PLAYERS_MAX_AMOUNT_-1;
+
+    if (as_player_id < 0 || as_player_id >= _PLAYERS_MAX_AMOUNT_) return;
+    
+    players[as_player_id].connected = 0;
+}
+void handle_disconnect_as_client() {
+    running = 0;
 }
