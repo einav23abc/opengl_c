@@ -12,6 +12,22 @@
 #endif
 
 
+// game defines
+#define _PLAYERS_MAX_AMOUNT_ (_CLIENTS_MAX_AMOUNT_+1)
+#define _SERVER_HOST_PLAYER_ID_ (_CLIENTS_MAX_AMOUNT_) /*the last player ID possible*/
+
+#define _UPDATE_PACKET_FRAME_INTERVALS_ (1)
+
+
+#define _OUTPORT_WIDTH_ (320*3)
+#define _OUTPORT_HEIGHT_ (240*3)
+
+#define _OUTPORT_BACKGROUND_COLOR_R_ (0.2)
+#define _OUTPORT_BACKGROUND_COLOR_G_ (0.2)
+#define _OUTPORT_BACKGROUND_COLOR_B_ (0.3)
+
+
+
 typedef struct {
     float x;
     float y;

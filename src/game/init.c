@@ -12,19 +12,25 @@ uint8_t init() {
         0, 60,
         0, 0, _WINDOW_START_WIDTH_, _WINDOW_START_HEIGHT_
     );
+    if (default_camera == NULL) return 1;
 
 
     in_game = 0;
     load_game_progress = 0;
-    create_thread(
-        &load_game_thread,
-        NULL,
-        (void*)&load_game,
-        NULL
-    );
+    if (
+        create_thread(
+            &load_game_thread,
+            NULL,
+            (void*)&load_game,
+            NULL
+        ) != 0
+    ) {
+        return 1;
+    }
 
 
     outport_fbo = create_fbo(_OUTPORT_WIDTH_, _OUTPORT_HEIGHT_, 1, GL_RGB, 4);
+    if (outport_fbo == NULL) return 1;
     load_game_progress += 1;
     
     global_shader = create_shader_from_files(
@@ -34,12 +40,15 @@ uint8_t init() {
         // "u_position\0u_scale\0u_rotation\0u_camera_position\0u_sun_vector\0u_sun_shadow_map_wvp_mat\0u_sun_shadow_map_texture", 7
         "u_position\0u_scale\0u_quat_rotation\0u_camera_position\0u_sun_vector\0u_sun_shadow_map_wvp_mat\0u_sun_shadow_map_texture", 7
     );
+    if (global_shader == NULL) return 1;
     load_game_progress += 1;
 
     global_texture = load_texture("./src/game/textures/global_texture.png");
+    if (global_texture == NULL) return 1;
     load_game_progress += 1;
 
     sun_shadow_map_fbo = create_fbo(3240, 3240, 0, 0, 2);
+    if (sun_shadow_map_fbo == NULL) return 1;
     load_game_progress += 1;
 
     sun_shadow_map_shader = create_shader_from_files(
@@ -49,6 +58,7 @@ uint8_t init() {
         // "u_position\0u_scale\0u_rotation", 3
         "u_position\0u_scale\0u_quat_rotation", 3
     );
+    if (sun_shadow_map_shader == NULL) return 1;
     load_game_progress += 1;
 
 

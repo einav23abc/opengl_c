@@ -327,7 +327,13 @@ server_packet_t generate_state_packet() {
         .packet_type = SERVER_STATE,
         .client_id = -1
     };
+
     int32_t body_index = 0;
+
+    // first 4 bytes is a float `frames`
+    memcpy(&(packet.packet_body), &frames, sizeof(float));
+    body_index += sizeof(float);
+
     for (int32_t i = 0; i < _PLAYERS_MAX_AMOUNT_; i++) {
         packet.packet_body[body_index    ] = players[i].connected;
         body_index += 1;
@@ -353,6 +359,11 @@ server_packet_t generate_state_packet() {
 }
 void parse_state_packet(server_packet_t packet) {
     int32_t body_index = 0;
+
+    // first 4 bytes is a float `frames`
+    memcpy(&frames, &(packet.packet_body), sizeof(float));
+    body_index += sizeof(float);
+
     for (int32_t i = 0; i < _PLAYERS_MAX_AMOUNT_; i++) {
         players[i].connected = (uint8_t)packet.packet_body[body_index];
         body_index += 1;

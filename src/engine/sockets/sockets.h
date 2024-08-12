@@ -11,7 +11,7 @@
 #include "../threads/threads.h"
 
 
-#ifdef DEUBUG_MODE
+#ifdef DEBUG_MODE
 #define DEBUG_SOFT_MODE
 #endif
 

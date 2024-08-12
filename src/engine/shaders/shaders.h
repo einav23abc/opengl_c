@@ -91,6 +91,7 @@ void use_shader(shader_t* shader);
  * Gets called automaticly by `use_shader()` and `camera_use()`, so generally there is no reason to call this function.
 */
 void update_shader_camera_uniforms();
+
 /* Destroys a shader.
  *
  * The shader will not be usable after destruction.

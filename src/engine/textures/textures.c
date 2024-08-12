@@ -13,12 +13,13 @@ texture_t* load_texture_ext_params(const char* file_path, void(*param_func)()) {
     if (textures_amount >= TEXTURES_MAX_AMOUNT) return NULL;
 
     texture_t* texture = malloc(sizeof(texture_t));
+    if (texture == NULL) return NULL;
 
     uint32_t texture_id;
     SDL_Surface* texture_load_surface;
     texture_load_surface = IMG_Load(file_path);
     if (texture_load_surface == NULL){
-        printf("failed to load texture '%s'.\n", file_path);
+        printf("failed to load texture '%s'. error: \"%s\"\n", file_path, SDL_GetError());
         free(texture);
         return NULL;
     }

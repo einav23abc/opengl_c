@@ -266,9 +266,7 @@ void sun_shadow_map_update() {
     sun_shadow_map_camera->y = player->cube.y;
     sun_shadow_map_camera->z = player->cube.z;
 
-    // int32_t time = SDL_GetTicks()
-
-    sun_shadow_map_camera->ry += 0.002*delta_frames;
+    sun_shadow_map_camera->ry = 0.002*frames;
     sun_vector_x = cos(sun_shadow_map_camera->ry+M_PI*0.5)*cos(sun_shadow_map_camera->rx);
     sun_vector_y = sin(sun_shadow_map_camera->rx);
     sun_vector_z = sin(sun_shadow_map_camera->ry+M_PI*0.5)*cos(sun_shadow_map_camera->rx);
