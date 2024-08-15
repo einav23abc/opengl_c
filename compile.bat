@@ -19,7 +19,7 @@ gcc ^
     src/game/render.c ^
     src/game/handle_event.c ^
     src/game/clean.c ^
-    -include ../src/game/engine_config.h ^
+    -include src/game/engine_config.h ^
     -o ./main.exe ^
     -l "mingw32" ^
     -l "SDL2main" ^

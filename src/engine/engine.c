@@ -165,6 +165,13 @@ uint32_t backend_init() {
         SDL_Quit();
         return 1;
     }
+    
+    #ifdef DEBUG_MODE
+    // Check OpenGL properties
+    printf("Vendor:   %s\n", glGetString(GL_VENDOR));
+    printf("Renderer: %s\n", glGetString(GL_RENDERER));
+    printf("Version:  %s\n", glGetString(GL_VERSION));
+    #endif
 
     return 0;
 }
@@ -175,22 +182,12 @@ uint32_t engine_init() {
         return 1;
     }
     
-    #ifdef DEBUG_MODE
-    // Check OpenGL properties
-    printf("Vendor:   %s\n", glGetString(GL_VENDOR));
-    printf("Renderer: %s\n", glGetString(GL_RENDERER));
-    printf("Version:  %s\n", glGetString(GL_VERSION));
-    #endif
-    
     // get window sizes
     SDL_GetWindowSize(window, &window_width, &window_height);
     SDL_GL_GetDrawableSize(window, &window_drawable_width, &window_drawable_height);
 
     // audio init
     audio_init();
-    
-    // simple draw module
-    simple_draw_module_init();
 
     // default_shader
     default_shader = create_shader_from_files(
@@ -203,6 +200,9 @@ uint32_t engine_init() {
         printf("error\n");
         return 1;
     }
+    
+    // simple draw module
+    simple_draw_module_init();
 
     // default_texture
     default_texture = load_texture("./src/engine/def_tex.png");

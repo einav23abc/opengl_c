@@ -1,15 +1,16 @@
-char cube_frag[] =
-"   varying vec2 v_texcoord;	\n"
+static char cube_frag_arr[] =
+"	varying vec2 v_texcoord;	\n"
 "		\n"
 "	uniform vec4 u_color;	\n"
 "		\n"
 "	void main(){	\n"
 "	    gl_FragColor = u_color;	\n"
-"	}   \n"
+"	}	\n"
 ;
+static char* cube_frag = cube_frag_arr;
 
-char cube_vert[] =
-"   in vec3 in_vertex_position;	\n"
+static char cube_vert_arr[] =
+"	in vec3 in_vertex_position;	\n"
 "	in vec2 in_vertex_texcoord;	\n"
 "		\n"
 "	varying vec2 v_texcoord;	\n"
@@ -23,5 +24,6 @@ char cube_vert[] =
 "	    vec4 position = vec4( in_vertex_position*u_size + u_position , 1.0 )*u_camera_world_view_projection_matrix;	\n"
 "	    v_texcoord = in_vertex_texcoord;	\n"
 "	    gl_Position = position;	\n"
-"	}   \n"
+"	}	\n"
 ;
+static char* cube_vert = cube_vert_arr;

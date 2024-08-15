@@ -17,11 +17,11 @@ const mesh_t* simple_draw_module_screen_quad_mesh;
 
 void simple_draw_module_init() {
     simple_draw_module_set_color(1, 1, 1, 1);
-
+    
     // <simple_draw_module_cube_shader>
         simple_draw_module_cube_shader = create_shader(
-            cube_vert,
-            cube_frag,
+            (const char**)&cube_vert,
+            (const char**)&cube_frag,
             "in_vertex_position\0in_vertex_texcoord", 2,
             "u_position\0u_size\0u_color", 3
         );
@@ -112,8 +112,8 @@ void simple_draw_module_init() {
     // <simple_draw_module_screen_quad_mesh_shader>
         // used along with screen_quad_mesh to draw a texture to a section of the screen
         simple_draw_module_screen_quad_mesh_shader = create_shader(
-            screen_quad_mesh_vert,
-            screen_quad_mesh_frag,
+            (const char**)&screen_quad_mesh_vert,
+            (const char**)&screen_quad_mesh_frag,
             "in_vertex_data", 1,
             "", 0
         );
