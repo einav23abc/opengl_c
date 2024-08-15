@@ -190,9 +190,10 @@ uint32_t engine_init() {
     audio_init();
 
     // default_shader
-    default_shader = create_shader_from_files(
-        "./src/engine/default.vert",
-        "./src/engine/default.frag",
+    #include "./default_sh.c"
+    default_shader = create_shader(
+        (const char**)&default_vert,
+        (const char**)&default_frag,
         "in_vertex_position\0in_vertex_texcoord", 2,
         "", 0
     );
@@ -200,17 +201,17 @@ uint32_t engine_init() {
         printf("error\n");
         return 1;
     }
-    
-    // simple draw module
-    if (simple_draw_module_init() != 0) {
-        printf("Failed to init simple-draw-module\n");
-        return 1;
-    }
 
     // default_texture
     default_texture = load_texture("./src/engine/def_tex.png");
     if (default_texture == NULL) {
         printf("error\n");
+        return 1;
+    }
+    
+    // simple draw module
+    if (simple_draw_module_init() != 0) {
+        printf("Failed to init simple-draw-module\n");
         return 1;
     }
 
