@@ -21,6 +21,29 @@ extern texture_t* textures_list[];
 extern const uint64_t TEXTURES_MAX_AMOUNT;
 
 
+/* \brief Create a texture from a SDL_Surface. 
+ * 
+ * The memory delocation of this texture is handled by the engine (by calling `clean_textures`).
+ *
+ * \param texture_load_surface The SDL_Surface to create a texture from.
+ * 
+ * \param param_func A pointer to a function that will be called after the texture is binded and before the image is loaded.
+ * Should be used to call `glTexParameter`. Null can be passed for no function.
+ * 
+ * \returns A pointer to an allocated texture or `NULL` on failure.
+ */
+texture_t* load_texture_from_surface_ext_params(SDL_Surface* texture_load_surface, void(*param_func)());
+
+/* \brief Create a texture from a SDL_Surface.
+ * 
+ * The memory delocation of this texture is handled by the engine (by calling `clean_textures`).
+ *
+ * \param texture_load_surface The SDL_Surface to create a texture from.
+ * 
+ * \returns A pointer to an allocated texture or `NULL` on failure.
+ */
+texture_t* load_texture_from_surface(SDL_Surface* texture_load_surface);
+
 /* \brief Create a texture from an image file. 
  * 
  * The memory delocation of this texture is handled by the engine (by calling `clean_textures`).
@@ -70,5 +93,16 @@ void destroy_texture(texture_t* texture);
  * Destroys all created textures.
  */
 void clean_textures();
+
+/* \brief Print a SDL_Surface struct for saving without loading from file.
+ *
+ * Can be used to save a surface without having to load from a file.
+ * 
+ * Surfaces are loaded from files using `IMG_Load(const char* file_path)`.
+ * And should be freed using `SDL_FreeSurface(SDL_Surface* surface)`.
+ * 
+ * \param surface A pointer to a SDL_Surface struct that will be printed.
+ */
+void print_surface_for_saving(SDL_Surface* surface);
 
 #endif

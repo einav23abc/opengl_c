@@ -203,12 +203,15 @@ uint32_t engine_init() {
     }
 
     // default_texture
-    default_texture = load_texture("./src/engine/def_tex.png");
+    if (1){ // create scope
+    #include "./def_tex_surf.c"
+    default_texture = load_texture_from_surface(&surface);
     if (default_texture == NULL) {
         printf("error\n");
         return 1;
     }
-    
+    }       // end scope
+
     // simple draw module
     if (simple_draw_module_init() != 0) {
         printf("Failed to init simple-draw-module\n");
