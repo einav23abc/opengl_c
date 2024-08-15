@@ -65,7 +65,7 @@ void exit_thread(int32_t exit_code) {
 // returns the thread's exit code
 int32_t join_thread(thread_t thread) {
     #ifdef DEBUG_MODE
-    threads_active -= 1; printf("threads -= 1 (%d)\t: %d\n", thread.thread_id, threads_active);
+    if (get_thread_exit_code(thread) == STILL_ACTIVE) {threads_active -= 1; printf("threads -= 1 (%d)\t: %d\n", thread.thread_id, threads_active);}
     #endif
 
     // wait
@@ -85,7 +85,7 @@ int32_t join_thread(thread_t thread) {
 
 void terminate_thread(thread_t thread) {
     #ifdef DEBUG_MODE
-    threads_active -= 1; printf("threads -= 1 (%d)\t: %d\n", thread.thread_id, threads_active);
+    if (get_thread_exit_code(thread) == STILL_ACTIVE) {threads_active -= 1; printf("threads -= 1 (%d)\t: %d\n", thread.thread_id, threads_active);}
     #endif
     
     TerminateThread(thread.thread_handle, 0);
