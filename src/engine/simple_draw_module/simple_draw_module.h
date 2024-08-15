@@ -18,7 +18,7 @@ extern const mesh_t* simple_draw_module_ball_mesh;
 extern const shader_t* simple_draw_module_screen_quad_mesh_shader;
 extern const mesh_t* simple_draw_module_screen_quad_mesh;
 
-void simple_draw_module_init();
+int32_t simple_draw_module_init();
 
 void simple_draw_module_set_color(float r, float g, float b, float a);
 void simple_draw_module_draw_rect(float x, float y, float w, float h);

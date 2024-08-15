@@ -15,9 +15,9 @@ const mesh_t* simple_draw_module_ball_mesh;
 const shader_t* simple_draw_module_screen_quad_mesh_shader;
 const mesh_t* simple_draw_module_screen_quad_mesh;
 
-void simple_draw_module_init() {
+int32_t simple_draw_module_init() {
     simple_draw_module_set_color(1, 1, 1, 1);
-    
+
     // <simple_draw_module_cube_shader>
         simple_draw_module_cube_shader = create_shader(
             (const char**)&cube_vert,
@@ -25,6 +25,10 @@ void simple_draw_module_init() {
             "in_vertex_position\0in_vertex_texcoord", 2,
             "u_position\0u_size\0u_color", 3
         );
+        if (simple_draw_module_cube_shader == NULL) {
+            printf("failed to create simple_draw_module_cube_shader\n");
+            return 1;
+        }
     // </simple_draw_module_cube_shader>
 
     // <simple_draw_module_rectangle_mesh>
@@ -53,6 +57,10 @@ void simple_draw_module_init() {
         };
 
         simple_draw_module_rectangle_mesh = generate_mesh(vbo_datas_arr, 1, indices_array, 6, 0);
+        if (simple_draw_module_rectangle_mesh == NULL) {
+            printf("failed to generate simple_draw_module_rectangle_mesh\n");
+            return 1;
+        }
         }
     // </simple_draw_module_rectangle_mesh>
 
@@ -103,11 +111,19 @@ void simple_draw_module_init() {
         };
 
         simple_draw_module_cube_mesh = generate_mesh(vbo_datas_arr, 1, indices_array, 6*6, 0);
+        if (simple_draw_module_cube_mesh == NULL) {
+            printf("failed to generate simple_draw_module_cube_mesh\n");
+            return 1;
+        }
         }
     // </simple_draw_module_cube_mesh>
 
     // simple_draw_module_ball_mesh
     simple_draw_module_ball_mesh = mesh_generate_ball(4);
+    if (simple_draw_module_ball_mesh == NULL) {
+        printf("failed to generate simple_draw_module_ball_mesh\n");
+        return 1;
+    }
 
     // <simple_draw_module_screen_quad_mesh_shader>
         // used along with screen_quad_mesh to draw a texture to a section of the screen
@@ -117,9 +133,10 @@ void simple_draw_module_init() {
             "in_vertex_data", 1,
             "", 0
         );
-        // if (simple_draw_module_screen_quad_mesh_shader == NULL){
-        //     return 1;
-        // }
+        if (simple_draw_module_screen_quad_mesh_shader == NULL) {
+            printf("failed to create simple_draw_module_screen_quad_mesh_shader\n");
+            return 1;
+        }
     // </simple_draw_module_screen_quad_mesh_shader>
 
     // <simple_draw_module_screen_quad_mesh>
@@ -149,8 +166,14 @@ void simple_draw_module_init() {
         };
 
         simple_draw_module_screen_quad_mesh = generate_mesh(vbo_datas_arr, 1, indices_array, 6, 0);
+        if (simple_draw_module_screen_quad_mesh == NULL) {
+            printf("failed to generate simple_draw_module_screen_quad_mesh\n");
+            return 1;
+        }
         }
     // </simple_draw_module_screen_quad_mesh>
+
+    return 0;
 }
 
 void simple_draw_module_set_color(float r, float g, float b, float a) {

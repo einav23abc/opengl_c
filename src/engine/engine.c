@@ -202,7 +202,10 @@ uint32_t engine_init() {
     }
     
     // simple draw module
-    simple_draw_module_init();
+    if (simple_draw_module_init() != 0) {
+        printf("Failed to init simple-draw-module\n");
+        return 1;
+    }
 
     // default_texture
     default_texture = load_texture("./src/engine/def_tex.png");
