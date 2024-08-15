@@ -1,5 +1,8 @@
 #include "simple_draw_module.h"
+
 #include "cube_sh.c"
+#include "screen_quad_mesh_sh.c"
+
 
 float simple_draw_module_color_r;
 float simple_draw_module_color_g;
@@ -108,9 +111,9 @@ void simple_draw_module_init() {
 
     // <simple_draw_module_screen_quad_mesh_shader>
         // used along with screen_quad_mesh to draw a texture to a section of the screen
-        simple_draw_module_screen_quad_mesh_shader = create_shader_from_files(
-            "./src/engine/simple_draw_module/screen_quad_mesh.vert",
-            "./src/engine/simple_draw_module/screen_quad_mesh.frag",
+        simple_draw_module_screen_quad_mesh_shader = create_shader(
+            screen_quad_mesh_vert,
+            screen_quad_mesh_frag,
             "in_vertex_data", 1,
             "", 0
         );
