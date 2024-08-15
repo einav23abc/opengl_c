@@ -1,4 +1,5 @@
 #include "simple_draw_module.h"
+#include "cube_sh.c"
 
 float simple_draw_module_color_r;
 float simple_draw_module_color_g;
@@ -15,9 +16,9 @@ void simple_draw_module_init() {
     simple_draw_module_set_color(1, 1, 1, 1);
 
     // <simple_draw_module_cube_shader>
-        simple_draw_module_cube_shader = create_shader_from_files(
-            "./src/engine/simple_draw_module/cube.vert",
-            "./src/engine/simple_draw_module/cube.frag",
+        simple_draw_module_cube_shader = create_shader(
+            cube_vert,
+            cube_frag,
             "in_vertex_position\0in_vertex_texcoord", 2,
             "u_position\0u_size\0u_color", 3
         );
