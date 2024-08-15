@@ -1,8 +1,8 @@
 #include <SDL2/SDL.h>
 #include <stdint.h>
-SDL_PixelFormat surface_format = (SDL_PixelFormat){
+static SDL_PixelFormat surface_format = (SDL_PixelFormat){
         .format = 376840196,
-        .palette = 0x00000000,
+        .palette = 0x0,
         .BitsPerPixel = 32,
         .BytesPerPixel = 4,
         .padding = {0, 0},
@@ -19,9 +19,9 @@ SDL_PixelFormat surface_format = (SDL_PixelFormat){
         .Bshift = 16,
         .Ashift = 24,
         .refcount = 1,
-        .next = 0x00000000
+        .next = 0x0
 };
-uint8_t surface_pixels[] = {
+static uint8_t surface_pixels[] = {
         255, 0, 255, 255, 0, 0, 0, 255, 0, 0, 0, 255, 255, 0, 255, 255
 };
 SDL_Surface surface = (SDL_Surface){
@@ -31,9 +31,9 @@ SDL_Surface surface = (SDL_Surface){
         .h = 2,
         .pitch = 8,
         .pixels = &surface_pixels,
-        .userdata = 0x00000000,
+        .userdata = 0x0,
         .locked = 0,
-        .list_blitmap = 0x00000000,
+        .list_blitmap = 0x0,
         .clip_rect = (SDL_Rect){
                 .x = 0,
                 .y = 0,

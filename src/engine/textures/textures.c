@@ -103,9 +103,9 @@ void print_surface_for_saving(SDL_Surface* surface) {
 
     // surface_format
     printf(
-        ""      "SDL_PixelFormat surface_format = (SDL_PixelFormat){\n"
+        ""      "static SDL_PixelFormat surface_format = (SDL_PixelFormat){\n"
         "\t"        ".format = %u,\n"
-        "\t"        ".palette = 0x%p,\n"
+        "\t"        ".palette = 0x0,\n"
         "\t"        ".BitsPerPixel = %hhu,\n"
         "\t"        ".BytesPerPixel = %hhu,\n"
         "\t"        ".padding = {%hhu, %hhu},\n"
@@ -122,11 +122,10 @@ void print_surface_for_saving(SDL_Surface* surface) {
         "\t"        ".Bshift = %hhu,\n"
         "\t"        ".Ashift = %hhu,\n"
         "\t"        ".refcount = %d,\n"
-        "\t"        ".next = 0x%p\n"
+        "\t"        ".next = 0x0\n"
         ""      "};\n"
         ,
         surface->format->format,
-        surface->format->palette,
         surface->format->BitsPerPixel,
         surface->format->BytesPerPixel,
         surface->format->padding[0], surface->format->padding[1],
@@ -142,13 +141,12 @@ void print_surface_for_saving(SDL_Surface* surface) {
         surface->format->Gshift,
         surface->format->Bshift,
         surface->format->Ashift,
-        surface->format->refcount,
-        surface->format->next
+        surface->format->refcount
     );
 
     // surface_pixels
     printf(
-        ""      "uint8_t surface_pixels[] = {"
+        ""      "static uint8_t surface_pixels[] = {"
     );
     for (uint64_t i = 0; i < surface->w*surface->h*surface->format->BytesPerPixel; i++) {
         if (i != 0) printf(", ");
@@ -157,6 +155,7 @@ void print_surface_for_saving(SDL_Surface* surface) {
     }
     printf("\n};\n");
 
+    // surface
     printf(
         ""      "SDL_Surface surface = (SDL_Surface){\n"
         "\t"        ".flags = %u,\n"
@@ -165,9 +164,9 @@ void print_surface_for_saving(SDL_Surface* surface) {
         "\t"        ".h = %d,\n"
         "\t"        ".pitch = %d,\n"
         "\t"        ".pixels = &surface_pixels,\n"
-        "\t"        ".userdata = 0x%p,\n"
+        "\t"        ".userdata = 0x0,\n"
         "\t"        ".locked = %d,\n"
-        "\t"        ".list_blitmap = 0x%p,\n"
+        "\t"        ".list_blitmap = 0x0,\n"
         "\t"        ".clip_rect = (SDL_Rect){\n"
         "\t\t"          ".x = %d,\n"
         "\t\t"          ".y = %d,\n"
@@ -182,14 +181,11 @@ void print_surface_for_saving(SDL_Surface* surface) {
         surface->w,
         surface->h,
         surface->pitch,
-        surface->userdata,
         surface->locked,
-        surface->list_blitmap,
         surface->clip_rect.x,
         surface->clip_rect.y,
         surface->clip_rect.w,
         surface->clip_rect.h,
-        surface->map,
         surface->refcount
     );
 
