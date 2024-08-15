@@ -151,7 +151,7 @@ void print_surface_for_saving(SDL_Surface* surface) {
     for (uint64_t i = 0; i < surface->w*surface->h*surface->format->BytesPerPixel; i++) {
         if (i != 0) printf(", ");
         if (i%20 == 0) printf("\n\t");
-        printf("%u", ((uint8_t*)(surface->pixels))[i]);
+        printf("%hhu", ((uint8_t*)(surface->pixels))[i]);
     }
     printf("\n};\n");
 

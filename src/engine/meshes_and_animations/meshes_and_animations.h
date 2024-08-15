@@ -38,14 +38,21 @@ typedef struct joint_t {
 } joint_t;
 
 typedef struct mesh_t {
-    const uint64_t mesh_index;
+    const int64_t mesh_index;
+
+    /* 0 = not saved.
+     * non-zero = saved.
+     *
+     * See `print_mesh_for_saving`.
+     */
+    uint8_t saved;
 
     uint8_t unbinded; // 0 = binded ; non-zero = unbinded
-    vbo_data_t* vbo_datas_arr; // only relevent when unbinded
     
     uint32_t vao;
     uint32_t vbos_amount;
     uint32_t* vbos;
+    vbo_data_t* vbo_datas_arr; // only relevent when unbinded
     uint32_t indices_count;
     uint32_t* indices_array;
     
@@ -126,5 +133,20 @@ void clean_meshes();
  * Destroys all created animations.
 */
 void clean_animations();
+
+
+/* \brief Print a mesh_t struct for saving.
+ *
+ * Can be used to load a saved mesh without having to load from a file.
+ * 
+ * Binded meshes will not be printed beacuse they will not work if saved.
+ * This is beacuse the mesh must be binded at each runtime.
+ * 
+ * Saved meshes do not have an index beacuse they dont need to be deallocated.
+ * Beacuse of this, Using `destroy_mesh` on a saved mesh will have undefined behavior.
+ * 
+ * \param mesh The mesh that will be printed.
+ */
+void print_mesh_for_saving(mesh_t* mesh);
 
 #endif

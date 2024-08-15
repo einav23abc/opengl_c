@@ -33,6 +33,7 @@ mesh_t* generate_mesh(vbo_data_t* vbo_datas_arr, uint32_t vbo_datas_arr_size, ui
         return mesh;
     }
     
+    mesh->saved = 0;
     mesh->unbinded = unbinded;
     
     if (unbinded == 0) {
@@ -89,9 +90,7 @@ mesh_t* generate_mesh(vbo_data_t* vbo_datas_arr, uint32_t vbo_datas_arr_size, ui
     return mesh;
 }
 void bind_mesh(mesh_t* mesh) {
-    if (mesh->unbinded == 0) {
-        return;
-    }
+    if (mesh->unbinded == 0) return;
 
     // create the vertex array object
     glGenVertexArrays(1, &mesh->vao);
@@ -110,10 +109,12 @@ void bind_mesh(mesh_t* mesh) {
         glVertexAttribDivisor(i, mesh->vbo_datas_arr[i].divisor);
     }
 
-    for (uint32_t i = 0; i < mesh->vbos_amount; i++) {
-        free(mesh->vbo_datas_arr[i].data_arr);
+    if (mesh->saved == 0) {
+        for (uint32_t i = 0; i < mesh->vbos_amount; i++) {
+            free(mesh->vbo_datas_arr[i].data_arr);
+        }
+        free(mesh->vbo_datas_arr);
     }
-    free(mesh->vbo_datas_arr);
 
     mesh->unbinded = 0;
 }
@@ -1631,6 +1632,13 @@ static void clean_animation(animation_t* anim) {
 }
 
 void destroy_mesh(mesh_t* mesh) {
+    if (mesh->saved == 1) {
+        #ifdef DEBUG_SOFT_MODE
+        printf("called destroy a saved mesh! not doint that\n");
+        return;
+        #endif
+    }
+
     meshes_amount -= 1;
 
     // move (meshes_list[meshes_amount]) to position (mesh->mesh_index) at (meshes_list)
@@ -1660,4 +1668,209 @@ void clean_animations() {
     printf("cleaning %u animations\n", animations_amount);
     for (uint64_t i = 0; i < animations_amount; i++) clean_animation(animations_list[i]);
     animations_amount = 0;
+}
+
+void print_mesh_for_saving(mesh_t* mesh) {
+    if (mesh->unbinded == 0) return;
+    
+    printf("\nprinting mesh for saving:\n\n");
+
+    printf("#include \"../vec_mat_quat/vec_mat_quat.h\"\n");
+    printf("#include <stdint.h>\n");
+
+    // mesh_vbo_data_arrX
+    for (uint64_t i = 0; i < mesh->vbos_amount; i++) {
+        printf(
+            ""      "static uint8_t mesh_vbo_data_arr%u[] = {", i
+        );
+        for (uint64_t j = 0; j < mesh->vbo_datas_arr[i].data_arr_size; j++) {
+            if (j != 0) printf(", ");
+            if (j%20 == 0) printf("\n\t");
+            printf("%hhu", ((uint8_t*)(mesh->vbo_datas_arr[i].data_arr))[j]);
+        }
+        printf("\n};\n");
+    }
+
+    // mesh_vbos
+    printf(
+        ""      "static uint32_t mesh_vbos[] = {"
+    );
+    for (uint64_t i = 0; i < mesh->vbos_amount; i++) {
+        if (i != 0) printf(", ");
+        if (i%20 == 0) printf("\n\t");
+        printf("0");
+    }
+    printf(
+        ""      "};\n"
+    );
+
+    // mesh_vbo_datas_arr
+    printf(
+        ""      "static vbo_data_t mesh_vbo_datas_arr[] = {\n"
+    );
+    for (uint64_t i = 0; i < mesh->vbos_amount; i++) {
+        if (i != 0) printf(",\n");
+        printf(
+            "\t"        "{\n"
+            "\t\t"          ".data_arr_size = %u,\n"
+            "\t\t"          ".data_arr = &mesh_data_arr%u,\n"
+            "\t\t"          ".size = %d,\n"
+            "\t\t"          ".type = %d,\n"
+            "\t\t"          ".stride = %d,\n"
+            "\t\t"          ".divisor = %u\n"
+            "\t"        "}"
+            ,
+            mesh->vbo_datas_arr[i].data_arr_size,
+            i,
+            mesh->vbo_datas_arr[i].size,
+            mesh->vbo_datas_arr[i].type,
+            mesh->vbo_datas_arr[i].stride,
+            mesh->vbo_datas_arr[i].divisor
+        );
+    }
+    printf(
+        ""      "};\n"
+    );
+
+    // mesh_indices_array
+    printf(
+        ""      "static uint32_t mesh_indices_array[] = {"
+    );
+    for (uint64_t i = 0; i < mesh->indices_count; i++) {
+        if (i != 0) printf(", ");
+        if (i%20 == 0) printf("\n\t");
+        printf("%u", ((uint32_t*)(mesh->indices_array))[i]);
+    }
+    printf("\n};\n");
+
+    // mesh_jointX_name
+    for (uint64_t i = 0; i < mesh->joints_amount; i++) {
+        printf(
+            ""      "static char mesh_joint%u_name[] = \"%s\";\n"
+            ,
+            i,
+            mesh->joints[i].name
+        );
+    }
+
+    // mesh_joints
+    printf(
+        ""      "static joint_t mesh_joints[] = {"
+    );
+    for (uint64_t i = 0; i < mesh->joints_amount; i++) {
+        if (i != 0) printf(",\n");
+        printf(
+            "\t"        "{\n"
+            "\t\t"          ".index = %u,\n"
+            "\t\t"          ".name = mesh_joint%u_name,\n"
+            "\t\t"          ".parent = %u,\n"
+            "\t\t"          ".inverse_bind_transform_mat = (mat4_t){\n"
+            "\t\t\t"            ".mat = {\n"
+            "\t\t\t\t"              "%f, %f, %f, %f,\n"
+            "\t\t\t\t"              "%f, %f, %f, %f,\n"
+            "\t\t\t\t"              "%f, %f, %f, %f,\n"
+            "\t\t\t\t"              "%f, %f, %f, %f\n"
+            "\t\t\t"            "}\n"
+            "\t\t"          "},\n"
+            "\t\t"          ".local_transform_qvv = (quat_vec_vec_t){\n"
+            "\t\t\t"            ".rot = (quat_t){%f, %f, %f, %f},\n"
+            "\t\t\t"            ".pos = (vec3_t){%f, %f, %f},\n"
+            "\t\t\t"            ".scale = (vec3_t){%f, %f, %f},\n"
+            "\t\t"          "},\n"
+            "\t\t"          ".model_transform_mat = (mat4_t){\n"
+            "\t\t\t"            ".mat = {\n"
+            "\t\t\t\t"              "%f, %f, %f, %f,\n"
+            "\t\t\t\t"              "%f, %f, %f, %f,\n"
+            "\t\t\t\t"              "%f, %f, %f, %f,\n"
+            "\t\t\t\t"              "%f, %f, %f, %f\n"
+            "\t\t\t"            "}\n"
+            "\t\t"          "}\n"
+            "\t"        "}"
+            ,
+            mesh->joints[i].index,
+            i,
+            mesh->joints[i].parent,
+            mesh->joints[i].inverse_bind_transform_mat.mat[ 0],
+            mesh->joints[i].inverse_bind_transform_mat.mat[ 1],
+            mesh->joints[i].inverse_bind_transform_mat.mat[ 2],
+            mesh->joints[i].inverse_bind_transform_mat.mat[ 3],
+            mesh->joints[i].inverse_bind_transform_mat.mat[ 4],
+            mesh->joints[i].inverse_bind_transform_mat.mat[ 5],
+            mesh->joints[i].inverse_bind_transform_mat.mat[ 6],
+            mesh->joints[i].inverse_bind_transform_mat.mat[ 7],
+            mesh->joints[i].inverse_bind_transform_mat.mat[ 8],
+            mesh->joints[i].inverse_bind_transform_mat.mat[ 9],
+            mesh->joints[i].inverse_bind_transform_mat.mat[10],
+            mesh->joints[i].inverse_bind_transform_mat.mat[11],
+            mesh->joints[i].inverse_bind_transform_mat.mat[12],
+            mesh->joints[i].inverse_bind_transform_mat.mat[13],
+            mesh->joints[i].inverse_bind_transform_mat.mat[14],
+            mesh->joints[i].inverse_bind_transform_mat.mat[15],
+            mesh->joints[i].local_transform_qvv.rot.w,
+            mesh->joints[i].local_transform_qvv.rot.x,
+            mesh->joints[i].local_transform_qvv.rot.y,
+            mesh->joints[i].local_transform_qvv.rot.z,
+            mesh->joints[i].local_transform_qvv.pos.x,
+            mesh->joints[i].local_transform_qvv.pos.y,
+            mesh->joints[i].local_transform_qvv.pos.z,
+            mesh->joints[i].local_transform_qvv.scale.x,
+            mesh->joints[i].local_transform_qvv.scale.y,
+            mesh->joints[i].local_transform_qvv.scale.z,
+            mesh->joints[i].model_transform_mat.mat[ 0],
+            mesh->joints[i].model_transform_mat.mat[ 1],
+            mesh->joints[i].model_transform_mat.mat[ 2],
+            mesh->joints[i].model_transform_mat.mat[ 3],
+            mesh->joints[i].model_transform_mat.mat[ 4],
+            mesh->joints[i].model_transform_mat.mat[ 5],
+            mesh->joints[i].model_transform_mat.mat[ 6],
+            mesh->joints[i].model_transform_mat.mat[ 7],
+            mesh->joints[i].model_transform_mat.mat[ 8],
+            mesh->joints[i].model_transform_mat.mat[ 9],
+            mesh->joints[i].model_transform_mat.mat[10],
+            mesh->joints[i].model_transform_mat.mat[11],
+            mesh->joints[i].model_transform_mat.mat[12],
+            mesh->joints[i].model_transform_mat.mat[13],
+            mesh->joints[i].model_transform_mat.mat[14],
+            mesh->joints[i].model_transform_mat.mat[15]
+        );
+    }
+    printf(
+        ""      "};\n"
+    );
+
+    // mesh_pose_joint_transform_matrices
+    printf(
+        ""      "static float mesh_pose_joint_transform_matrices[] = {"
+    );
+    for (uint64_t i = 0; i < mesh->joints_amount*16; i++) {
+        if (i != 0) printf(", ");
+        if (i%16 == 0) printf("\n\t");
+        printf(
+            "%f",
+            mesh->pose_joint_transform_matrices[i]
+        );
+    }
+    printf(
+        ""      "\n};\n"
+    );
+
+    // mesh
+    printf(
+        ""      "mesh_t mesh = (mesh_t){\n"
+        "\t"        ".mesh_index = -1,\n"
+        "\t"        ".saved = 1,\n"
+        "\t"        ".unbinded = %hhu,\n",
+        "\t"        ".vao = %u,\n",
+        "\t"        ".vbos_amount = %u,\n",
+        "\t"        ".vbos = mesh_vbos,\n",
+        "\t"        ".vbo_datas_arr = mesh_vbo_datas_arr,\n",
+        "\t"        ".indices_count = %u,\n",
+        "\t"        ".indices_array = mesh_indices_array,\n",
+        "\t"        ".joints_amount = %u,\n",
+        "\t"        ".joints = mesh_joints,\n",
+        "\t"        ".pose_joint_transform_matrices = mesh_pose_joint_transform_matrices\n",
+        ""      "};\n"
+    );
+
+    printf("\n");
 }
