@@ -135,7 +135,7 @@ void clean_meshes();
 void clean_animations();
 
 
-/* \brief Save a mesh_t struct into a .c file.
+/* \brief Save a mesh_t into a .c file.
  *
  * Can be used to load the saved mesh without having to load from a model file.
  * 
@@ -147,13 +147,13 @@ void clean_animations();
  * 
  * \param mesh The mesh that will be saved.
  * 
- * \param name The name that will be given to the mesh struct.
+ * \param name The name that will be given to the mesh. This will be `mesh_t* name`
  * 
  * \param file_path The path to the c file where the mesh will be saved.
  */
 void save_mesh_to_c_file(mesh_t* mesh, const char* name, const char* file_path);
 
-/* \brief Save a animation_t struct into a .c file.
+/* \brief Save a animation_t into a .c file.
  *
  * The animation can then be used without having to load from a file.
  * 
@@ -162,7 +162,7 @@ void save_mesh_to_c_file(mesh_t* mesh, const char* name, const char* file_path);
  * 
  * \param anim The animation that will be saved.
  * 
- * \param name The name that will be given to the animation_t struct.
+ * \param name The name that will be given to the animation. This will be `animation_t* name`.
  * 
  * \param file_path The path to the c file where the animation_t will be saved.
  */

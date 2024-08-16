@@ -1,5 +1,5 @@
 #include <stdint.h>
-static key_frame_t man_anim_run_struct_animation_joint0_key_frames[] = {
+static key_frame_t man_anim_run_animation_joint0_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -305,7 +305,7 @@ static key_frame_t man_anim_run_struct_animation_joint0_key_frames[] = {
 		.time_stamp = 0.750000
 	}
 };
-static key_frame_t man_anim_run_struct_animation_joint1_key_frames[] = {
+static key_frame_t man_anim_run_animation_joint1_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -323,7 +323,7 @@ static key_frame_t man_anim_run_struct_animation_joint1_key_frames[] = {
 		.time_stamp = 0.000000
 	}
 };
-static key_frame_t man_anim_run_struct_animation_joint2_key_frames[] = {
+static key_frame_t man_anim_run_animation_joint2_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -338,10 +338,10 @@ static key_frame_t man_anim_run_struct_animation_joint2_key_frames[] = {
 			.pos = (vec3_t){1.044119, 1.249182, 0.000000},
 			.scale = (vec3_t){1.000000, 1.000000, 1.000000}
 		},
-		.time_stamp = 68291490374736750000000.000000
+		.time_stamp = 0.000000
 	}
 };
-static key_frame_t man_anim_run_struct_animation_joint3_key_frames[] = {
+static key_frame_t man_anim_run_animation_joint3_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -359,7 +359,7 @@ static key_frame_t man_anim_run_struct_animation_joint3_key_frames[] = {
 		.time_stamp = 0.000000
 	}
 };
-static key_frame_t man_anim_run_struct_animation_joint4_key_frames[] = {
+static key_frame_t man_anim_run_animation_joint4_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -374,10 +374,10 @@ static key_frame_t man_anim_run_struct_animation_joint4_key_frames[] = {
 			.pos = (vec3_t){0.000000, 1.243903, 0.000000},
 			.scale = (vec3_t){1.000000, 1.000000, 1.000000}
 		},
-		.time_stamp = 0.000000
+		.time_stamp = 68291490374736750000000.000000
 	}
 };
-static key_frame_t man_anim_run_struct_animation_joint5_key_frames[] = {
+static key_frame_t man_anim_run_animation_joint5_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -395,7 +395,7 @@ static key_frame_t man_anim_run_struct_animation_joint5_key_frames[] = {
 		.time_stamp = 0.000000
 	}
 };
-static key_frame_t man_anim_run_struct_animation_joint6_key_frames[] = {
+static key_frame_t man_anim_run_animation_joint6_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -413,7 +413,7 @@ static key_frame_t man_anim_run_struct_animation_joint6_key_frames[] = {
 		.time_stamp = 0.000000
 	}
 };
-static key_frame_t man_anim_run_struct_animation_joint7_key_frames[] = {
+static key_frame_t man_anim_run_animation_joint7_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -431,7 +431,7 @@ static key_frame_t man_anim_run_struct_animation_joint7_key_frames[] = {
 		.time_stamp = 0.000000
 	}
 };
-static key_frame_t man_anim_run_struct_animation_joint8_key_frames[] = {
+static key_frame_t man_anim_run_animation_joint8_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -449,7 +449,7 @@ static key_frame_t man_anim_run_struct_animation_joint8_key_frames[] = {
 		.time_stamp = 0.000000
 	}
 };
-static key_frame_t man_anim_run_struct_animation_joint9_key_frames[] = {
+static key_frame_t man_anim_run_animation_joint9_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -467,7 +467,7 @@ static key_frame_t man_anim_run_struct_animation_joint9_key_frames[] = {
 		.time_stamp = 0.000000
 	}
 };
-static key_frame_t man_anim_run_struct_animation_joint10_key_frames[] = {
+static key_frame_t man_anim_run_animation_joint10_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -773,7 +773,7 @@ static key_frame_t man_anim_run_struct_animation_joint10_key_frames[] = {
 		.time_stamp = 0.750000
 	}
 };
-static key_frame_t man_anim_run_struct_animation_joint11_key_frames[] = {
+static key_frame_t man_anim_run_animation_joint11_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -1079,7 +1079,7 @@ static key_frame_t man_anim_run_struct_animation_joint11_key_frames[] = {
 		.time_stamp = 0.750000
 	}
 };
-static key_frame_t man_anim_run_struct_animation_joint12_key_frames[] = {
+static key_frame_t man_anim_run_animation_joint12_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -1385,7 +1385,7 @@ static key_frame_t man_anim_run_struct_animation_joint12_key_frames[] = {
 		.time_stamp = 0.750000
 	}
 };
-static key_frame_t man_anim_run_struct_animation_joint13_key_frames[] = {
+static key_frame_t man_anim_run_animation_joint13_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -1691,7 +1691,7 @@ static key_frame_t man_anim_run_struct_animation_joint13_key_frames[] = {
 		.time_stamp = 0.750000
 	}
 };
-static key_frame_t man_anim_run_struct_animation_joint14_key_frames[] = {
+static key_frame_t man_anim_run_animation_joint14_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -1997,7 +1997,7 @@ static key_frame_t man_anim_run_struct_animation_joint14_key_frames[] = {
 		.time_stamp = 0.750000
 	}
 };
-static key_frame_t man_anim_run_struct_animation_joint15_key_frames[] = {
+static key_frame_t man_anim_run_animation_joint15_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -2303,74 +2303,74 @@ static key_frame_t man_anim_run_struct_animation_joint15_key_frames[] = {
 		.time_stamp = 0.750000
 	}
 };
-static joint_key_frame_t man_anim_run_struct_animation_joints_key_frames[] = {
+static joint_key_frame_t man_anim_run_animation_joints_key_frames[] = {
 	{
 		.key_frames_amount = 19,
-		.key_frames = man_anim_run_struct_animation_joint0_key_frames
+		.key_frames = man_anim_run_animation_joint0_key_frames
 	},
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_run_struct_animation_joint1_key_frames
+		.key_frames = man_anim_run_animation_joint1_key_frames
 	},
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_run_struct_animation_joint2_key_frames
+		.key_frames = man_anim_run_animation_joint2_key_frames
 	},
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_run_struct_animation_joint3_key_frames
+		.key_frames = man_anim_run_animation_joint3_key_frames
 	},
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_run_struct_animation_joint4_key_frames
+		.key_frames = man_anim_run_animation_joint4_key_frames
 	},
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_run_struct_animation_joint5_key_frames
+		.key_frames = man_anim_run_animation_joint5_key_frames
 	},
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_run_struct_animation_joint6_key_frames
+		.key_frames = man_anim_run_animation_joint6_key_frames
 	},
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_run_struct_animation_joint7_key_frames
+		.key_frames = man_anim_run_animation_joint7_key_frames
 	},
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_run_struct_animation_joint8_key_frames
+		.key_frames = man_anim_run_animation_joint8_key_frames
 	},
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_run_struct_animation_joint9_key_frames
-	},
-	{
-		.key_frames_amount = 19,
-		.key_frames = man_anim_run_struct_animation_joint10_key_frames
+		.key_frames = man_anim_run_animation_joint9_key_frames
 	},
 	{
 		.key_frames_amount = 19,
-		.key_frames = man_anim_run_struct_animation_joint11_key_frames
+		.key_frames = man_anim_run_animation_joint10_key_frames
 	},
 	{
 		.key_frames_amount = 19,
-		.key_frames = man_anim_run_struct_animation_joint12_key_frames
+		.key_frames = man_anim_run_animation_joint11_key_frames
 	},
 	{
 		.key_frames_amount = 19,
-		.key_frames = man_anim_run_struct_animation_joint13_key_frames
+		.key_frames = man_anim_run_animation_joint12_key_frames
 	},
 	{
 		.key_frames_amount = 19,
-		.key_frames = man_anim_run_struct_animation_joint14_key_frames
+		.key_frames = man_anim_run_animation_joint13_key_frames
 	},
 	{
 		.key_frames_amount = 19,
-		.key_frames = man_anim_run_struct_animation_joint15_key_frames
+		.key_frames = man_anim_run_animation_joint14_key_frames
+	},
+	{
+		.key_frames_amount = 19,
+		.key_frames = man_anim_run_animation_joint15_key_frames
 	}
 };
-animation_t man_anim_run_struct = (animation_t){
+static animation_t man_anim_run_animation = (animation_t){
 	.animation_index = -1,
 	.joints_amount = 16,
-	.joints_key_frames = man_anim_run_struct_animation_joints_key_frames
-};
+	.joints_key_frames = man_anim_run_animation_joints_key_frames
+};animation_t* man_anim_run = &man_anim_run_animation;

@@ -1,5 +1,5 @@
 #include <stdint.h>
-static uint8_t man_mesh_struct_mesh_vbo_data_arr0[] = {
+static uint8_t man_mesh_mesh_vbo_data_arr0[] = {
 	123, 123, 177, 62, 175, 3, 176, 190, 228, 45, 230, 64, 25, 4, 193, 62, 240, 162, 239, 189, 
 	44, 186, 234, 64, 25, 4, 65, 62, 198, 109, 52, 190, 180, 227, 235, 64, 196, 191, 230, 62, 
 	85, 120, 8, 191, 182, 120, 211, 64, 0, 0, 0, 0, 93, 221, 27, 191, 246, 209, 222, 64, 
@@ -1960,7 +1960,7 @@ static uint8_t man_mesh_struct_mesh_vbo_data_arr0[] = {
 	29, 218, 214, 64, 180, 33, 124, 192, 108, 38, 71, 62, 51, 254, 213, 64, 224, 131, 124, 192, 
 	175, 135, 53, 62, 127, 166, 217, 64
 };
-static uint8_t man_mesh_struct_mesh_vbo_data_arr1[] = {
+static uint8_t man_mesh_mesh_vbo_data_arr1[] = {
 	0, 0, 32, 63, 241, 166, 101, 63, 0, 0, 32, 63, 227, 77, 75, 63, 0, 0, 32, 63, 
 	241, 166, 101, 63, 2, 123, 11, 63, 241, 166, 101, 63, 0, 0, 32, 63, 0, 0, 128, 63, 
 	2, 123, 11, 63, 0, 0, 128, 63, 2, 123, 11, 63, 241, 166, 69, 63, 8, 236, 237, 62, 
@@ -3268,7 +3268,7 @@ static uint8_t man_mesh_struct_mesh_vbo_data_arr1[] = {
 	8, 236, 237, 62, 0, 0, 0, 63, 8, 236, 237, 62, 0, 0, 0, 63, 8, 236, 237, 62, 
 	0, 0, 0, 63, 8, 236, 237, 62, 0, 0, 0, 63
 };
-static uint8_t man_mesh_struct_mesh_vbo_data_arr2[] = {
+static uint8_t man_mesh_mesh_vbo_data_arr2[] = {
 	29, 22, 163, 62, 203, 155, 8, 191, 174, 143, 72, 63, 29, 22, 163, 62, 203, 155, 8, 191, 
 	174, 143, 72, 63, 29, 22, 163, 62, 203, 155, 8, 191, 174, 143, 72, 63, 63, 110, 31, 62, 
 	21, 219, 124, 191, 190, 86, 87, 188, 63, 110, 31, 62, 21, 219, 124, 191, 190, 86, 87, 188, 
@@ -5229,7 +5229,7 @@ static uint8_t man_mesh_struct_mesh_vbo_data_arr2[] = {
 	4, 178, 18, 62, 56, 193, 196, 189, 183, 41, 124, 63, 4, 178, 18, 62, 56, 193, 196, 189, 
 	183, 41, 124, 63, 4, 178, 18, 62
 };
-static uint8_t man_mesh_struct_mesh_vbo_data_arr3[] = {
+static uint8_t man_mesh_mesh_vbo_data_arr3[] = {
 	1, 0, 0, 0, 5, 0, 0, 0, 2, 0, 0, 0, 5, 0, 0, 0, 1, 0, 0, 0, 
 	2, 0, 0, 0, 5, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 
 	2, 0, 0, 0, 5, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 7, 0, 0, 0, 
@@ -7190,7 +7190,7 @@ static uint8_t man_mesh_struct_mesh_vbo_data_arr3[] = {
 	0, 0, 0, 0, 9, 0, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 9, 0, 0, 0, 
 	7, 0, 0, 0, 1, 0, 0, 0
 };
-static uint8_t man_mesh_struct_mesh_vbo_data_arr4[] = {
+static uint8_t man_mesh_mesh_vbo_data_arr4[] = {
 	79, 153, 117, 63, 4, 31, 24, 61, 246, 192, 100, 59, 253, 248, 255, 62, 31, 238, 255, 62, 
 	115, 25, 71, 57, 236, 157, 255, 62, 105, 152, 255, 62, 48, 171, 201, 58, 69, 203, 126, 63, 
 	108, 169, 148, 59, 109, 126, 54, 57, 144, 226, 125, 63, 212, 232, 248, 59, 235, 119, 46, 58, 
@@ -9151,13 +9151,13 @@ static uint8_t man_mesh_struct_mesh_vbo_data_arr4[] = {
 	0, 0, 0, 0, 12, 179, 123, 63, 185, 54, 57, 60, 129, 12, 180, 59, 206, 52, 126, 63, 
 	232, 61, 168, 59, 45, 109, 245, 58
 };
-static uint32_t man_mesh_struct_mesh_vbos[] = {
+static uint32_t man_mesh_mesh_vbos[] = {
 	0, 0, 0, 0, 0
 };
-static vbo_data_t man_mesh_struct_mesh_vbo_datas_arr[] = {
+static vbo_data_t man_mesh_mesh_vbo_datas_arr[] = {
 	{
 		.data_arr_size = 39168,
-		.data_arr = man_mesh_struct_mesh_vbo_data_arr0,
+		.data_arr = man_mesh_mesh_vbo_data_arr0,
 		.size = 3,
 		.type = 5126,
 		.stride = 12,
@@ -9165,7 +9165,7 @@ static vbo_data_t man_mesh_struct_mesh_vbo_datas_arr[] = {
 	},
 	{
 		.data_arr_size = 26112,
-		.data_arr = man_mesh_struct_mesh_vbo_data_arr1,
+		.data_arr = man_mesh_mesh_vbo_data_arr1,
 		.size = 2,
 		.type = 5126,
 		.stride = 8,
@@ -9173,7 +9173,7 @@ static vbo_data_t man_mesh_struct_mesh_vbo_datas_arr[] = {
 	},
 	{
 		.data_arr_size = 39168,
-		.data_arr = man_mesh_struct_mesh_vbo_data_arr2,
+		.data_arr = man_mesh_mesh_vbo_data_arr2,
 		.size = 3,
 		.type = 5126,
 		.stride = 12,
@@ -9181,7 +9181,7 @@ static vbo_data_t man_mesh_struct_mesh_vbo_datas_arr[] = {
 	},
 	{
 		.data_arr_size = 39168,
-		.data_arr = man_mesh_struct_mesh_vbo_data_arr3,
+		.data_arr = man_mesh_mesh_vbo_data_arr3,
 		.size = 3,
 		.type = 5124,
 		.stride = 12,
@@ -9189,14 +9189,14 @@ static vbo_data_t man_mesh_struct_mesh_vbo_datas_arr[] = {
 	},
 	{
 		.data_arr_size = 39168,
-		.data_arr = man_mesh_struct_mesh_vbo_data_arr4,
+		.data_arr = man_mesh_mesh_vbo_data_arr4,
 		.size = 3,
 		.type = 5126,
 		.stride = 12,
 		.divisor = 0
 	}
 };
-static uint32_t man_mesh_struct_mesh_indices_array[] = {
+static uint32_t man_mesh_mesh_indices_array[] = {
 	1, 0, 2, 4, 3, 5, 7, 6, 8, 10, 9, 11, 13, 12, 14, 16, 15, 17, 19, 18, 
 	20, 22, 21, 23, 25, 24, 26, 28, 27, 29, 31, 30, 32, 34, 33, 35, 37, 36, 38, 40, 
 	39, 41, 43, 42, 44, 46, 45, 47, 49, 48, 50, 52, 51, 53, 55, 54, 56, 58, 57, 59, 
@@ -9362,26 +9362,26 @@ static uint32_t man_mesh_struct_mesh_indices_array[] = {
 	3241, 3240, 3242, 3244, 3243, 3245, 3247, 3246, 3248, 3250, 3249, 3251, 3253, 3252, 3254, 3256, 3255, 3257, 3259, 3258, 
 	3260, 3262, 3261, 3263
 };
-static char man_mesh_struct_mesh_joint0_name[] = "Body";
-static char man_mesh_struct_mesh_joint1_name[] = "Chest";
-static char man_mesh_struct_mesh_joint2_name[] = "Arm0Left";
-static char man_mesh_struct_mesh_joint3_name[] = "Arm1Left";
-static char man_mesh_struct_mesh_joint4_name[] = "Arm2Left";
-static char man_mesh_struct_mesh_joint5_name[] = "Neck";
-static char man_mesh_struct_mesh_joint6_name[] = "Head";
-static char man_mesh_struct_mesh_joint7_name[] = "Arm0Right";
-static char man_mesh_struct_mesh_joint8_name[] = "Arm1Right";
-static char man_mesh_struct_mesh_joint9_name[] = "Arm2Right";
-static char man_mesh_struct_mesh_joint10_name[] = "Leg0Left";
-static char man_mesh_struct_mesh_joint11_name[] = "Leg1Left";
-static char man_mesh_struct_mesh_joint12_name[] = "Leg2Left";
-static char man_mesh_struct_mesh_joint13_name[] = "Leg0Right";
-static char man_mesh_struct_mesh_joint14_name[] = "Leg1Right";
-static char man_mesh_struct_mesh_joint15_name[] = "Leg2Right";
-static joint_t man_mesh_struct_mesh_joints[] = {
+static char man_mesh_mesh_joint0_name[] = "Body";
+static char man_mesh_mesh_joint1_name[] = "Chest";
+static char man_mesh_mesh_joint2_name[] = "Arm0Left";
+static char man_mesh_mesh_joint3_name[] = "Arm1Left";
+static char man_mesh_mesh_joint4_name[] = "Arm2Left";
+static char man_mesh_mesh_joint5_name[] = "Neck";
+static char man_mesh_mesh_joint6_name[] = "Head";
+static char man_mesh_mesh_joint7_name[] = "Arm0Right";
+static char man_mesh_mesh_joint8_name[] = "Arm1Right";
+static char man_mesh_mesh_joint9_name[] = "Arm2Right";
+static char man_mesh_mesh_joint10_name[] = "Leg0Left";
+static char man_mesh_mesh_joint11_name[] = "Leg1Left";
+static char man_mesh_mesh_joint12_name[] = "Leg2Left";
+static char man_mesh_mesh_joint13_name[] = "Leg0Right";
+static char man_mesh_mesh_joint14_name[] = "Leg1Right";
+static char man_mesh_mesh_joint15_name[] = "Leg2Right";
+static joint_t man_mesh_mesh_joints[] = {
 	{
 		.index = 0,
-		.name = man_mesh_struct_mesh_joint0_name,
+		.name = man_mesh_mesh_joint0_name,
 		.parent = 0,
 		.inverse_bind_transform_mat = (mat4_t){
 			.mat = {
@@ -9407,7 +9407,7 @@ static joint_t man_mesh_struct_mesh_joints[] = {
 	},
 	{
 		.index = 1,
-		.name = man_mesh_struct_mesh_joint1_name,
+		.name = man_mesh_mesh_joint1_name,
 		.parent = 0,
 		.inverse_bind_transform_mat = (mat4_t){
 			.mat = {
@@ -9433,7 +9433,7 @@ static joint_t man_mesh_struct_mesh_joints[] = {
 	},
 	{
 		.index = 2,
-		.name = man_mesh_struct_mesh_joint2_name,
+		.name = man_mesh_mesh_joint2_name,
 		.parent = 1,
 		.inverse_bind_transform_mat = (mat4_t){
 			.mat = {
@@ -9459,7 +9459,7 @@ static joint_t man_mesh_struct_mesh_joints[] = {
 	},
 	{
 		.index = 3,
-		.name = man_mesh_struct_mesh_joint3_name,
+		.name = man_mesh_mesh_joint3_name,
 		.parent = 2,
 		.inverse_bind_transform_mat = (mat4_t){
 			.mat = {
@@ -9485,7 +9485,7 @@ static joint_t man_mesh_struct_mesh_joints[] = {
 	},
 	{
 		.index = 4,
-		.name = man_mesh_struct_mesh_joint4_name,
+		.name = man_mesh_mesh_joint4_name,
 		.parent = 3,
 		.inverse_bind_transform_mat = (mat4_t){
 			.mat = {
@@ -9511,7 +9511,7 @@ static joint_t man_mesh_struct_mesh_joints[] = {
 	},
 	{
 		.index = 5,
-		.name = man_mesh_struct_mesh_joint5_name,
+		.name = man_mesh_mesh_joint5_name,
 		.parent = 1,
 		.inverse_bind_transform_mat = (mat4_t){
 			.mat = {
@@ -9537,7 +9537,7 @@ static joint_t man_mesh_struct_mesh_joints[] = {
 	},
 	{
 		.index = 6,
-		.name = man_mesh_struct_mesh_joint6_name,
+		.name = man_mesh_mesh_joint6_name,
 		.parent = 5,
 		.inverse_bind_transform_mat = (mat4_t){
 			.mat = {
@@ -9563,7 +9563,7 @@ static joint_t man_mesh_struct_mesh_joints[] = {
 	},
 	{
 		.index = 7,
-		.name = man_mesh_struct_mesh_joint7_name,
+		.name = man_mesh_mesh_joint7_name,
 		.parent = 1,
 		.inverse_bind_transform_mat = (mat4_t){
 			.mat = {
@@ -9589,7 +9589,7 @@ static joint_t man_mesh_struct_mesh_joints[] = {
 	},
 	{
 		.index = 8,
-		.name = man_mesh_struct_mesh_joint8_name,
+		.name = man_mesh_mesh_joint8_name,
 		.parent = 7,
 		.inverse_bind_transform_mat = (mat4_t){
 			.mat = {
@@ -9615,7 +9615,7 @@ static joint_t man_mesh_struct_mesh_joints[] = {
 	},
 	{
 		.index = 9,
-		.name = man_mesh_struct_mesh_joint9_name,
+		.name = man_mesh_mesh_joint9_name,
 		.parent = 8,
 		.inverse_bind_transform_mat = (mat4_t){
 			.mat = {
@@ -9641,7 +9641,7 @@ static joint_t man_mesh_struct_mesh_joints[] = {
 	},
 	{
 		.index = 10,
-		.name = man_mesh_struct_mesh_joint10_name,
+		.name = man_mesh_mesh_joint10_name,
 		.parent = 0,
 		.inverse_bind_transform_mat = (mat4_t){
 			.mat = {
@@ -9667,7 +9667,7 @@ static joint_t man_mesh_struct_mesh_joints[] = {
 	},
 	{
 		.index = 11,
-		.name = man_mesh_struct_mesh_joint11_name,
+		.name = man_mesh_mesh_joint11_name,
 		.parent = 10,
 		.inverse_bind_transform_mat = (mat4_t){
 			.mat = {
@@ -9693,7 +9693,7 @@ static joint_t man_mesh_struct_mesh_joints[] = {
 	},
 	{
 		.index = 12,
-		.name = man_mesh_struct_mesh_joint12_name,
+		.name = man_mesh_mesh_joint12_name,
 		.parent = 11,
 		.inverse_bind_transform_mat = (mat4_t){
 			.mat = {
@@ -9719,7 +9719,7 @@ static joint_t man_mesh_struct_mesh_joints[] = {
 	},
 	{
 		.index = 13,
-		.name = man_mesh_struct_mesh_joint13_name,
+		.name = man_mesh_mesh_joint13_name,
 		.parent = 0,
 		.inverse_bind_transform_mat = (mat4_t){
 			.mat = {
@@ -9745,7 +9745,7 @@ static joint_t man_mesh_struct_mesh_joints[] = {
 	},
 	{
 		.index = 14,
-		.name = man_mesh_struct_mesh_joint14_name,
+		.name = man_mesh_mesh_joint14_name,
 		.parent = 13,
 		.inverse_bind_transform_mat = (mat4_t){
 			.mat = {
@@ -9771,7 +9771,7 @@ static joint_t man_mesh_struct_mesh_joints[] = {
 	},
 	{
 		.index = 15,
-		.name = man_mesh_struct_mesh_joint15_name,
+		.name = man_mesh_mesh_joint15_name,
 		.parent = 14,
 		.inverse_bind_transform_mat = (mat4_t){
 			.mat = {
@@ -9796,7 +9796,7 @@ static joint_t man_mesh_struct_mesh_joints[] = {
 		}
 	}
 };
-static float man_mesh_struct_mesh_pose_joint_transform_matrices[] = {
+static float man_mesh_mesh_pose_joint_transform_matrices[] = {
 	0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 
 	0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 
 	0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 
@@ -9814,17 +9814,18 @@ static float man_mesh_struct_mesh_pose_joint_transform_matrices[] = {
 	0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 
 	0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000
 };
-mesh_t man_mesh_struct = (mesh_t){
+static mesh_t man_mesh_mesh = (mesh_t){
 	.mesh_index = -1,
 	.saved = 1,
 	.unbinded = 1,
 	.vao = 538976266,
 	.vbos_amount = 5,
-	.vbos = man_mesh_struct_mesh_vbos,
-	.vbo_datas_arr = man_mesh_struct_mesh_vbo_datas_arr,
+	.vbos = man_mesh_mesh_vbos,
+	.vbo_datas_arr = man_mesh_mesh_vbo_datas_arr,
 	.indices_count = 3264,
-	.indices_array = man_mesh_struct_mesh_indices_array,
+	.indices_array = man_mesh_mesh_indices_array,
 	.joints_amount = 16,
-	.joints = man_mesh_struct_mesh_joints,
-	.pose_joint_transform_matrices = man_mesh_struct_mesh_pose_joint_transform_matrices
+	.joints = man_mesh_mesh_joints,
+	.pose_joint_transform_matrices = man_mesh_mesh_pose_joint_transform_matrices
 };
+mesh_t* man_mesh = &man_mesh_mesh;

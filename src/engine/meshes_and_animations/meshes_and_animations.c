@@ -1884,9 +1884,9 @@ void save_mesh_to_c_file(mesh_t* mesh, const char* name, const char* file_path) 
         ""      "\n};\n"
     );
 
-    // mesh 'name'
+    // mesh
     fprintf(fp,
-        ""      "mesh_t %s = (mesh_t){\n"
+        ""      "static mesh_t %s_mesh = (mesh_t){\n"
         "\t"        ".mesh_index = -1,\n"
         "\t"        ".saved = 1,\n"
         "\t"        ".unbinded = %hhu,\n"
@@ -1914,9 +1914,16 @@ void save_mesh_to_c_file(mesh_t* mesh, const char* name, const char* file_path) 
         name
     );
 
+    // name
+    fprintf(fp,
+        ""      "mesh_t* %s = &%s_mesh;\n"
+        ,
+        name,
+        name
+    );
+
     fclose(fp);
 }
-
 void save_animation_to_c_file(animation_t* anim, const char* name, const char* file_path) {
     FILE* fp;
     fp = fopen(file_path, "w");
@@ -2018,9 +2025,9 @@ void save_animation_to_c_file(animation_t* anim, const char* name, const char* f
         "\n};\n"
     );
 
-    // animation 'name'
+    // animation
     fprintf(fp,
-        ""      "animation_t %s = (animation_t){\n"
+        ""      "static animation_t %s_animation = (animation_t){\n"
         "\t"        ".animation_index = -1,\n"
         "\t"        ".joints_amount = %u,\n"
         "\t"        ".joints_key_frames = %s_animation_joints_key_frames\n"
@@ -2028,6 +2035,14 @@ void save_animation_to_c_file(animation_t* anim, const char* name, const char* f
         ,
         name,
         anim->joints_amount,
+        name
+    );
+
+    // name
+    fprintf(fp,
+        ""      "animation_t* %s = &%s_animation;\n"
+        ,
+        name,
         name
     );
 

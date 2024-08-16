@@ -1,5 +1,5 @@
 #include <stdint.h>
-static key_frame_t man_anim_t_pose_struct_animation_joint0_key_frames[] = {
+static key_frame_t man_anim_t_pose_animation_joint0_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -14,10 +14,10 @@ static key_frame_t man_anim_t_pose_struct_animation_joint0_key_frames[] = {
 			.pos = (vec3_t){0.000000, 0.394275, -0.300000},
 			.scale = (vec3_t){1.000000, 1.000000, 1.000000}
 		},
-		.time_stamp = 4742042355046783100000000000000.000000
+		.time_stamp = 4543734999300477800000000000000.000000
 	}
 };
-static key_frame_t man_anim_t_pose_struct_animation_joint1_key_frames[] = {
+static key_frame_t man_anim_t_pose_animation_joint1_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -32,10 +32,10 @@ static key_frame_t man_anim_t_pose_struct_animation_joint1_key_frames[] = {
 			.pos = (vec3_t){0.000000, 1.108439, 0.000000},
 			.scale = (vec3_t){1.000000, 1.000000, 1.000000}
 		},
-		.time_stamp = 309902911298669450000000000000000.000000
+		.time_stamp = 10444523436104256000000000.000000
 	}
 };
-static key_frame_t man_anim_t_pose_struct_animation_joint2_key_frames[] = {
+static key_frame_t man_anim_t_pose_animation_joint2_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -53,7 +53,7 @@ static key_frame_t man_anim_t_pose_struct_animation_joint2_key_frames[] = {
 		.time_stamp = 0.000000
 	}
 };
-static key_frame_t man_anim_t_pose_struct_animation_joint3_key_frames[] = {
+static key_frame_t man_anim_t_pose_animation_joint3_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -71,7 +71,7 @@ static key_frame_t man_anim_t_pose_struct_animation_joint3_key_frames[] = {
 		.time_stamp = 0.000000
 	}
 };
-static key_frame_t man_anim_t_pose_struct_animation_joint4_key_frames[] = {
+static key_frame_t man_anim_t_pose_animation_joint4_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -89,7 +89,7 @@ static key_frame_t man_anim_t_pose_struct_animation_joint4_key_frames[] = {
 		.time_stamp = 0.000000
 	}
 };
-static key_frame_t man_anim_t_pose_struct_animation_joint5_key_frames[] = {
+static key_frame_t man_anim_t_pose_animation_joint5_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -107,7 +107,7 @@ static key_frame_t man_anim_t_pose_struct_animation_joint5_key_frames[] = {
 		.time_stamp = 0.000000
 	}
 };
-static key_frame_t man_anim_t_pose_struct_animation_joint6_key_frames[] = {
+static key_frame_t man_anim_t_pose_animation_joint6_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -125,7 +125,7 @@ static key_frame_t man_anim_t_pose_struct_animation_joint6_key_frames[] = {
 		.time_stamp = 0.000000
 	}
 };
-static key_frame_t man_anim_t_pose_struct_animation_joint7_key_frames[] = {
+static key_frame_t man_anim_t_pose_animation_joint7_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -140,10 +140,10 @@ static key_frame_t man_anim_t_pose_struct_animation_joint7_key_frames[] = {
 			.pos = (vec3_t){-1.044119, 1.249182, -0.000000},
 			.scale = (vec3_t){1.000000, 1.000000, 1.000000}
 		},
-		.time_stamp = 16242355201414005000.000000
+		.time_stamp = 0.000000
 	}
 };
-static key_frame_t man_anim_t_pose_struct_animation_joint8_key_frames[] = {
+static key_frame_t man_anim_t_pose_animation_joint8_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -158,10 +158,10 @@ static key_frame_t man_anim_t_pose_struct_animation_joint8_key_frames[] = {
 			.pos = (vec3_t){0.000000, 1.336369, 0.000000},
 			.scale = (vec3_t){1.000000, 1.000000, 1.000000}
 		},
-		.time_stamp = 0.000000
+		.time_stamp = 273388270998503030000.000000
 	}
 };
-static key_frame_t man_anim_t_pose_struct_animation_joint9_key_frames[] = {
+static key_frame_t man_anim_t_pose_animation_joint9_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -176,10 +176,10 @@ static key_frame_t man_anim_t_pose_struct_animation_joint9_key_frames[] = {
 			.pos = (vec3_t){0.000000, 1.243903, 0.000000},
 			.scale = (vec3_t){1.000000, 1.000000, 1.000000}
 		},
-		.time_stamp = 0.000000
+		.time_stamp = 1102182005649851900000000.000000
 	}
 };
-static key_frame_t man_anim_t_pose_struct_animation_joint10_key_frames[] = {
+static key_frame_t man_anim_t_pose_animation_joint10_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -194,10 +194,10 @@ static key_frame_t man_anim_t_pose_struct_animation_joint10_key_frames[] = {
 			.pos = (vec3_t){0.492880, -0.105168, 0.000000},
 			.scale = (vec3_t){1.000008, 1.000000, 1.000004}
 		},
-		.time_stamp = 0.000000
+		.time_stamp = 17179297437953556000.000000
 	}
 };
-static key_frame_t man_anim_t_pose_struct_animation_joint11_key_frames[] = {
+static key_frame_t man_anim_t_pose_animation_joint11_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -212,10 +212,10 @@ static key_frame_t man_anim_t_pose_struct_animation_joint11_key_frames[] = {
 			.pos = (vec3_t){0.000000, 2.119657, 0.000000},
 			.scale = (vec3_t){1.000000, 1.000000, 1.000000}
 		},
-		.time_stamp = 10444523436104256000000000.000000
+		.time_stamp = 0.000000
 	}
 };
-static key_frame_t man_anim_t_pose_struct_animation_joint12_key_frames[] = {
+static key_frame_t man_anim_t_pose_animation_joint12_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -230,10 +230,10 @@ static key_frame_t man_anim_t_pose_struct_animation_joint12_key_frames[] = {
 			.pos = (vec3_t){0.000000, 1.992231, 0.000000},
 			.scale = (vec3_t){1.000000, 1.000000, 1.000000}
 		},
-		.time_stamp = 4741806312280503400000000000000.000000
+		.time_stamp = 0.000000
 	}
 };
-static key_frame_t man_anim_t_pose_struct_animation_joint13_key_frames[] = {
+static key_frame_t man_anim_t_pose_animation_joint13_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -248,10 +248,10 @@ static key_frame_t man_anim_t_pose_struct_animation_joint13_key_frames[] = {
 			.pos = (vec3_t){-0.492880, -0.105168, 0.000000},
 			.scale = (vec3_t){1.000008, 1.000000, 1.000004}
 		},
-		.time_stamp = 18759341123043108000000000000.000000
+		.time_stamp = 0.000000
 	}
 };
-static key_frame_t man_anim_t_pose_struct_animation_joint14_key_frames[] = {
+static key_frame_t man_anim_t_pose_animation_joint14_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -266,10 +266,10 @@ static key_frame_t man_anim_t_pose_struct_animation_joint14_key_frames[] = {
 			.pos = (vec3_t){0.000000, 2.119657, 0.000000},
 			.scale = (vec3_t){1.000000, 1.000000, 1.000000}
 		},
-		.time_stamp = 279522120914423510000.000000
+		.time_stamp = 0.000000
 	}
 };
-static key_frame_t man_anim_t_pose_struct_animation_joint15_key_frames[] = {
+static key_frame_t man_anim_t_pose_animation_joint15_key_frames[] = {
 	{
 		.joint_local_transform = (mat4_t){
 			.mat = {
@@ -284,77 +284,77 @@ static key_frame_t man_anim_t_pose_struct_animation_joint15_key_frames[] = {
 			.pos = (vec3_t){0.000000, 1.992231, 0.000000},
 			.scale = (vec3_t){1.000000, 1.000000, 1.000000}
 		},
-		.time_stamp = 71428439089791065000000000000000.000000
+		.time_stamp = 0.000000
 	}
 };
-static joint_key_frame_t man_anim_t_pose_struct_animation_joints_key_frames[] = {
+static joint_key_frame_t man_anim_t_pose_animation_joints_key_frames[] = {
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_t_pose_struct_animation_joint0_key_frames
+		.key_frames = man_anim_t_pose_animation_joint0_key_frames
 	},
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_t_pose_struct_animation_joint1_key_frames
+		.key_frames = man_anim_t_pose_animation_joint1_key_frames
 	},
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_t_pose_struct_animation_joint2_key_frames
+		.key_frames = man_anim_t_pose_animation_joint2_key_frames
 	},
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_t_pose_struct_animation_joint3_key_frames
+		.key_frames = man_anim_t_pose_animation_joint3_key_frames
 	},
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_t_pose_struct_animation_joint4_key_frames
+		.key_frames = man_anim_t_pose_animation_joint4_key_frames
 	},
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_t_pose_struct_animation_joint5_key_frames
+		.key_frames = man_anim_t_pose_animation_joint5_key_frames
 	},
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_t_pose_struct_animation_joint6_key_frames
+		.key_frames = man_anim_t_pose_animation_joint6_key_frames
 	},
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_t_pose_struct_animation_joint7_key_frames
+		.key_frames = man_anim_t_pose_animation_joint7_key_frames
 	},
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_t_pose_struct_animation_joint8_key_frames
+		.key_frames = man_anim_t_pose_animation_joint8_key_frames
 	},
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_t_pose_struct_animation_joint9_key_frames
+		.key_frames = man_anim_t_pose_animation_joint9_key_frames
 	},
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_t_pose_struct_animation_joint10_key_frames
+		.key_frames = man_anim_t_pose_animation_joint10_key_frames
 	},
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_t_pose_struct_animation_joint11_key_frames
+		.key_frames = man_anim_t_pose_animation_joint11_key_frames
 	},
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_t_pose_struct_animation_joint12_key_frames
+		.key_frames = man_anim_t_pose_animation_joint12_key_frames
 	},
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_t_pose_struct_animation_joint13_key_frames
+		.key_frames = man_anim_t_pose_animation_joint13_key_frames
 	},
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_t_pose_struct_animation_joint14_key_frames
+		.key_frames = man_anim_t_pose_animation_joint14_key_frames
 	},
 	{
 		.key_frames_amount = 1,
-		.key_frames = man_anim_t_pose_struct_animation_joint15_key_frames
+		.key_frames = man_anim_t_pose_animation_joint15_key_frames
 	}
 };
-animation_t man_anim_t_pose_struct = (animation_t){
+static animation_t man_anim_t_pose_animation = (animation_t){
 	.animation_index = -1,
 	.joints_amount = 16,
-	.joints_key_frames = man_anim_t_pose_struct_animation_joints_key_frames
-};
+	.joints_key_frames = man_anim_t_pose_animation_joints_key_frames
+};animation_t* man_anim_t_pose = &man_anim_t_pose_animation;

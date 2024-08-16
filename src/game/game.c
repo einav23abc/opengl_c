@@ -20,12 +20,9 @@ fbo_t* outport_fbo;
     camera_t* player_camera;
     player_t player;
 
-    #include "models/man_mesh_struct.c"
-    mesh_t* man_mesh = &man_mesh_struct;
-    #include "models/man_anim_t_pose_struct.c"
-    animation_t* man_anim_t_pose = &man_anim_t_pose_struct;
-    #include "models/man_anim_run_struct.c"
-    animation_t* man_anim_run = &man_anim_run_struct;
+    #include "models/man_mesh.c"
+    #include "models/man_anim_t_pose.c"
+    #include "models/man_anim_run.c"
 
     mesh_t* cube_mesh;
     #define _CUBES_AMOUNT_ (3)
