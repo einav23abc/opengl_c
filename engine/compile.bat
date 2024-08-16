@@ -1,5 +1,8 @@
 @echo off
 
+@REM change to batch file's dir
+cd /D "%~dp0"
+
 echo compiling to libengine.a
 gcc ^
     glad/glad.c ^
@@ -35,7 +38,7 @@ gcc ^
     frame_buffer_objects/frame_buffer_objects.c ^
     meshes_and_animations/meshes_and_animations.c ^
     simple_draw_module/simple_draw_module.c ^
-    -D SOFT_DEBUG_MODE ^
+    -D DEBUG_SOFT_MODE ^
     -c ^
     -g
 
@@ -58,6 +61,7 @@ gcc ^
     meshes_and_animations/meshes_and_animations.c ^
     simple_draw_module/simple_draw_module.c ^
     -D DEBUG_MODE ^
+    -D DEBUG_SOFT_MODE ^
     -c ^
     -g
 

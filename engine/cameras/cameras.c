@@ -169,7 +169,9 @@ static void clean_camera(camera_t* camera) {
 }
 int32_t destoroy_camera(camera_t* camera) {
     if (current_camera != -1){
+        #ifdef DEBUG_SOFT_MODE
         printf("cannot destroy a camera during render period!\n");
+        #endif
         return -1;
     }
 
@@ -186,7 +188,9 @@ int32_t destoroy_camera(camera_t* camera) {
     return 0;
 }
 void clean_cameras() {
+    #ifdef DEBUG_SOFT_MODE
     printf("cleaning %u cameras\n", cameras_amount);
+    #endif
     for (uint64_t i = 0; i < cameras_amount; i++) clean_camera(cameras_list[i]);
     cameras_amount = 0;
 }

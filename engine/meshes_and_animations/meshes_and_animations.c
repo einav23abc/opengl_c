@@ -1660,12 +1660,16 @@ void destroy_animation(animation_t* anim) {
 }
 
 void clean_meshes() {
+    #ifdef DEBUG_SOFT_MODE
     printf("cleaning %u meshes\n", meshes_amount);
+    #endif
     for (uint64_t i = 0; i < meshes_amount; i++) clean_mesh(meshes_list[i]);
     meshes_amount = 0;
 }
 void clean_animations() {
+    #ifdef DEBUG_SOFT_MODE
     printf("cleaning %u animations\n", animations_amount);
+    #endif
     for (uint64_t i = 0; i < animations_amount; i++) clean_animation(animations_list[i]);
     animations_amount = 0;
 }

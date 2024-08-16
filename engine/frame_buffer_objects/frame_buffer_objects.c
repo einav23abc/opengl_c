@@ -218,7 +218,9 @@ int32_t destroy_fbo(fbo_t* fbo) {
     clean_fbo(fbo);
 }
 void clean_fbos() {
+    #ifdef DEBUG_SOFT_MODE
     printf("cleaning %u fbos\n", fbos_amount);
+    #endif
     for (uint64_t i = 0; i < fbos_amount; i++) clean_fbo(fbos_list[i]);
     fbos_amount = 0;
 }

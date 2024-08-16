@@ -5,33 +5,30 @@
 
 fbo_t* outport_fbo;
 
+#include "textures/global_texture_surface.c"
+texture_t* global_texture;
+shader_t* global_shader;
 
-// <game variables>
-    texture_t* global_texture;
-    shader_t* global_shader;
+camera_t* player_camera;
+player_t player;
 
-    camera_t* player_camera;
-    player_t player;
+#include "models/man_mesh.c"
+#include "models/man_anim_t_pose.c"
+#include "models/man_anim_run.c"
 
-    #include "models/man_mesh.c"
-    #include "models/man_anim_t_pose.c"
-    #include "models/man_anim_run.c"
-    
-    #include "models/cube_mesh.c"
-    #define _CUBES_AMOUNT_ (3)
-    cube_t cubes[_CUBES_AMOUNT_];
+#include "models/cube_mesh.c"
+#define _CUBES_AMOUNT_ (3)
+cube_t cubes[_CUBES_AMOUNT_];
 
-    float sun_vector_x;
-    float sun_vector_y;
-    float sun_vector_z;
-    camera_t* sun_shadow_map_camera;
-    fbo_t* sun_shadow_map_fbo;
-    shader_t* sun_shadow_map_shader;
-// </game variables>
+float sun_vector_x;
+float sun_vector_y;
+float sun_vector_z;
+camera_t* sun_shadow_map_camera;
+fbo_t* sun_shadow_map_fbo;
+shader_t* sun_shadow_map_shader;
 
-
-// constants
 const uint64_t CUBES_AMOUNT = _CUBES_AMOUNT_;
+
 
 // functions
 void cube_update_aabb(cube_t* cube) {

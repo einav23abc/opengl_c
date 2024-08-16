@@ -171,7 +171,9 @@ int32_t destroy_shader(shader_t* shader) {
     return 0;
 }
 void clean_shaders() {
+    #ifdef DEBUG_SOFT_MODE
     printf("cleaning %u shaders\n", shaders_amount);
+    #endif
     for (uint64_t i = 0; i < shaders_amount; i++) clean_shader(shaders_list[i]);
     shaders_amount = 0;
 }

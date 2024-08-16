@@ -76,23 +76,25 @@ uint8_t init() {
 
     outport_fbo = create_fbo(_OUTPORT_WIDTH_, _OUTPORT_HEIGHT_, 1, GL_RGB, 4);
     
-    global_shader = create_shader_from_files(
-        "./src/game/shaders/global.vert",
-        "./src/game/shaders/global.frag",
+    #include "shaders/global_sh.c"
+    global_shader = create_shader(
+        (const char**)&global_vert,
+        (const char**)&global_frag,
         "in_vertex_position\0in_vertex_texcoord\0in_vertex_normal\0in_vertex_joint_id\0in_vertex_joint_wheight", 5,
-        // "u_position\0u_scale\0u_rotation\0u_camera_position\0u_sun_vector\0u_sun_shadow_map_wvp_mat\0u_sun_shadow_map_texture", 7
         "u_position\0u_scale\0u_quat_rotation\0u_camera_position\0u_sun_vector\0u_sun_shadow_map_wvp_mat\0u_sun_shadow_map_texture", 7
     );
 
-    global_texture = load_texture("./src/game/textures/global_texture.png");
-
+    // global_texture = load_texture("./game/textures/global_texture.png");
+    // save_surface_to_c_file("./game/textures/global_texture.png", "global_texture_surface", "./game/textures/global_texture_surface.c");
+    global_texture = load_texture_from_surface(global_texture_surface);
+    
     sun_shadow_map_fbo = create_fbo(3240, 3240, 0, 0, 2);
-
-    sun_shadow_map_shader = create_shader_from_files(
-        "./src/game/shaders/sun_shadow_map.vert",
-        "./src/game/shaders/sun_shadow_map.frag",
+    
+    #include "shaders/sun_shadow_map_sh.c"
+    sun_shadow_map_shader = create_shader(
+        (const char**)&sun_shadow_map_vert,
+        (const char**)&sun_shadow_map_frag,
         "in_vertex_position\0in_vertex_texcoord\0in_vertex_normal\0in_vertex_joint_id\0in_vertex_joint_wheight", 5,
-        // "u_position\0u_scale\0u_rotation", 3
         "u_position\0u_scale\0u_quat_rotation", 3
     );
 

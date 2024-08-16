@@ -82,7 +82,9 @@ void destroy_texture(texture_t* texture) {
 }
 
 void clean_textures() {
+    #ifdef DEBUG_SOFT_MODE
     printf("cleaning %u textures\n", textures_amount);
+    #endif
     for (uint64_t i = 0; i < textures_amount; i++) clean_texture(textures_list[i]);
     textures_amount = 0;
 }

@@ -250,11 +250,15 @@ void audio_music_destroy(music_t* music) {
     audio_music_clean(music);
 }
 void audio_clean() {
+    #ifdef DEBUG_SOFT_MODE
     printf("cleaning %u sounds\n", sounds_amount);
+    #endif
     for (uint64_t i = 0; i < sounds_amount; i++) audio_sound_clean(sounds_list[i]);
     sounds_amount = 0;
     
+    #ifdef DEBUG_SOFT_MODE
     printf("cleaning %u musics\n", musics_amount);
+    #endif
     for (uint64_t i = 0; i < musics_amount; i++) audio_music_clean(musics_list[i]);
     musics_amount = 0;
 
