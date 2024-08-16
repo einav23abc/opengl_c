@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        "*.s": "nasm",
-        "*.asm": "nasm",
-        "vec_mat_quat.h": "c",
-        "engine.h": "c"
-    }
-}
