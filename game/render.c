@@ -55,22 +55,21 @@ void render_game() {
 
 void render_game_world() {
     quat_t quat_rotation;
-    // <cubes>
+
+    // <player[0].tiles>
         // u_texture
         bind_texture(global_texture, shaders_list[current_shader]->u_texture_loc, 0);
-        for (uint64_t i = 0; i < CUBES_AMOUNT; i++){
-            cube_draw(&(cubes[i]));
+        for (uint32_t x = 0; x < _PLAYER_GRID_WIDTH_; x++) {
+            for (uint32_t z = 0; z < _PLAYER_GRID_DEPTH_; z++) {
+                // u_position
+                glUniform3f(shaders_list[current_shader]->uniform_locations[0], x*_TILE_WIDTH_, 0*_TILE_HEIGHT_, z*_TILE_DEPTH_);
+                // u_scale
+                glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_WIDTH_, _TILE_HEIGHT_, _TILE_DEPTH_);
+                // u_quat_rotation
+                quat_t quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
+                glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
+                draw_mesh(cube_mesh);
+            }
         }
-    // </cubes>
-}
-
-void cube_draw(cube_t* cube) {
-    // u_position
-    glUniform3f(shaders_list[current_shader]->uniform_locations[0], cube->x, cube->y, cube->z);
-    // u_scale
-    glUniform3f(shaders_list[current_shader]->uniform_locations[1], cube->w, cube->h, cube->d);
-    // u_quat_rotation
-    quat_t quat_rotation = quat_from_axis_angles_yzx(-cube->rx, -cube->ry, -cube->rz);
-    glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
-    draw_mesh(cube_mesh);
+    // </player[0].tiles>
 }

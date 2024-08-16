@@ -167,23 +167,12 @@ uint8_t init() {
         );
     // </camera>
 
-    // <cubes>
-        cubes[0] = (cube_t){
-            .x = 0, .y = -10, .z = 0,
-            .rx = 0, .ry = 0, .rz = 0,
-            .w = 500, .h = 20, .d = 500
-        };
-        cubes[1] = (cube_t){
-            .x = 40, .y = 20, .z = 40,
-            .rx = M_PI*0.7, .ry = M_PI*1.8, .rz = M_PI*0.1,
-            .w = 80, .h = 60, .d = 20
-        };
-        cubes[2] = (cube_t){
-            .x = -50, .y = 40, .z = 20,
-            .rx = 0, .ry = M_PI*0.2, .rz = M_PI*0.05,
-            .w = 50, .h = 10, .d = 40
-        };
-    // </cubes>
+    // <game_struct>
+        for (uint32_t i = 0; i < _PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_; i++) {
+            game_struct.players[0].tiles[i] = 1;
+            game_struct.players[1].tiles[i] = 1;
+        }
+    // </game_struct>
 
     // <sun shadow map>
         sun_shadow_map_camera = create_camera(
