@@ -1,18 +1,5 @@
 @echo off
 gcc ^
-    src/engine/glad/glad.c ^
-    src/engine/engine_config.c ^
-    src/engine/engine.c ^
-    src/engine/threads/threads.c ^
-    src/engine/audio/audio.c ^
-    src/engine/utils/utils.c ^
-    src/engine/vec_mat_quat/vec_mat_quat.c ^
-    src/engine/cameras/cameras.c ^
-    src/engine/shaders/shaders.c ^
-    src/engine/textures/textures.c ^
-    src/engine/frame_buffer_objects/frame_buffer_objects.c ^
-    src/engine/meshes_and_animations/meshes_and_animations.c ^
-    src/engine/simple_draw_module/simple_draw_module.c ^
     src/game/engine_config.c ^
     src/game/game.c ^
     src/game/init.c ^
@@ -20,7 +7,8 @@ gcc ^
     src/game/render.c ^
     src/game/handle_event.c ^
     src/game/clean.c ^
-    -o ./main.exe ^
+    -o export/main.exe ^
+    -L"src/engine" -l "engine" ^
     -l "mingw32" ^
     -l "SDL2main" ^
     -l "SDL2" ^
