@@ -51,6 +51,8 @@ extern const shader_t* default_shader;
 extern SDL_Surface* default_texture_surface;
 extern const texture_t* default_texture;
 
+
+int32_t main(int32_t argc, char** argv);
 uint32_t backend_init();
 uint32_t engine_init();
 void engine_handle_event();

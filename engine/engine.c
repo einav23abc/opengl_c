@@ -39,6 +39,11 @@ const shader_t* default_shader;
 const texture_t* default_texture;
 
 
+// overload for `main`
+int APIENTRY WinMain (HINSTANCE p1, HINSTANCE p2, LPSTR p3, int p4) {
+    main(0, NULL);
+}
+
 int32_t main(int32_t argc, char** argv) {
     #ifdef DEBUG_MODE
     if (init == NULL) printf("init() does not exist\n");

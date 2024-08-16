@@ -13,7 +13,6 @@ gcc ^
     clean.c ^
     -o ../export/main.exe ^
     -L"../engine" -l "engine" ^
-    -l "mingw32" ^
     -l "SDL2main" ^
     -l "SDL2" ^
     -l "opengl32" ^
