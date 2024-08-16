@@ -60,12 +60,8 @@ extern SDL_Surface* global_texture_surface;
 extern texture_t* global_texture;
 extern shader_t* global_shader;
 
-extern camera_t* player_camera;
-extern player_t player;
-
-extern mesh_t* man_mesh;
-extern animation_t* man_anim_t_pose;
-extern animation_t* man_anim_run;
+extern vec3_t camera_pos;
+extern camera_t* camera;
 
 extern mesh_t* cube_mesh;
 extern cube_t cubes[];
@@ -85,14 +81,7 @@ extern const uint64_t CUBES_AMOUNT;
 void update_game();
 void render_game();
 
-
-vec3_t sat_cube_collision(cube_t* cube1, cube_t* cube2);
-
-
-void cube_update_aabb(cube_t* cube);
-
-void player_camera_update();
-void player_update();
+void camera_update();
 
 void sun_shadow_map_update();
 
@@ -100,7 +89,6 @@ void sun_shadow_map_update();
 void render_game_world();
 
 void cube_draw(cube_t* cube);
-void cube_debug_draw_vertices(cube_t* cube);
 
 
 
