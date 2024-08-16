@@ -1,9 +1,6 @@
 #include "threads.h"
 
 
-// #define DEBUG_MODE
-
-
 #ifdef DEBUG_MODE
 #include <stdio.h>
 int32_t threads_active = 0;

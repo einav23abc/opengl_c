@@ -11,6 +11,7 @@
 #include <math.h>
 
 
+#include "engine_config.h"
 #include "threads/threads.h"
 #include "audio/audio.h"
 #include "utils/utils.h"
@@ -21,44 +22,6 @@
 #include "frame_buffer_objects/frame_buffer_objects.h"
 #include "meshes_and_animations/meshes_and_animations.h"
 #include "simple_draw_module/simple_draw_module.h"
-
-
-// <engine configurables>
-#ifndef _WINDOW_TITLE_
-#define _WINDOW_TITLE_ "SDL+OpenGL app"
-#endif
-
-#ifndef _WINDOW_START_WIDTH_
-#define  _WINDOW_START_WIDTH_ (320)
-#endif
-#ifndef _WINDOW_START_HEIGHT_
-#define  _WINDOW_START_HEIGHT_ (180)
-#endif
-#ifndef _WINDOW_START_X_
-#define  _WINDOW_START_X_ (100)
-#endif
-#ifndef _WINDOW_START_Y_
-#define  _WINDOW_START_Y_ (100)
-#endif
-
-
-#ifndef _BACKGROUND_COLOR_R_
-#define  _BACKGROUND_COLOR_R_ (0.2)
-#endif
-#ifndef _BACKGROUND_COLOR_G_
-#define  _BACKGROUND_COLOR_G_ (0.2)
-#endif
-#ifndef _BACKGROUND_COLOR_B_
-#define  _BACKGROUND_COLOR_B_ (0.2)
-#endif
-
-
-#ifndef _TARGET_FRAME_RATE_
-#define  _TARGET_FRAME_RATE_ (60)
-#endif
-#define _TARGET_FRAME_DELAY_ (1000/_TARGET_FRAME_RATE_)
-
-// </engine configurables>
 
 
 extern const SDL_Event event;

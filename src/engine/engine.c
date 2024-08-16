@@ -9,6 +9,8 @@ __attribute__((weak)) void clean();
 
 const SDL_Event event;
 
+const float TARGET_FRAME_DELAY;
+
 uint8_t keys[SDL_NUM_SCANCODES]; // ticks since key pressed; 0 if released
 
 uint8_t running;
@@ -49,6 +51,7 @@ int32_t main(int32_t argc, char** argv) {
     uint32_t init_result = engine_init();
     if (init_result != 0) return init_result;
     
+    *((float*)&TARGET_FRAME_DELAY) = (1000/TARGET_FRAME_RATE);
     *((uint32_t*)&delta_time) = 0;
     *((float*)&delta_frames)  = 0;
     *((uint32_t*)&time) = 0;
@@ -68,9 +71,9 @@ int32_t main(int32_t argc, char** argv) {
         engine_render();
         
         *((uint32_t*)&delta_time) = SDL_GetTicks() - frame_start_time;
-        *((float*)&delta_frames)  = ((float)delta_time)/_TARGET_FRAME_DELAY_;
+        *((float*)&delta_frames)  = ((float)delta_time)/TARGET_FRAME_DELAY;
         *((uint32_t*)&time) += delta_time;
-        *((float*)&frames)   = ((float)time)/_TARGET_FRAME_DELAY_;
+        *((float*)&frames)   = ((float)time)/TARGET_FRAME_DELAY;
         
         #ifdef DEBUG_MODE
         acum_frames_amount += 1;
@@ -129,11 +132,11 @@ uint32_t backend_init() {
 
     // create window
     window = SDL_CreateWindow(
-        _WINDOW_TITLE_,
-        _WINDOW_START_X_,
-        _WINDOW_START_Y_,
-        _WINDOW_START_WIDTH_,
-        _WINDOW_START_HEIGHT_,
+        WINDOW_TITLE,
+        WINDOW_START_X,
+        WINDOW_START_Y,
+        WINDOW_START_WIDTH,
+        WINDOW_START_HEIGHT,
         SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE
     );
     if (window == NULL) {
@@ -180,6 +183,8 @@ uint32_t backend_init() {
 }
 
 uint32_t engine_init() {
+    engine_config_init();
+
     if (backend_init() != 0) {
         printf("Failed to init backend\n");
         return 1;
@@ -284,7 +289,7 @@ void engine_update() {
 void engine_render() {
     // clear window
     use_default_fbo();
-    glClearColor(_BACKGROUND_COLOR_R_, _BACKGROUND_COLOR_G_, _BACKGROUND_COLOR_B_, 1.0);
+    glClearColor(BACKGROUND_COLOR_R, BACKGROUND_COLOR_G, BACKGROUND_COLOR_B, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     glEnable(GL_DEPTH_TEST);
