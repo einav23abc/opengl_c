@@ -1,31 +1,8 @@
 #include "game.h"
 
 void update() {
-    if (in_game) {
-        update_game();
-        return;
-    }
-
-    // wait for load_game to finish
+    update_game();
     
-    default_camera->viewport_w = window_drawable_width;
-    default_camera->viewport_h = window_drawable_height;
-
-    int32_t load_game_exit_code = get_thread_exit_code(load_game_thread);
-    if (load_game_exit_code != STILL_ACTIVE) {
-        if (load_game_exit_code != 0) {
-            engine_clean();
-            return;
-        }
-        
-        join_thread(load_game_thread);
-        default_camera->active = 0;
-        in_game = 1;
-
-        bind_mesh(man_mesh);
-        bind_mesh(cube_mesh);
-    }
-
     return;
 }
 

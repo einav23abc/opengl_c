@@ -3,13 +3,6 @@
 
 // variable declarations
 
-uint8_t in_game;
-#define _LOAD_GAME_PROGRESS_MAX_ (9)
-uint32_t load_game_progress;
-thread_t load_game_thread;
-
-camera_t* default_camera;
-
 fbo_t* outport_fbo;
 
 
@@ -23,8 +16,8 @@ fbo_t* outport_fbo;
     #include "models/man_mesh.c"
     #include "models/man_anim_t_pose.c"
     #include "models/man_anim_run.c"
-
-    mesh_t* cube_mesh;
+    
+    #include "models/cube_mesh.c"
     #define _CUBES_AMOUNT_ (3)
     cube_t cubes[_CUBES_AMOUNT_];
 
@@ -38,7 +31,6 @@ fbo_t* outport_fbo;
 
 
 // constants
-const uint32_t LOAD_GAME_PROGRESS_MAX = _LOAD_GAME_PROGRESS_MAX_;
 const uint64_t CUBES_AMOUNT = _CUBES_AMOUNT_;
 
 // functions

@@ -1,29 +1,7 @@
 #include "game.h"
 
 void render() {
-    if (in_game) {
-        render_game();
-        return;
-    }
-    
-    render_load_game_screen();
-}
-
-void render_load_game_screen() {
-    use_camera(default_camera);
-
-    glDisable(GL_DEPTH_TEST);
-
-    sdm_set_color(1, 1, 1, 1);
-    sdm_draw_rect(0, 0, _OUTPORT_WIDTH_, _OUTPORT_HEIGHT_);
-    
-    sdm_set_color(0.2, 0.2, 0.2, 1);
-    sdm_draw_rect(_OUTPORT_WIDTH_*0.2, _OUTPORT_HEIGHT_*0.4, _OUTPORT_WIDTH_*0.6, _OUTPORT_HEIGHT_*0.2);
-    
-    sdm_set_color(0.8, 0.0, 0.0, 1);
-    sdm_draw_rect(_OUTPORT_WIDTH_*0.2, _OUTPORT_HEIGHT_*0.4, _OUTPORT_WIDTH_*0.6 * (((float)load_game_progress)/LOAD_GAME_PROGRESS_MAX), _OUTPORT_HEIGHT_*0.2);
-    
-    glEnable(GL_DEPTH_TEST);
+    render_game();
 }
 
 void render_game() {

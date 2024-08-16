@@ -54,12 +54,6 @@ typedef struct player_t {
 #define _OUTPORT_BACKGROUND_COLOR_B_ (0.3)
 
 
-extern uint8_t in_game;
-extern uint32_t load_game_progress;
-extern thread_t load_game_thread;
-
-extern camera_t* default_camera;
-
 extern fbo_t* outport_fbo;
 
 
@@ -86,13 +80,10 @@ extern fbo_t* outport_fbo;
 // </game variables>
 
 // constants
-extern const uint32_t LOAD_GAME_PROGRESS_MAX;
 extern const uint64_t CUBES_AMOUNT;
 
 
 
-
-void load_game();
 
 void update_game();
 void render_game();
@@ -108,8 +99,6 @@ void player_update();
 
 void sun_shadow_map_update();
 
-
-void render_load_game_screen();
 
 void render_game_world();
 
