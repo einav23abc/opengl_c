@@ -45,6 +45,13 @@ int APIENTRY WinMain (HINSTANCE p1, HINSTANCE p2, LPSTR p3, int p4) {
 }
 
 int32_t main(int32_t argc, char** argv) {
+    // hide console
+    #ifndef DEBUG_MODE
+    #ifndef DEBUG_SOFT_MODE
+    FreeConsole();
+    #endif
+    #endif
+
     #ifdef DEBUG_MODE
     if (init == NULL) printf("init() does not exist\n");
     if (render == NULL) printf("render() does not exist\n");
