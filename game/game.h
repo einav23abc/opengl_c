@@ -66,4 +66,7 @@ void sun_shadow_map_update();
 void render_game_world();
 
 
+vec3_t get_mouse_world_space_position_at_y(float at_y);
+
+
 #endif
