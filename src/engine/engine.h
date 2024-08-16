@@ -84,6 +84,8 @@ extern int32_t window_drawable_width;
 extern int32_t window_drawable_height;
 
 extern const shader_t* default_shader;
+
+extern SDL_Surface* default_texture_surface;
 extern const texture_t* default_texture;
 
 uint32_t backend_init();

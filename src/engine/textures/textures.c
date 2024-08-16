@@ -87,23 +87,40 @@ void clean_textures() {
     textures_amount = 0;
 }
 
-void print_surface_for_saving(SDL_Surface* surface) {
+void save_surface_to_c_file(const char* image_file_path, const char* name, const char* c_file_path) {
+    FILE* fp;
+    fp = fopen(c_file_path, "w");
+    if (fp == NULL) {
+        #ifdef DEBUG_SOFT_MODE
+        printf("failed to open file \"%s\" to save surface \"%s\" to.\n", c_file_path, name);
+        #endif
+        return;
+    }
+    
+    SDL_Surface* surface;
+    surface = IMG_Load(image_file_path);
+    if (surface == NULL){
+        printf("failed to load image '%s'. error: \"%s\"\n", image_file_path, SDL_GetError());
+        fclose(fp);
+        return;
+    }
+
     printf("\nprinting surface for saving:\n");
     if (surface->format->palette != NULL) printf("ATTENTION! format->palette isnt NULL. Might not work when saved.\n");
     if (surface->format->next != NULL)    printf("ATTENTION! format has next.           Might not work when saved.\n");
     if (surface->userdata != NULL)        printf("ATTENTION! userdata isnt NULL.        Might not work when saved.\n");
     if (surface->list_blitmap != NULL)    printf("ATTENTION! list_blitmap isnt NULL.    Might not work when saved.\n");
     if (surface->map != NULL)             printf("ATTENTION! map isnt NULL.             Might not work when saved.\n");
+    printf("\n");
 
-    printf(
-        ""      "\n"
+    fprintf(fp,
         ""      "#include <SDL2/SDL.h>\n"
         ""      "#include <stdint.h>\n"
     );
 
     // surface_format
-    printf(
-        ""      "static SDL_PixelFormat surface_format = (SDL_PixelFormat){\n"
+    fprintf(fp,
+        ""      "static SDL_PixelFormat %s_surface_format = (SDL_PixelFormat){\n"
         "\t"        ".format = %u,\n"
         "\t"        ".palette = 0x0,\n"
         "\t"        ".BitsPerPixel = %hhu,\n"
@@ -125,6 +142,7 @@ void print_surface_for_saving(SDL_Surface* surface) {
         "\t"        ".next = 0x0\n"
         ""      "};\n"
         ,
+        name,
         surface->format->format,
         surface->format->BitsPerPixel,
         surface->format->BytesPerPixel,
@@ -145,25 +163,27 @@ void print_surface_for_saving(SDL_Surface* surface) {
     );
 
     // surface_pixels
-    printf(
-        ""      "static uint8_t surface_pixels[] = {"
+    fprintf(fp,
+        ""      "static uint8_t %s_surface_pixels[] = {"
+        ,
+        name
     );
     for (uint64_t i = 0; i < surface->w*surface->h*surface->format->BytesPerPixel; i++) {
-        if (i != 0) printf(", ");
-        if (i%20 == 0) printf("\n\t");
-        printf("%hhu", ((uint8_t*)(surface->pixels))[i]);
+        if (i != 0) fprintf(fp,", ");
+        if (i%20 == 0) fprintf(fp,"\n\t");
+        fprintf(fp,"%hhu", ((uint8_t*)(surface->pixels))[i]);
     }
-    printf("\n};\n");
+    fprintf(fp,"\n};\n");
 
     // surface
-    printf(
-        ""      "SDL_Surface surface = (SDL_Surface){\n"
+    fprintf(fp,
+        ""      "static SDL_Surface %s_surface = {\n"
         "\t"        ".flags = %u,\n"
-        "\t"        ".format = &surface_format,\n"
+        "\t"        ".format = &%s_surface_format,\n"
         "\t"        ".w = %d,\n"
         "\t"        ".h = %d,\n"
         "\t"        ".pitch = %d,\n"
-        "\t"        ".pixels = &surface_pixels,\n"
+        "\t"        ".pixels = &%s_surface_pixels,\n"
         "\t"        ".userdata = 0x0,\n"
         "\t"        ".locked = %d,\n"
         "\t"        ".list_blitmap = 0x0,\n"
@@ -177,10 +197,13 @@ void print_surface_for_saving(SDL_Surface* surface) {
         "\t"        ".refcount = %d\n"
         ""      "};\n"
         ,
+        name,
         surface->flags,
+        name,
         surface->w,
         surface->h,
         surface->pitch,
+        name,
         surface->locked,
         surface->clip_rect.x,
         surface->clip_rect.y,
@@ -189,5 +212,14 @@ void print_surface_for_saving(SDL_Surface* surface) {
         surface->refcount
     );
 
-    printf("\n");
+    // name
+    fprintf(fp,
+        ""      "SDL_Surface* %s = &%s_surface;\n"
+        ,
+        name,
+        name
+    );
+
+    SDL_FreeSurface(surface);
+    fclose(fp);
 }

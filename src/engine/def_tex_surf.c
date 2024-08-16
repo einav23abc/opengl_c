@@ -1,6 +1,6 @@
 #include <SDL2/SDL.h>
 #include <stdint.h>
-static SDL_PixelFormat surface_format = (SDL_PixelFormat){
+static SDL_PixelFormat default_texture_surface_surface_format = (SDL_PixelFormat){
         .format = 376840196,
         .palette = 0x0,
         .BitsPerPixel = 32,
@@ -21,16 +21,16 @@ static SDL_PixelFormat surface_format = (SDL_PixelFormat){
         .refcount = 1,
         .next = 0x0
 };
-static uint8_t surface_pixels[] = {
+static uint8_t default_texture_surface_surface_pixels[] = {
         255, 0, 255, 255, 0, 0, 0, 255, 0, 0, 0, 255, 255, 0, 255, 255
 };
-SDL_Surface surface = (SDL_Surface){
+static SDL_Surface default_texture_surface_surface = {
         .flags = 8,
-        .format = &surface_format,
+        .format = &default_texture_surface_surface_format,
         .w = 2,
         .h = 2,
         .pitch = 8,
-        .pixels = &surface_pixels,
+        .pixels = &default_texture_surface_surface_pixels,
         .userdata = 0x0,
         .locked = 0,
         .list_blitmap = 0x0,
@@ -43,3 +43,4 @@ SDL_Surface surface = (SDL_Surface){
         .map = 0x0,
         .refcount = 1
 };
+SDL_Surface* default_texture_surface = &default_texture_surface_surface;

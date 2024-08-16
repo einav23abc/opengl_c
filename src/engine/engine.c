@@ -31,6 +31,9 @@ int32_t window_drawable_width;
 int32_t window_drawable_height;
 
 const shader_t* default_shader;
+
+
+#include "./def_tex_surf.c"
 const texture_t* default_texture;
 
 
@@ -203,14 +206,11 @@ uint32_t engine_init() {
     }
 
     // default_texture
-    if (1){ // create scope
-    #include "./def_tex_surf.c"
-    default_texture = load_texture_from_surface(&surface);
+    default_texture = load_texture_from_surface(default_texture_surface);
     if (default_texture == NULL) {
         printf("error\n");
         return 1;
     }
-    }       // end scope
 
     // simple draw module
     if (simple_draw_module_init() != 0) {

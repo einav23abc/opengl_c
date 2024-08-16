@@ -94,15 +94,19 @@ void destroy_texture(texture_t* texture);
  */
 void clean_textures();
 
-/* \brief Print a SDL_Surface struct for saving without loading from file.
+/* \brief Save an SDL_Surface into a .c file.
  *
- * Can be used to save a surface without having to load from a file.
+ * Can be used to load a texture without having to load from a file.
+ * This can be done by calling `load_texture_from_surface` or `load_texture_from_surface_ext_params`.
  * 
- * Surfaces are loaded from files using `IMG_Load(const char* file_path)`.
- * And should be freed using `SDL_FreeSurface(SDL_Surface* surface)`.
+ * Unlike surfaces created by SDL's functions, This surface does not need to be freed using `SDL_FreeSurface`.
  * 
- * \param surface A pointer to a SDL_Surface struct that will be printed.
+ * \param image_file_path The path to the texture's image.
+ * 
+ * \param name The name that will be given to the surface. This will be `SDL_Surface* name`.
+ * 
+ * \param surface_file_path The path to the c file where the surface will be saved.
  */
-void print_surface_for_saving(SDL_Surface* surface);
+void save_surface_to_c_file(const char* image_file_path, const char* name, const char* c_file_path);
 
 #endif
