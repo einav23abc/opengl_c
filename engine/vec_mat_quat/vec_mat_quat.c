@@ -1,6 +1,13 @@
 #include "vec_mat_quat.h"
 
 
+vec3_t vec3_add(vec3_t vec1, vec3_t vec2) {
+    return (vec3_t){
+        .x = vec1.x+vec2.x,
+        .y = vec1.y+vec2.y,
+        .z = vec1.z+vec2.z
+    };
+}
 vec3_t vec3_mul(vec3_t vec1, vec3_t vec2) {
     return (vec3_t){
         .x = vec1.x*vec2.x,
@@ -8,11 +15,11 @@ vec3_t vec3_mul(vec3_t vec1, vec3_t vec2) {
         .z = vec1.z*vec2.z
     };
 }
-vec3_t vec3_add(vec3_t vec1, vec3_t vec2) {
+vec3_t vec3_mul_by_scalar(vec3_t vec, float scalar) {
     return (vec3_t){
-        .x = vec1.x+vec2.x,
-        .y = vec1.y+vec2.y,
-        .z = vec1.z+vec2.z
+        .x = vec.x*scalar,
+        .y = vec.y*scalar,
+        .z = vec.z*scalar
     };
 }
 

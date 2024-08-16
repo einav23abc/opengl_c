@@ -72,9 +72,9 @@ void camera_update() {
 
 
     // follow camera_pos
-    camera->x = camera_pos.x      - 60*cos(camera->ry+M_PI*0.5)*cos(camera->rx);
-    camera->y = camera_pos.y + 20 - 60*sin(camera->rx);
-    camera->z = camera_pos.z      - 60*sin(camera->ry+M_PI*0.5)*cos(camera->rx);
+    camera->x = camera_pos.x - 60*cos(camera->ry+M_PI*0.5)*cos(camera->rx);
+    camera->y = camera_pos.y - 60*sin(camera->rx);
+    camera->z = camera_pos.z - 60*sin(camera->ry+M_PI*0.5)*cos(camera->rx);
 
     // perspective <-> orthographic togle
     if (keys[SDL_SCANCODE_P] == 1) {

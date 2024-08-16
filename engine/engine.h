@@ -24,10 +24,26 @@
 #include "simple_draw_module/simple_draw_module.h"
 
 
+#define MOUSE_BUTTONS_AMOUNT (4)
+
+typedef struct {
+    // mouse X coordinate, relative to window.
+    int32_t x;
+    // mouse Y coordinate, relative to window.
+    int32_t y;
+    /* 0 = released
+     * 1 = single click
+     * 2 = double click
+     * etc...
+     */
+    uint8_t button_states[MOUSE_BUTTONS_AMOUNT];
+} mouse_t;
+
+
 extern const SDL_Event event;
 
 extern uint8_t keys[SDL_NUM_SCANCODES]; // ticks since key pressed; 0 if released
-
+extern mouse_t mouse;
 
 extern const float TARGET_FRAME_DELAY;
 

@@ -62,8 +62,9 @@ typedef struct {
 
 
 
-vec3_t vec3_mul(vec3_t vec1, vec3_t vec2);
 vec3_t vec3_add(vec3_t vec1, vec3_t vec2);
+vec3_t vec3_mul(vec3_t vec1, vec3_t vec2);
+vec3_t vec3_mul_by_scalar(vec3_t vec, float scalar);
 
 float dot_product(vec3_t vec1, vec3_t vec2);
 vec3_t cross_product(vec3_t vec1, vec3_t vec2);

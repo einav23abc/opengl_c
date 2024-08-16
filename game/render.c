@@ -4,6 +4,36 @@ void render() {
     render_game();
 }
 
+
+vec3_t get_mouse_world_space_position() {
+    // assuming using `camera`-ortho and `outport_fbo`
+    // very unoptimised, quickly hacked together
+
+    vec3_t mouse_relative_to_middle = {
+        .x =  (((float)mouse.x)/window_drawable_width  - 0.5)*camera->width,
+        .y = -(((float)mouse.y)/window_drawable_height - 0.5)*camera->height,
+        .z = 0
+    };
+
+    quat_t camera_rot_quat = quat_from_axis_angles_yzx(-camera->rx, -camera->ry, -camera->rz);
+    vec3_t mouse_as_camera_plane_translation = rotate_vector(mouse_relative_to_middle, camera_rot_quat);
+
+    vec3_t pos = {
+        .x = camera_pos.x + mouse_as_camera_plane_translation.x,
+        .y = camera_pos.y + mouse_as_camera_plane_translation.y,
+        .z = camera_pos.z + mouse_as_camera_plane_translation.z
+    };
+
+    vec3_t camera_in_translation = rotate_vector((vec3_t){0,0,1}, camera_rot_quat);
+
+    // find intersection with top of player[0].tiles
+    float t = (_TILE_HEIGHT_*0.5-pos.y)/camera_in_translation.y;
+    pos = vec3_add(pos, vec3_mul_by_scalar(camera_in_translation, t));
+    
+    return pos;
+}
+
+
 void render_game() {
     // clear outport fbo
     use_fbo(outport_fbo);
@@ -23,8 +53,12 @@ void render_game() {
         use_camera(camera);
         use_fbo(outport_fbo);
 
-        sdm_set_color(0, 1, 0, 1);
+        sdm_set_color(1, 0, 1, 1);
         sdm_draw_ball(camera_pos.x, camera_pos.y, camera_pos.z, 5);
+        
+        vec3_t mouse_world_space_position = get_mouse_world_space_position();
+        sdm_set_color(0, 0, 1, 1);
+        sdm_draw_ball(mouse_world_space_position.x, mouse_world_space_position.y, mouse_world_space_position.z, 5);
         
         use_shader(global_shader);
         // u_camera_position
@@ -44,8 +78,8 @@ void render_game() {
     // draw outport frame buffer to screen
     use_default_fbo();
 
-    // float pixel_scale = fmin(((float)window_drawable_width)/_OUTPORT_WIDTH_, ((float)window_drawable_height)/_OUTPORT_HEIGHT_);
-    uint32_t pixel_scale = uintmin(window_drawable_width/_OUTPORT_WIDTH_, window_drawable_height/_OUTPORT_HEIGHT_);
+    float pixel_scale = fmin(((float)window_drawable_width)/_OUTPORT_WIDTH_, ((float)window_drawable_height)/_OUTPORT_HEIGHT_);
+    // uint32_t pixel_scale = uintmin(window_drawable_width/_OUTPORT_WIDTH_, window_drawable_height/_OUTPORT_HEIGHT_);
     uint32_t w = _OUTPORT_WIDTH_*pixel_scale;
     uint32_t h = _OUTPORT_HEIGHT_*pixel_scale;
     glViewport((window_drawable_width-w)*0.5,(window_drawable_height-h)*0.5,w,h);

@@ -12,6 +12,7 @@ const SDL_Event event;
 const float TARGET_FRAME_DELAY;
 
 uint8_t keys[SDL_NUM_SCANCODES]; // ticks since key pressed; 0 if released
+mouse_t mouse;
 
 uint8_t running;
 uint32_t frame_start_time;
@@ -273,6 +274,23 @@ void engine_handle_event() {
                     SDL_GL_GetDrawableSize(window, &window_drawable_width, &window_drawable_height);
                     break;
             }
+            break;
+        
+        case SDL_MOUSEBUTTONDOWN:
+            if (event.button.button < MOUSE_BUTTONS_AMOUNT) mouse.button_states[event.button.button] = event.button.clicks;
+            mouse.x = event.button.x;
+            mouse.y = event.button.y;
+            break;
+            
+        case SDL_MOUSEBUTTONUP:
+            if (event.button.button < MOUSE_BUTTONS_AMOUNT) mouse.button_states[event.button.button] = 0;
+            mouse.x = event.button.x;
+            mouse.y = event.button.y;
+            break;
+
+        case SDL_MOUSEMOTION:
+            mouse.x = event.button.x;
+            mouse.y = event.button.y;
             break;
     }
     
