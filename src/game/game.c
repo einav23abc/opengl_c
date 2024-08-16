@@ -4,7 +4,7 @@
 // variable declarations
 
 uint8_t in_game;
-#define _LOAD_GAME_PROGRESS_MAX_ (11)
+#define _LOAD_GAME_PROGRESS_MAX_ (9)
 uint32_t load_game_progress;
 thread_t load_game_thread;
 
@@ -19,11 +19,13 @@ fbo_t* outport_fbo;
 
     camera_t* player_camera;
     player_t player;
-    
-    #include "man_mesh_struct.c"
+
+    #include "models/man_mesh_struct.c"
     mesh_t* man_mesh = &man_mesh_struct;
-    animation_t* man_anim_t_pose;
-    animation_t* man_anim_run;
+    #include "models/man_anim_t_pose_struct.c"
+    animation_t* man_anim_t_pose = &man_anim_t_pose_struct;
+    #include "models/man_anim_run_struct.c"
+    animation_t* man_anim_run = &man_anim_run_struct;
 
     mesh_t* cube_mesh;
     #define _CUBES_AMOUNT_ (3)

@@ -153,4 +153,19 @@ void clean_animations();
  */
 void save_mesh_to_c_file(mesh_t* mesh, const char* name, const char* file_path);
 
+/* \brief Save a animation_t struct into a .c file.
+ *
+ * The animation can then be used without having to load from a file.
+ * 
+ * Saved animations do not have an index beacuse they dont need to be deallocated.
+ * Beacuse of this, Using `destroy_animation` on a saved animation will have undefined behavior.
+ * 
+ * \param anim The animation that will be saved.
+ * 
+ * \param name The name that will be given to the animation_t struct.
+ * 
+ * \param file_path The path to the c file where the animation_t will be saved.
+ */
+void save_animation_to_c_file(animation_t* anim, const char* name, const char* file_path);
+
 #endif

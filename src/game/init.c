@@ -54,49 +54,51 @@ uint8_t init() {
 
 
 void load_game() {
-    // <animation of man mesh>
-        man_anim_t_pose = animation_from_collada_dae_ext(
-            "./src/game/models/man_rigged_t_pose.dae",
-            man_mesh->joints,
-            man_mesh->joints_amount,
-            (quat_vec_vec_t){
-                .rot = quat_from_axis_angles_yzx(M_PI*1.5, 0, 0),
-                .scale = (vec3_t){
-                    .x = 1,
-                    .y = 1,
-                    .z = 1
-                },
-                .pos = (vec3_t){
-                    .x = 0,
-                    .y = -4.0,
-                    .z = -0.3
-                }
-            }
-        );
-        load_game_progress += 1;
+    // // <animation of man mesh>
+    //     man_anim_t_pose = animation_from_collada_dae_ext(
+    //         "./src/game/models/man_rigged_t_pose.dae",
+    //         man_mesh->joints,
+    //         man_mesh->joints_amount,
+    //         (quat_vec_vec_t){
+    //             .rot = quat_from_axis_angles_yzx(M_PI*1.5, 0, 0),
+    //             .scale = (vec3_t){
+    //                 .x = 1,
+    //                 .y = 1,
+    //                 .z = 1
+    //             },
+    //             .pos = (vec3_t){
+    //                 .x = 0,
+    //                 .y = -4.0,
+    //                 .z = -0.3
+    //             }
+    //         }
+    //     );
+    //     load_game_progress += 1;
 
         
-        man_anim_run = animation_from_collada_dae_ext(
-            "./src/game/models/man_rigged_run.dae",
-            man_mesh->joints,
-            man_mesh->joints_amount,
-            (quat_vec_vec_t){
-                .rot = quat_from_axis_angles_yzx(M_PI*1.5, 0, 0),
-                .scale = (vec3_t){
-                    .x = 1,
-                    .y = 1,
-                    .z = 1
-                },
-                .pos = (vec3_t){
-                    .x = 0,
-                    .y = -4.0,
-                    .z = -0.3
-                }
-            }
-        );
-        load_game_progress += 1;
-    // </animation of man mesh>
+    //     man_anim_run = animation_from_collada_dae_ext(
+    //         "./src/game/models/man_rigged_run.dae",
+    //         man_mesh->joints,
+    //         man_mesh->joints_amount,
+    //         (quat_vec_vec_t){
+    //             .rot = quat_from_axis_angles_yzx(M_PI*1.5, 0, 0),
+    //             .scale = (vec3_t){
+    //                 .x = 1,
+    //                 .y = 1,
+    //                 .z = 1
+    //             },
+    //             .pos = (vec3_t){
+    //                 .x = 0,
+    //                 .y = -4.0,
+    //                 .z = -0.3
+    //             }
+    //         }
+    //     );
+    //     load_game_progress += 1;
+    // // </animation of man mesh>
     
+    // save_animation_to_c_file(man_anim_t_pose, "man_anim_t_pose_struct", "src/game/models/man_anim_t_pose_struct.c");
+    // save_animation_to_c_file(man_anim_run, "man_anim_run_struct", "src/game/models/man_anim_run_struct.c");
 
     // <player>
         player = (player_t){

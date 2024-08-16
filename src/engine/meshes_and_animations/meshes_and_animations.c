@@ -1675,7 +1675,12 @@ void save_mesh_to_c_file(mesh_t* mesh, const char* name, const char* file_path) 
 
     FILE* fp;
     fp = fopen(file_path, "w");
-    if (fp == NULL) return;
+    if (fp == NULL) {
+        #ifdef DEBUG_SOFT_MODE
+        printf("failed to open file \"%s\" to save mesh \"%s\" to.\n", file_path, name);
+        #endif
+        return;
+    }
     
     printf("saving mesh \"%s\" to file \"%s\"\n", name, file_path);
 
@@ -1879,7 +1884,7 @@ void save_mesh_to_c_file(mesh_t* mesh, const char* name, const char* file_path) 
         ""      "\n};\n"
     );
 
-    // mesh
+    // mesh 'name'
     fprintf(fp,
         ""      "mesh_t %s = (mesh_t){\n"
         "\t"        ".mesh_index = -1,\n"
@@ -1906,6 +1911,123 @@ void save_mesh_to_c_file(mesh_t* mesh, const char* name, const char* file_path) 
         name,
         mesh->joints_amount,
         name,
+        name
+    );
+
+    fclose(fp);
+}
+
+void save_animation_to_c_file(animation_t* anim, const char* name, const char* file_path) {
+    FILE* fp;
+    fp = fopen(file_path, "w");
+    if (fp == NULL) {
+        #ifdef DEBUG_SOFT_MODE
+        printf("failed to open file \"%s\" to save animation \"%s\" to.\n", file_path, name);
+        #endif
+        return;
+    }
+    
+    printf("saving animation \"%s\" to file \"%s\"\n", name, file_path);
+
+    fprintf(fp, "#include <stdint.h>\n");
+
+    // animation_jointX_key_frames
+    for (uint64_t i = 0; i < anim->joints_amount; i++) {
+        fprintf(fp,
+            ""      "static key_frame_t %s_animation_joint%llu_key_frames[] = {"
+            ,
+            name,
+            i
+        );
+        for (uint64_t j = 0; j < anim->joints_key_frames[i].key_frames_amount; j++) {
+            if (j != 0) fprintf(fp, ",");
+            fprintf(fp,
+                "\n"
+                "\t"        "{\n"
+                "\t\t"          ".joint_local_transform = (mat4_t){\n"
+                "\t\t\t"            ".mat = {\n"
+                "\t\t\t\t"              "%f, %f, %f, %f,\n"
+                "\t\t\t\t"              "%f, %f, %f, %f,\n"
+                "\t\t\t\t"              "%f, %f, %f, %f,\n"
+                "\t\t\t\t"              "%f, %f, %f, %f\n"
+                "\t\t\t"            "}\n"
+                "\t\t"          "},\n"
+                "\t\t"          ".joint_local_transform_qvv = {\n"
+                "\t\t\t"            ".rot = (quat_t){%f, %f, %f, %f},\n"
+                "\t\t\t"            ".pos = (vec3_t){%f, %f, %f},\n"
+                "\t\t\t"            ".scale = (vec3_t){%f, %f, %f}\n"
+                "\t\t"          "},\n"
+                "\t\t"          ".time_stamp = %f\n"
+                "\t"        "}"
+                ,
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform.mat[ 0],
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform.mat[ 1],
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform.mat[ 2],
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform.mat[ 3],
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform.mat[ 4],
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform.mat[ 5],
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform.mat[ 6],
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform.mat[ 7],
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform.mat[ 8],
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform.mat[ 9],
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform.mat[10],
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform.mat[11],
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform.mat[12],
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform.mat[13],
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform.mat[14],
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform.mat[15],
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform_qvv.rot.w,
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform_qvv.rot.x,
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform_qvv.rot.y,
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform_qvv.rot.z,
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform_qvv.pos.x,
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform_qvv.pos.y,
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform_qvv.pos.z,
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform_qvv.scale.x,
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform_qvv.scale.y,
+                anim->joints_key_frames[i].key_frames[j].joint_local_transform_qvv.scale.z,
+                anim->joints_key_frames[i].key_frames[j].time_stamp
+            );
+        }
+        fprintf(fp,
+            "\n};\n"
+        );
+    }
+
+    // animation_joints_key_frames
+    fprintf(fp,
+        ""      "static joint_key_frame_t %s_animation_joints_key_frames[] = {"
+        ,
+        name
+    );
+    for (uint64_t i = 0; i < anim->joints_amount; i++) {
+        if (i != 0) fprintf(fp, ",");
+        fprintf(fp,
+            "\n"
+            "\t"        "{\n"
+            "\t\t"          ".key_frames_amount = %u,\n"
+            "\t\t"          ".key_frames = %s_animation_joint%llu_key_frames\n"
+            "\t"        "}"
+            ,
+            anim->joints_key_frames[i].key_frames_amount,
+            name,
+            i
+        );
+    }
+    fprintf(fp,
+        "\n};\n"
+    );
+
+    // animation 'name'
+    fprintf(fp,
+        ""      "animation_t %s = (animation_t){\n"
+        "\t"        ".animation_index = -1,\n"
+        "\t"        ".joints_amount = %u,\n"
+        "\t"        ".joints_key_frames = %s_animation_joints_key_frames\n"
+        ""      "};"
+        ,
+        name,
+        anim->joints_amount,
         name
     );
 
