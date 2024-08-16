@@ -54,28 +54,6 @@ uint8_t init() {
 
 
 void load_game() {
-    // <man mesh>
-        // man_mesh = mesh_from_wavefront_obj("./src/game/models/man.obj");
-        // man_mesh = mesh_from_collada_dae_ext(
-        //     "./src/game/models/man_rigged.dae",
-        //     (quat_vec_vec_t){
-        //         .rot = quat_from_axis_angles_yzx(M_PI*1.5, 0, 0),
-        //         .scale = (vec3_t){
-        //             .x = 1,
-        //             .y = 1,
-        //             .z = 1
-        //         },
-        //         .pos = (vec3_t){
-        //             .x = 0,
-        //             .y = 0,
-        //             .z = 0
-        //         }
-        //     }
-        // );
-        man_mesh = mesh_from_collada_dae("./src/game/models/man_rigged_t_pose.dae", 1);
-    // </man mesh>
-    load_game_progress += 1;
-
     // <animation of man mesh>
         man_anim_t_pose = animation_from_collada_dae_ext(
             "./src/game/models/man_rigged_t_pose.dae",

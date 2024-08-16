@@ -135,18 +135,22 @@ void clean_meshes();
 void clean_animations();
 
 
-/* \brief Print a mesh_t struct for saving.
+/* \brief Save a mesh_t struct into a .c file.
  *
- * Can be used to load a saved mesh without having to load from a file.
+ * Can be used to load the saved mesh without having to load from a model file.
  * 
- * Binded meshes will not be printed beacuse they will not work if saved.
+ * Binded meshes will not be saved beacuse they will not work if saved.
  * This is beacuse the mesh must be binded at each runtime.
  * 
  * Saved meshes do not have an index beacuse they dont need to be deallocated.
  * Beacuse of this, Using `destroy_mesh` on a saved mesh will have undefined behavior.
  * 
- * \param mesh The mesh that will be printed.
+ * \param mesh The mesh that will be saved.
+ * 
+ * \param name The name that will be given to the mesh struct.
+ * 
+ * \param file_path The path to the c file where the mesh will be saved.
  */
-void print_mesh_for_saving(mesh_t* mesh);
+void save_mesh_to_c_file(mesh_t* mesh, const char* name, const char* file_path);
 
 #endif

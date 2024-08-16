@@ -1670,50 +1670,63 @@ void clean_animations() {
     animations_amount = 0;
 }
 
-void print_mesh_for_saving(mesh_t* mesh) {
+void save_mesh_to_c_file(mesh_t* mesh, const char* name, const char* file_path) {
     if (mesh->unbinded == 0) return;
-    
-    printf("\nprinting mesh for saving:\n\n");
 
-    printf("#include \"../vec_mat_quat/vec_mat_quat.h\"\n");
-    printf("#include <stdint.h>\n");
+    FILE* fp;
+    fp = fopen(file_path, "w");
+    if (fp == NULL) return;
+    
+    printf("saving mesh \"%s\" to file \"%s\"\n", name, file_path);
+
+    fprintf(fp, "#include <stdint.h>\n");
 
     // mesh_vbo_data_arrX
     for (uint64_t i = 0; i < mesh->vbos_amount; i++) {
-        printf(
-            ""      "static uint8_t mesh_vbo_data_arr%u[] = {", i
+        fprintf(fp,
+            ""      "static uint8_t %s_mesh_vbo_data_arr%llu[] = {"
+            ,
+            name,
+            i
         );
         for (uint64_t j = 0; j < mesh->vbo_datas_arr[i].data_arr_size; j++) {
-            if (j != 0) printf(", ");
-            if (j%20 == 0) printf("\n\t");
-            printf("%hhu", ((uint8_t*)(mesh->vbo_datas_arr[i].data_arr))[j]);
+            if (j != 0) fprintf(fp,", ");
+            if (j%20 == 0) fprintf(fp,"\n\t");
+            fprintf(fp,
+                "%hhu",
+                ((uint8_t*)(mesh->vbo_datas_arr[i].data_arr))[j]
+            );
         }
-        printf("\n};\n");
+        fprintf(fp, "\n};\n");
     }
 
     // mesh_vbos
-    printf(
-        ""      "static uint32_t mesh_vbos[] = {"
+    fprintf(fp,
+        ""      "static uint32_t %s_mesh_vbos[] = {"
+        ,
+        name
     );
     for (uint64_t i = 0; i < mesh->vbos_amount; i++) {
-        if (i != 0) printf(", ");
-        if (i%20 == 0) printf("\n\t");
-        printf("0");
+        if (i != 0) fprintf(fp, ", ");
+        if (i%20 == 0) fprintf(fp,"\n\t");
+        fprintf(fp, "0");
     }
-    printf(
-        ""      "};\n"
+    fprintf(fp,
+        ""      "\n};\n"
     );
 
     // mesh_vbo_datas_arr
-    printf(
-        ""      "static vbo_data_t mesh_vbo_datas_arr[] = {\n"
+    fprintf(fp,
+        ""      "static vbo_data_t %s_mesh_vbo_datas_arr[] = {\n"
+        ,
+        name
     );
     for (uint64_t i = 0; i < mesh->vbos_amount; i++) {
-        if (i != 0) printf(",\n");
-        printf(
+        if (i != 0) fprintf(fp,",\n");
+        fprintf(fp,
             "\t"        "{\n"
             "\t\t"          ".data_arr_size = %u,\n"
-            "\t\t"          ".data_arr = &mesh_data_arr%u,\n"
+            "\t\t"          ".data_arr = %s_mesh_vbo_data_arr%llu,\n"
             "\t\t"          ".size = %d,\n"
             "\t\t"          ".type = %d,\n"
             "\t\t"          ".stride = %d,\n"
@@ -1721,6 +1734,7 @@ void print_mesh_for_saving(mesh_t* mesh) {
             "\t"        "}"
             ,
             mesh->vbo_datas_arr[i].data_arr_size,
+            name,
             i,
             mesh->vbo_datas_arr[i].size,
             mesh->vbo_datas_arr[i].type,
@@ -1728,41 +1742,49 @@ void print_mesh_for_saving(mesh_t* mesh) {
             mesh->vbo_datas_arr[i].divisor
         );
     }
-    printf(
-        ""      "};\n"
+    fprintf(fp,
+        ""      "\n};\n"
     );
 
     // mesh_indices_array
-    printf(
-        ""      "static uint32_t mesh_indices_array[] = {"
+    fprintf(fp,
+        ""      "static uint32_t %s_mesh_indices_array[] = {"
+        ,
+        name
     );
     for (uint64_t i = 0; i < mesh->indices_count; i++) {
-        if (i != 0) printf(", ");
-        if (i%20 == 0) printf("\n\t");
-        printf("%u", ((uint32_t*)(mesh->indices_array))[i]);
+        if (i != 0) fprintf(fp,", ");
+        if (i%20 == 0) fprintf(fp,"\n\t");
+        fprintf(fp,
+            "%u",
+            ((uint32_t*)(mesh->indices_array))[i]
+        );
     }
-    printf("\n};\n");
+    fprintf(fp, "\n};\n");
 
     // mesh_jointX_name
     for (uint64_t i = 0; i < mesh->joints_amount; i++) {
-        printf(
-            ""      "static char mesh_joint%u_name[] = \"%s\";\n"
+        fprintf(fp,
+            ""      "static char %s_mesh_joint%llu_name[] = \"%s\";\n"
             ,
+            name,
             i,
             mesh->joints[i].name
         );
     }
 
     // mesh_joints
-    printf(
-        ""      "static joint_t mesh_joints[] = {"
+    fprintf(fp,
+        ""      "static joint_t %s_mesh_joints[] = {\n"
+        ,
+        name
     );
     for (uint64_t i = 0; i < mesh->joints_amount; i++) {
-        if (i != 0) printf(",\n");
-        printf(
+        if (i != 0) fprintf(fp, ",\n");
+        fprintf(fp,
             "\t"        "{\n"
             "\t\t"          ".index = %u,\n"
-            "\t\t"          ".name = mesh_joint%u_name,\n"
+            "\t\t"          ".name = %s_mesh_joint%llu_name,\n"
             "\t\t"          ".parent = %u,\n"
             "\t\t"          ".inverse_bind_transform_mat = (mat4_t){\n"
             "\t\t\t"            ".mat = {\n"
@@ -1772,10 +1794,10 @@ void print_mesh_for_saving(mesh_t* mesh) {
             "\t\t\t\t"              "%f, %f, %f, %f\n"
             "\t\t\t"            "}\n"
             "\t\t"          "},\n"
-            "\t\t"          ".local_transform_qvv = (quat_vec_vec_t){\n"
+            "\t\t"          ".local_transform_qvv = {\n"
             "\t\t\t"            ".rot = (quat_t){%f, %f, %f, %f},\n"
             "\t\t\t"            ".pos = (vec3_t){%f, %f, %f},\n"
-            "\t\t\t"            ".scale = (vec3_t){%f, %f, %f},\n"
+            "\t\t\t"            ".scale = (vec3_t){%f, %f, %f}\n"
             "\t\t"          "},\n"
             "\t\t"          ".model_transform_mat = (mat4_t){\n"
             "\t\t\t"            ".mat = {\n"
@@ -1788,6 +1810,7 @@ void print_mesh_for_saving(mesh_t* mesh) {
             "\t"        "}"
             ,
             mesh->joints[i].index,
+            name,
             i,
             mesh->joints[i].parent,
             mesh->joints[i].inverse_bind_transform_mat.mat[ 0],
@@ -1834,43 +1857,57 @@ void print_mesh_for_saving(mesh_t* mesh) {
             mesh->joints[i].model_transform_mat.mat[15]
         );
     }
-    printf(
-        ""      "};\n"
+    fprintf(fp,
+        ""      "\n};\n"
     );
 
     // mesh_pose_joint_transform_matrices
-    printf(
-        ""      "static float mesh_pose_joint_transform_matrices[] = {"
+    fprintf(fp,
+        ""      "static float %s_mesh_pose_joint_transform_matrices[] = {"
+        ,
+        name
     );
     for (uint64_t i = 0; i < mesh->joints_amount*16; i++) {
-        if (i != 0) printf(", ");
-        if (i%16 == 0) printf("\n\t");
-        printf(
+        if (i != 0) fprintf(fp,", ");
+        if (i%16 == 0) fprintf(fp,"\n\t");
+        fprintf(fp,
             "%f",
             mesh->pose_joint_transform_matrices[i]
         );
     }
-    printf(
+    fprintf(fp,
         ""      "\n};\n"
     );
 
     // mesh
-    printf(
-        ""      "mesh_t mesh = (mesh_t){\n"
+    fprintf(fp,
+        ""      "mesh_t %s = (mesh_t){\n"
         "\t"        ".mesh_index = -1,\n"
         "\t"        ".saved = 1,\n"
-        "\t"        ".unbinded = %hhu,\n",
-        "\t"        ".vao = %u,\n",
-        "\t"        ".vbos_amount = %u,\n",
-        "\t"        ".vbos = mesh_vbos,\n",
-        "\t"        ".vbo_datas_arr = mesh_vbo_datas_arr,\n",
-        "\t"        ".indices_count = %u,\n",
-        "\t"        ".indices_array = mesh_indices_array,\n",
-        "\t"        ".joints_amount = %u,\n",
-        "\t"        ".joints = mesh_joints,\n",
-        "\t"        ".pose_joint_transform_matrices = mesh_pose_joint_transform_matrices\n",
+        "\t"        ".unbinded = %hhu,\n"
+        "\t"        ".vao = %u,\n"
+        "\t"        ".vbos_amount = %u,\n"
+        "\t"        ".vbos = %s_mesh_vbos,\n"
+        "\t"        ".vbo_datas_arr = %s_mesh_vbo_datas_arr,\n"
+        "\t"        ".indices_count = %u,\n"
+        "\t"        ".indices_array = %s_mesh_indices_array,\n"
+        "\t"        ".joints_amount = %u,\n"
+        "\t"        ".joints = %s_mesh_joints,\n"
+        "\t"        ".pose_joint_transform_matrices = %s_mesh_pose_joint_transform_matrices\n"
         ""      "};\n"
+        ,
+        name,
+        mesh->unbinded,
+        mesh->vao,
+        mesh->vbos_amount,
+        name,
+        name,
+        mesh->indices_count,
+        name,
+        mesh->joints_amount,
+        name,
+        name
     );
 
-    printf("\n");
+    fclose(fp);
 }

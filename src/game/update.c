@@ -22,8 +22,6 @@ void update() {
         default_camera->active = 0;
         in_game = 1;
 
-        print_mesh_for_saving(man_mesh);
-
         bind_mesh(man_mesh);
         bind_mesh(cube_mesh);
     }
