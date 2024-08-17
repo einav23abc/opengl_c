@@ -150,19 +150,28 @@ void render_game_world() {
     // u_texture
     bind_texture(global_texture, shaders_list[current_shader]->u_texture_loc, 0);
     for (int8_t i = 0; i < 2; i ++) {
+        ivec2_t hovered_tile = get_hovered_tile_position(i);
+
         for (uint32_t x = 0; x < _PLAYER_GRID_WIDTH_; x++) {
             for (uint32_t z = 0; z < _PLAYER_GRID_DEPTH_; z++) {
+                uint8_t hovered = (hovered_tile.x == x && hovered_tile.y == z);
+
                 int32_t tile = game_struct.players[i].tiles[z*_PLAYER_GRID_DEPTH_ + x];
-                if (tile == 0) continue;
+                if (tile == 0 && hovered == 0) continue;
+
                 // u_position
                 glUniform3f(
                     shaders_list[current_shader]->uniform_locations[0],
-                    (x+0.25)*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
+                    (((float)x)+0.25)*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
                     game_struct.players[i].y_current_translation,
-                    (z+0.25)*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
+                    (((float)z)+0.25)*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
                 );
                 // u_scale
-                glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_*0.5, _TILE_SIZE_*0.75, _TILE_SIZE_*0.5);
+                if (hovered) {
+                    glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_*0.5, _TILE_SIZE_*1.75, _TILE_SIZE_*0.5);
+                }else {
+                    glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_*0.5, _TILE_SIZE_*0.75, _TILE_SIZE_*0.5);
+                }
                 // u_quat_rotation
                 quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
                 glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);

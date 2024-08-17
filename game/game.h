@@ -82,8 +82,9 @@ void sun_shadow_map_update();
 
 void render_game_world();
 
-
+vec2_t get_mouse_camera_space_position();
 vec3_t get_mouse_world_space_position_at_y(float at_y);
+ivec2_t get_hovered_tile_position(uint8_t player_i);
 
 
 #endif

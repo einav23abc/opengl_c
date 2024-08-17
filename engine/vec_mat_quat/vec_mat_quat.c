@@ -1,6 +1,14 @@
 #include "vec_mat_quat.h"
 
 
+vec3_t vec3_from_vec2(vec2_t vec) {
+    return (vec3_t){
+        .x = vec.x,
+        .y = vec.y,
+        .z = 0
+    };
+}
+
 vec3_t vec3_add(vec3_t vec1, vec3_t vec2) {
     return (vec3_t){
         .x = vec1.x+vec2.x,
