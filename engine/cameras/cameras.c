@@ -48,6 +48,8 @@ camera_t* create_camera(float x, float y, float z,
     camera->viewport_w = viewport_w;
     camera->viewport_h = viewport_h;
 
+    update_camera_wvp_mat(camera);
+
     // append camera to cameras_list
     *((uint64_t*)(&camera->camera_index)) = cameras_amount;
     cameras_list[cameras_amount] = camera;

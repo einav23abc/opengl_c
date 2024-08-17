@@ -20,26 +20,12 @@ void render_game() {
         render_game_world();
     // </sun shadow map>
     
-    // <camera>
+    // <game world>
         use_camera(camera);
         use_fbo(outport_fbo);
 
         sdm_set_color(1, 0, 1, 1);
         sdm_draw_ball(camera_pos.x, camera_pos.y, camera_pos.z, 5);
-
-
-        // sdm_set_color(0, 1, 1, 1);
-        // sdm_draw_ball(0, 0, 0, 5);
-        // sdm_draw_ball(0, _SCALE_AXIS_POINT_Y_, 0, 5);
-        
-        // for (uint8_t i = 0; i < 2; i++) {
-        //     vec3_t mouse_world_space_position = get_mouse_world_space_position_at_y(game_struct.players[i].y_current_translation);
-        //     sdm_set_color(0, 0, 1, 1);
-        //     sdm_draw_ball(mouse_world_space_position.x, mouse_world_space_position.y, mouse_world_space_position.z, 5);
-
-        //     sdm_set_color(1, 1, 1, 1);
-        //     sdm_draw_ball(game_struct.players[i].x_current_translation, game_struct.players[i].y_current_translation, 0, 5);
-        // }
 
         use_shader(global_shader);
         // u_camera_position
@@ -52,8 +38,15 @@ void render_game() {
         bind_fbo_depth_stencil_texture(sun_shadow_map_fbo, global_shader->uniform_locations[6], 1);
 
         render_game_world();
-        
-    // </camera>
+    // </game world>
+
+    // <ui>
+        use_fbo(outport_fbo);
+        use_camera(ui_camera);
+        use_shader(ui_shader);
+
+        render_game_ui();
+    // <ui>
     
 
     // draw outport frame buffer to screen
@@ -226,24 +219,42 @@ void render_game_world() {
 
     draw_string(
         letters_font,
-        " !\"#$%%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz",
+        "Hello World!",
         (vec3_t){
             .x = 0,
             .y = 0,
             .z = -20
         },
         quat_from_axis_angles_yzx(-0, -0, -0),
-        120,
+        24,
         1, 1, 1
     );
+}
+
+void render_game_ui() {
+    glDisable(GL_DEPTH_TEST);
+
+    draw_string(
+        letters_font,
+        "Hello World!",
+        (vec3_t){
+            .x = 0,
+            .y = 248,
+            .z = 0
+        },
+        quat_from_axis_angles_yzx(-0, -0, -0),
+        12,
+        1, 1, 1
+    );
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 void draw_string(font_t font, char* str, vec3_t pos, quat_t rot, float height, float color_r, float color_b, float color_g) {
     int32_t string_len = min(strlen(str), _MAX_TEXT_ROW_LENGTH);
 
+    shader_t* last_shader = shaders_list[current_shader];
     use_shader(font_shader);
-
-    float scale = height/12;
 
     // u_texture
     bind_texture(font.font_texture, shaders_list[current_shader]->u_texture_loc, 0);
@@ -257,8 +268,8 @@ void draw_string(font_t font, char* str, vec3_t pos, quat_t rot, float height, f
     // u_scale
     glUniform3f(
         shaders_list[current_shader]->uniform_locations[1],
-        string_len*scale,
-        scale,
+        string_len*height,
+        height,
         0
     );
     // u_quat_rotation
@@ -297,5 +308,7 @@ void draw_string(font_t font, char* str, vec3_t pos, quat_t rot, float height, f
         color_g,
         color_b
     );
-    draw_mesh(cube_mesh);
+    draw_mesh(rect_plane_mesh);
+
+    use_shader(last_shader);
 }

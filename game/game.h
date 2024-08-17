@@ -66,12 +66,14 @@ extern texture_t* global_texture;
 extern font_t letters_font;
 
 extern shader_t* global_shader;
+extern shader_t* ui_shader;
 extern shader_t* font_shader;
 
 extern vec3_t camera_pos;
 extern camera_t* camera;
+extern camera_t* ui_camera;
 
-extern mesh_t* text_plane_mesh;
+extern mesh_t* rect_plane_mesh;
 extern mesh_t* cube_mesh;
 extern mesh_t* centered_cube_mesh;
 
@@ -96,6 +98,7 @@ void camera_update();
 void sun_shadow_map_update();
 
 void render_game_world();
+void render_game_ui();
 void draw_string(font_t font, char* str, vec3_t pos, quat_t rot, float height, float color_r, float color_b, float color_g);
 
 vec2_t get_mouse_camera_space_position();

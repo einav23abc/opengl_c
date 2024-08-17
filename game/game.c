@@ -11,12 +11,14 @@ texture_t* global_texture;
 font_t letters_font;
 
 shader_t* global_shader;
+shader_t* ui_shader;
 shader_t* font_shader;
 
 vec3_t camera_pos;
 camera_t* camera;
+camera_t* ui_camera;
 
-mesh_t* text_plane_mesh;
+mesh_t* rect_plane_mesh;
 mesh_t* cube_mesh;
 mesh_t* centered_cube_mesh;
 

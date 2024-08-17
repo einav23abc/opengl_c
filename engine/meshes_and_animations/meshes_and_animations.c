@@ -153,8 +153,8 @@ mesh_t* generate_2d_quad_mesh(  float min_x, float max_x, float min_y, float max
     };
     
     uint32_t indices_array[] = {
-        0, 1, 2,
-        0, 2, 3
+        1, 0, 2,
+        2, 0, 3
     };
     return generate_mesh(vbo_datas_arr, 2, indices_array, 6, 0);
 }
