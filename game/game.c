@@ -7,11 +7,16 @@ fbo_t* outport_fbo;
 
 texture_t* floor_texture;
 texture_t* global_texture;
+
+font_t letters_font;
+
 shader_t* global_shader;
+shader_t* font_shader;
 
 vec3_t camera_pos;
 camera_t* camera;
 
+mesh_t* text_plane_mesh;
 mesh_t* cube_mesh;
 mesh_t* centered_cube_mesh;
 

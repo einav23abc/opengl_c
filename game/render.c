@@ -223,4 +223,79 @@ void render_game_world() {
         }
     }
     // </player tiles>
+
+    draw_string(
+        letters_font,
+        " !\"#$%%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz",
+        (vec3_t){
+            .x = 0,
+            .y = 0,
+            .z = -20
+        },
+        quat_from_axis_angles_yzx(-0, -0, -0),
+        120,
+        1, 1, 1
+    );
+}
+
+void draw_string(font_t font, char* str, vec3_t pos, quat_t rot, float height, float color_r, float color_b, float color_g) {
+    int32_t string_len = min(strlen(str), _MAX_TEXT_ROW_LENGTH);
+
+    use_shader(font_shader);
+
+    float scale = height/12;
+
+    // u_texture
+    bind_texture(font.font_texture, shaders_list[current_shader]->u_texture_loc, 0);
+    // u_position
+    glUniform3f(
+        shaders_list[current_shader]->uniform_locations[0],
+        pos.x,
+        pos.y,
+        pos.z
+    );
+    // u_scale
+    glUniform3f(
+        shaders_list[current_shader]->uniform_locations[1],
+        string_len*scale,
+        scale,
+        0
+    );
+    // u_quat_rotation
+    glUniform4f(
+        shaders_list[current_shader]->uniform_locations[2],
+        rot.x,
+        rot.y,
+        rot.z,
+        rot.w
+    );
+    // u_text_row_length
+    glUniform1i(
+        shaders_list[current_shader]->uniform_locations[3],
+        string_len
+    );
+    // u_text_row
+    int32_t text_row[string_len];
+    for (int32_t i = 0; i < string_len; i++) {
+        text_row[i] = max(str[i] - ' ', 0);
+    }
+    glUniform1iv(
+        shaders_list[current_shader]->uniform_locations[4],
+        string_len,
+        text_row
+    );
+    // u_font_data
+    glUniform2i(
+        shaders_list[current_shader]->uniform_locations[5],
+        font.letters_in_row,
+        font.letters_in_col
+    );
+    // u_color
+    glUniform3f(
+        shaders_list[current_shader]->uniform_locations[6],
+        color_r,
+        color_g,
+        color_b
+    );
+    draw_mesh(cube_mesh);
 }

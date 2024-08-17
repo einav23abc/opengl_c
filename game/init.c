@@ -155,6 +155,48 @@ uint8_t init() {
         };
     // </cube_mesh & centered_cube_mesh>
 
+    // <text_plane_mesh>
+        if(1){
+        float vertices_position_arr[] = {
+            0,0,0,
+            0,1,0,
+            1,1,0,
+            1,0,0
+        };
+        float vertices_texcoord_arr[] = {
+            0,1,
+            0,0,
+            1,0,
+            1,1
+        };
+        vbo_data_t vbo_datas_arr[2] = {
+            {
+                .data_arr_size = sizeof(vertices_position_arr),
+                .data_arr = (void*)vertices_position_arr,
+                .size = 3,
+                .type = GL_FLOAT,
+                .stride = 3*sizeof(float),
+                .divisor = 0
+            },
+            {
+                .data_arr_size = sizeof(vertices_texcoord_arr),
+                .data_arr = (void*)vertices_texcoord_arr,
+                .size = 2,
+                .type = GL_FLOAT,
+                .stride = 2*sizeof(float),
+                .divisor = 0
+            }
+        };
+        
+        uint32_t indices_array[] = {
+            1, 0, 2,
+            2, 0, 3
+        };
+
+        text_plane_mesh = generate_mesh(vbo_datas_arr, 2, indices_array, 6, 0);
+        };
+    // </text_plane_mesh>
+
     // <camera>
         camera_pos = (vec3_t){
             .x = 0,
@@ -163,7 +205,7 @@ uint8_t init() {
         };
         camera = create_camera(
             0, 0, 0,
-            M_PI*1.75, -M_PI*0.15, 0,
+            M_PI*1.8, -M_PI*0.15, 0,
             320, 260, 1600,
             -32000, 32000,
             0, 60,
@@ -186,8 +228,8 @@ uint8_t init() {
         game_struct.players[0].translation_lerp_time = 0;
         game_struct.players[1].translation_lerp_time = 0;
         for (uint32_t i = 0; i < _PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_; i++) {
-            game_struct.players[0].tiles[i] = (i+(i/4))%2;
-            game_struct.players[1].tiles[i] = (i+(i/4))%2;
+            game_struct.players[0].tiles[i] = 0;//(i+(i/4))%2;
+            game_struct.players[1].tiles[i] = 0;//(i+(i/4))%2;
         }
     // </game_struct>
 
@@ -203,6 +245,18 @@ uint8_t init() {
     // </sun shadow map>
 
     outport_fbo = create_fbo(_OUTPORT_WIDTH_, _OUTPORT_HEIGHT_, 1, GL_RGB, 4);
+
+    floor_texture = load_texture("./game/textures/floor.png");
+    global_texture = load_texture("./game/textures/global_texture.png");
+    // save_surface_to_c_file("./game/textures/global_texture.png", "global_texture_surface", "./game/textures/global_texture_surface.c");
+    
+    // <letters_font>
+        letters_font = (font_t){
+            .font_texture = load_texture("./game/textures/font.png"),
+            .letters_in_row = 16,
+            .letters_in_col = 8,
+        };
+    // </letters_font>
     
     global_shader = create_shader_from_files(
         "./game/shaders/global.vert",
@@ -210,11 +264,13 @@ uint8_t init() {
         "in_vertex_position\0in_vertex_texcoord\0in_vertex_normal\0in_vertex_joint_id\0in_vertex_joint_wheight", 5,
         "u_position\0u_scale\0u_quat_rotation\0u_camera_position\0u_sun_vector\0u_sun_shadow_map_wvp_mat\0u_sun_shadow_map_texture", 7
     );
+    font_shader = create_shader_from_files(
+        "./game/shaders/font.vert",
+        "./game/shaders/font.frag",
+        "in_vertex_position\0in_vertex_texcoord", 2,
+        "u_position\0u_scale\0u_quat_rotation\0u_text_row_length\0u_text_row\0u_font_data\0u_color", 7
+    );
 
-    floor_texture = load_texture("./game/textures/floor.png");
-    global_texture = load_texture("./game/textures/global_texture.png");
-    // save_surface_to_c_file("./game/textures/global_texture.png", "global_texture_surface", "./game/textures/global_texture_surface.c");
-    
     sun_shadow_map_fbo = create_fbo(3240, 3240, 0, 0, 2);
     
     sun_shadow_map_shader = create_shader_from_files(

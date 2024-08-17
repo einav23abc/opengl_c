@@ -8,8 +8,8 @@
 
 
 
-#define _OUTPORT_WIDTH_ (320)
-#define _OUTPORT_HEIGHT_ (260)
+#define _OUTPORT_WIDTH_ (320*2)
+#define _OUTPORT_HEIGHT_ (260*2)
 
 #define _OUTPORT_BACKGROUND_COLOR_R_ (0.2)
 #define _OUTPORT_BACKGROUND_COLOR_G_ (0.2)
@@ -25,6 +25,8 @@
 #define _HINGE_DISTANCE_FROM_SCALE_AT_BOTTOM_ (2)
 #define _SCALE_AXIS_POINT_Y_ (_TILE_SIZE_*(_WIN_WHEIGHT_*0.5))
 #define _SCALE_AXIS_LENGTH_ (sqrt(_SCALE_AXIS_POINT_Y_*_SCALE_AXIS_POINT_Y_ + _HINGE_DISTANCE_FROM_SCALE_AT_BOTTOM_*_HINGE_DISTANCE_FROM_SCALE_AT_BOTTOM_*_TILE_SIZE_*_TILE_SIZE_))
+
+#define _MAX_TEXT_ROW_LENGTH (64)
 
 
 typedef struct {
@@ -49,16 +51,27 @@ typedef struct {
 } game_t;
 
 
+typedef struct {
+    int32_t letters_in_row;
+    int32_t letters_in_col;
+    texture_t* font_texture;
+} font_t;
+
 
 extern fbo_t* outport_fbo;
 
 extern texture_t* floor_texture;
 extern texture_t* global_texture;
+
+extern font_t letters_font;
+
 extern shader_t* global_shader;
+extern shader_t* font_shader;
 
 extern vec3_t camera_pos;
 extern camera_t* camera;
 
+extern mesh_t* text_plane_mesh;
 extern mesh_t* cube_mesh;
 extern mesh_t* centered_cube_mesh;
 
@@ -83,6 +96,7 @@ void camera_update();
 void sun_shadow_map_update();
 
 void render_game_world();
+void draw_string(font_t font, char* str, vec3_t pos, quat_t rot, float height, float color_r, float color_b, float color_g);
 
 vec2_t get_mouse_camera_space_position();
 vec3_t get_mouse_world_space_position_at_y(float at_y);
