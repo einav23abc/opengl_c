@@ -16,6 +16,7 @@ mesh_t* cube_mesh;
 mesh_t* centered_cube_mesh;
 
 game_t game_struct;
+ivec2_t selected_tile;
 
 float sun_vector_x;
 float sun_vector_y;

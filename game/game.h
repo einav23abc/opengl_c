@@ -8,8 +8,8 @@
 
 
 
-#define _OUTPORT_WIDTH_ (320*2)
-#define _OUTPORT_HEIGHT_ (240*2)
+#define _OUTPORT_WIDTH_ (320)
+#define _OUTPORT_HEIGHT_ (260)
 
 #define _OUTPORT_BACKGROUND_COLOR_R_ (0.2)
 #define _OUTPORT_BACKGROUND_COLOR_G_ (0.2)
@@ -36,6 +36,7 @@ typedef struct {
     float y_translation;
     float y_current_translation;
     float x_current_translation;
+    float hinge_y_position;
     float hinge_x_position;
     uint32_t translation_lerp_time;
     int32_t wheight;
@@ -62,6 +63,7 @@ extern mesh_t* cube_mesh;
 extern mesh_t* centered_cube_mesh;
 
 extern game_t game_struct;
+extern ivec2_t selected_tile;
 
 extern float sun_vector_x;
 extern float sun_vector_y;

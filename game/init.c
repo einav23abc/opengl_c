@@ -159,12 +159,12 @@ uint8_t init() {
         camera_pos = (vec3_t){
             .x = 0,
             .y = _SCALE_AXIS_POINT_Y_,
-            .z = 0
+            .z = -_TILE_SIZE_*2
         };
         camera = create_camera(
             0, 0, 0,
-            M_PI*1.75, M_PI*0.25, 0,
-            320, 240, 1600,
+            M_PI*1.75, -M_PI*0.15, 0,
+            320, 260, 1600,
             -32000, 32000,
             0, 60,
             0, 0, _OUTPORT_WIDTH_, _OUTPORT_HEIGHT_
@@ -172,6 +172,9 @@ uint8_t init() {
     // </camera>
 
     // <game_struct>
+        selected_tile.x = -1;
+        selected_tile.y = -1;
+
         game_struct.player_turn = 0;
         game_struct.players[0].wheight = 1;
         game_struct.players[1].wheight = -1;
@@ -191,7 +194,7 @@ uint8_t init() {
     // <sun shadow map>
         sun_shadow_map_camera = create_camera(
             0, 0, 0,
-            M_PI*1.8, M_PI*0.9, 0,
+            M_PI*1.8, M_PI*1.1, 0,
             1080, 1080, 1600,
             -32000, 32000,
             0, 45,

@@ -102,7 +102,7 @@ void player_translations_update() {
     for (uint8_t i = 0; i < 2; i++) {
         // set translation
         float last_y_translation = game_struct.players[i].y_translation;
-        game_struct.players[i].y_translation = (game_struct.players[i].wheight*0.5)*_TILE_SIZE_+_SCALE_AXIS_POINT_Y_;
+        game_struct.players[i].y_translation = (game_struct.players[i].wheight*0.5)*_TILE_SIZE_+_SCALE_AXIS_POINT_Y_ + _TILE_SIZE_*0.5;
         if (last_y_translation != game_struct.players[i].y_translation) {
             game_struct.players[i].y_lerp_start_translation = game_struct.players[i].y_current_translation;
             game_struct.players[i].translation_lerp_time = 0;
@@ -114,12 +114,15 @@ void player_translations_update() {
             float t = ((float)(game_struct.players[i].translation_lerp_time))/_PLAYER_TRANSLATION_LERP_DURATION_;
             game_struct.players[i].y_current_translation = (1-t)*(game_struct.players[i].y_lerp_start_translation) + (t)*(game_struct.players[i].y_translation);
         }
+
+        // set hinge_y_position
+        game_struct.players[i].hinge_y_position = game_struct.players[i].y_current_translation - _TILE_SIZE_*0.5;
         
-        // set hinge_x_position according to y
-        game_struct.players[i].hinge_x_position = abs(
+        // set hinge_x_position according to hinge_y_position
+        game_struct.players[i].hinge_x_position = fabs(
             sqrt(
                 (_SCALE_AXIS_LENGTH_*_SCALE_AXIS_LENGTH_) -
-                ((_SCALE_AXIS_POINT_Y_-game_struct.players[i].y_current_translation)*(_SCALE_AXIS_POINT_Y_-game_struct.players[i].y_current_translation))
+                ((_SCALE_AXIS_POINT_Y_-game_struct.players[i].hinge_y_position)*(_SCALE_AXIS_POINT_Y_-game_struct.players[i].hinge_y_position))
             )
         );
         if (i == 0) {
