@@ -11,6 +11,16 @@ void update() {
 }
 
 void update_game() {
+    if (keys[SDL_SCANCODE_K] == 1) {
+        game_struct.players[0].wheight += 1;
+        game_struct.players[1].wheight -= 1;
+    }
+    if (keys[SDL_SCANCODE_L] == 1) {
+        game_struct.players[0].wheight -= 1;
+        game_struct.players[1].wheight += 1;
+    }
+
+    player_translations_update();
     camera_update();
     sun_shadow_map_update();
 }
@@ -88,13 +98,50 @@ void camera_update() {
     }
 }
 
+void player_translations_update() {
+    for (uint8_t i = 0; i < 2; i++) {
+        // set translation
+        float last_y_translation = game_struct.players[i].y_translation;
+        game_struct.players[i].y_translation = (game_struct.players[i].wheight*0.5)*_TILE_SIZE_+_SCALE_AXIS_POINT_Y_;
+        if (last_y_translation != game_struct.players[i].y_translation) {
+            game_struct.players[i].y_lerp_start_translation = game_struct.players[i].y_current_translation;
+            game_struct.players[i].translation_lerp_time = 0;
+        }
+
+        // animate current translation
+        if (game_struct.players[i].y_current_translation != game_struct.players[i].y_translation) {
+            game_struct.players[i].translation_lerp_time = min(game_struct.players[i].translation_lerp_time + delta_time, _PLAYER_TRANSLATION_LERP_DURATION_);
+            float t = ((float)(game_struct.players[i].translation_lerp_time))/_PLAYER_TRANSLATION_LERP_DURATION_;
+            game_struct.players[i].y_current_translation = (1-t)*(game_struct.players[i].y_lerp_start_translation) + (t)*(game_struct.players[i].y_translation);
+        }
+        
+        // set hinge_x_position according to y
+        game_struct.players[i].hinge_x_position = abs(
+            sqrt(
+                (_SCALE_AXIS_LENGTH_*_SCALE_AXIS_LENGTH_) -
+                ((_SCALE_AXIS_POINT_Y_-game_struct.players[i].y_current_translation)*(_SCALE_AXIS_POINT_Y_-game_struct.players[i].y_current_translation))
+            )
+        );
+        if (i == 0) {
+            game_struct.players[i].hinge_x_position = -(game_struct.players[i].hinge_x_position);
+        }
+
+        // set x_current_translation
+        if (i == 0) {
+            game_struct.players[i].x_current_translation = game_struct.players[i].hinge_x_position - _TILE_SIZE_ - _TILE_SIZE_*_PLAYER_GRID_WIDTH_;
+        }else {
+            game_struct.players[i].x_current_translation = game_struct.players[i].hinge_x_position + _TILE_SIZE_;
+        }
+    }
+}
+
 void sun_shadow_map_update() {
     // follow the player
     sun_shadow_map_camera->x = 0;
     sun_shadow_map_camera->y = 0;
     sun_shadow_map_camera->z = 0;
 
-    sun_shadow_map_camera->ry += 0.002*delta_frames;
+    // sun_shadow_map_camera->ry += 0.002*delta_frames;
     sun_vector_x = cos(sun_shadow_map_camera->ry+M_PI*0.5)*cos(sun_shadow_map_camera->rx);
     sun_vector_y = sin(sun_shadow_map_camera->rx);
     sun_vector_z = sin(sun_shadow_map_camera->ry+M_PI*0.5)*cos(sun_shadow_map_camera->rx);

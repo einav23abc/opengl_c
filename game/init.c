@@ -1,39 +1,39 @@
 #include "game.h"
 
 uint8_t init() {
-    // <cube_mesh>
+    // <cube_mesh & centered_cube_mesh;>
         if(1){
         float vertices_position_arr[] = {
             // front
-            -0.5,-0.5,-0.5,
-            -0.5, 0.5,-0.5,
-             0.5, 0.5,-0.5,
-             0.5,-0.5,-0.5,
+            0,0,0,
+            0,1,0,
+            1,1,0,
+            1,0,0,
             // back
-            -0.5,-0.5, 0.5,
-            -0.5, 0.5, 0.5,
-             0.5, 0.5, 0.5,
-             0.5,-0.5, 0.5,
+            0,0,1,
+            0,1,1,
+            1,1,1,
+            1,0,1,
             // bottom
-            -0.5,-0.5,-0.5,
-            -0.5,-0.5, 0.5,
-             0.5,-0.5, 0.5,
-             0.5,-0.5,-0.5,
+            0,0,0,
+            0,0,1,
+            1,0,1,
+            1,0,0,
             // top
-            -0.5, 0.5,-0.5,
-            -0.5, 0.5, 0.5,
-             0.5, 0.5, 0.5,
-             0.5, 0.5,-0.5,
+            0,1,0,
+            0,1,1,
+            1,1,1,
+            1,1,0,
             // left
-            -0.5,-0.5,-0.5,
-            -0.5, 0.5,-0.5,
-            -0.5, 0.5, 0.5,
-            -0.5,-0.5, 0.5,
+            0,0,0,
+            0,1,0,
+            0,1,1,
+            0,0,1,
             // right
-             0.5,-0.5,-0.5,
-             0.5, 0.5,-0.5,
-             0.5, 0.5, 0.5,
-             0.5,-0.5, 0.5,
+            1,0,0,
+            1,1,0,
+            1,1,1,
+            1,0,1,
         };
         float vertices_texcoord_arr[] = {
             // front
@@ -146,20 +146,24 @@ uint8_t init() {
             21,20,22,
             22,20,23,
         };
+
         cube_mesh = generate_mesh(vbo_datas_arr, 3, indices_array, 36, 0);
         // bind_mesh(cube_mesh);
+        
+        for (uint32_t i = 0; i <sizeof(vertices_position_arr)/sizeof(float); i++) vertices_position_arr[i] -= 0.5;
+        centered_cube_mesh = generate_mesh(vbo_datas_arr, 3, indices_array, 36, 0);
         };
-    // </cube_mesh>
+    // </cube_mesh & centered_cube_mesh>
 
     // <camera>
         camera_pos = (vec3_t){
             .x = 0,
-            .y = 0,
+            .y = _SCALE_AXIS_POINT_Y_,
             .z = 0
         };
         camera = create_camera(
             0, 0, 0,
-            0, 0, 0,
+            M_PI*1.75, M_PI*0.25, 0,
             320, 240, 1600,
             -32000, 32000,
             0, 60,
@@ -168,16 +172,26 @@ uint8_t init() {
     // </camera>
 
     // <game_struct>
+        game_struct.player_turn = 0;
+        game_struct.players[0].wheight = 1;
+        game_struct.players[1].wheight = -1;
+        player_translations_update();
+        game_struct.players[0].y_lerp_start_translation = game_struct.players[0].y_translation;
+        game_struct.players[1].y_lerp_start_translation = game_struct.players[1].y_translation;
+        game_struct.players[0].y_current_translation = game_struct.players[0].y_translation;
+        game_struct.players[1].y_current_translation = game_struct.players[1].y_translation;
+        game_struct.players[0].translation_lerp_time = 0;
+        game_struct.players[1].translation_lerp_time = 0;
         for (uint32_t i = 0; i < _PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_; i++) {
-            game_struct.players[0].tiles[i] = 1;
-            game_struct.players[1].tiles[i] = 1;
+            game_struct.players[0].tiles[i] = (i+(i/4))%2;
+            game_struct.players[1].tiles[i] = (i+(i/4))%2;
         }
     // </game_struct>
 
     // <sun shadow map>
         sun_shadow_map_camera = create_camera(
             0, 0, 0,
-            M_PI*1.6, M_PI*0.3, 0,
+            M_PI*1.8, M_PI*0.9, 0,
             1080, 1080, 1600,
             -32000, 32000,
             0, 45,
@@ -194,6 +208,7 @@ uint8_t init() {
         "u_position\0u_scale\0u_quat_rotation\0u_camera_position\0u_sun_vector\0u_sun_shadow_map_wvp_mat\0u_sun_shadow_map_texture", 7
     );
 
+    floor_texture = load_texture("./game/textures/floor.png");
     global_texture = load_texture("./game/textures/global_texture.png");
     // save_surface_to_c_file("./game/textures/global_texture.png", "global_texture_surface", "./game/textures/global_texture_surface.c");
     

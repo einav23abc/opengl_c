@@ -5,6 +5,7 @@
 
 fbo_t* outport_fbo;
 
+texture_t* floor_texture;
 texture_t* global_texture;
 shader_t* global_shader;
 
@@ -12,6 +13,7 @@ vec3_t camera_pos;
 camera_t* camera;
 
 mesh_t* cube_mesh;
+mesh_t* centered_cube_mesh;
 
 game_t game_struct;
 
@@ -23,18 +25,27 @@ fbo_t* sun_shadow_map_fbo;
 shader_t* sun_shadow_map_shader;
 
 
+
+vec3_t get_mouse_camera_space_position() {
+    uint32_t outport_fbo_pixel_scale = uintmin(window_drawable_width/_OUTPORT_WIDTH_, window_drawable_height/_OUTPORT_HEIGHT_);
+    uint32_t outport_fbo_w = _OUTPORT_WIDTH_*outport_fbo_pixel_scale;
+    uint32_t outport_fbo_h = _OUTPORT_HEIGHT_*outport_fbo_pixel_scale;
+
+    return (vec3_t){
+        .x =  ((float)(mouse.x - 0.5*window_drawable_width ))*camera->width /outport_fbo_w,
+        .y = -((float)(mouse.y - 0.5*window_drawable_height))*camera->height/outport_fbo_h,
+        .z = 0
+    };
+}
+
 vec3_t get_mouse_world_space_position_at_y(float at_y) {
     // assuming using `camera`-ortho and `outport_fbo`
     // very unoptimised, quickly hacked together
 
-    vec3_t mouse_relative_to_middle = {
-        .x =  (((float)mouse.x)/window_drawable_width  - 0.5)*camera->width,
-        .y = -(((float)mouse.y)/window_drawable_height - 0.5)*camera->height,
-        .z = 0
-    };
+    vec3_t mouse_camera_space_position = get_mouse_camera_space_position();
 
     quat_t camera_rot_quat = quat_from_axis_angles_yzx(-camera->rx, -camera->ry, -camera->rz);
-    vec3_t mouse_as_camera_plane_translation = rotate_vector(mouse_relative_to_middle, camera_rot_quat);
+    vec3_t mouse_as_camera_plane_translation = rotate_vector(mouse_camera_space_position, camera_rot_quat);
 
     vec3_t pos = {
         .x = camera_pos.x + mouse_as_camera_plane_translation.x,
