@@ -248,7 +248,6 @@ void render_game_ui() {
 
     // draw ui lists
     ivec3_t cursor_inside_box_pos = get_ui_list_inside_pos();
-
     for (int32_t i = 0; i < _MAX_UI_LISTS_AMOUNT_; i++) {
         if (ui_lists[i].active == 1) {
 
@@ -339,7 +338,59 @@ void render_game_ui() {
             }
         }
     }
-    
+
+    // draw alerts
+    for (int32_t i = 0; i < _MAX_ALERTS_AMOUNT_; i++) {
+        if (alerts[i].time_to_live <= 0) continue;
+
+        uvec2_t box_pos = get_alert_box_pos(i);
+        uvec2_t box_padded_pos = get_alert_box_pos_padded(i);
+        uvec2_t box_size = get_alert_box_size(i);
+
+        uint32_t left_x = box_pos.x;
+        uint32_t top_y = box_pos.y;
+        uint32_t x = 0;
+        uint32_t y = 0;
+
+        sdm_set_color(0,0.25,0,1);
+        sdm_draw_rect(
+            box_padded_pos.x,
+            box_padded_pos.y,
+            2*_ALERT_PADDING_ + box_size.x,
+            2*_ALERT_PADDING_ + box_size.y
+        );
+        
+        char one_char_str[2] = "X\0";
+        int32_t str_len = strlen(alerts[i].string);
+
+        for (uint32_t c = 0; c < str_len; c++) {
+            one_char_str[0] = alerts[i].string[c];
+            if (one_char_str[0] == '\n') {
+                x = 0;
+                y -= _ALERT_ROW_HEIGHT_;
+                continue;
+            }
+
+            if (x >= box_size.x) {
+                x = 0;
+                y -= _ALERT_ROW_HEIGHT_;
+            }
+
+            x += draw_string(
+                letters_font,
+                one_char_str,
+                (vec3_t){
+                    .x = left_x + x,
+                    .y = top_y + y,
+                    .z = 0
+                },
+                quat_from_axis_angles_yzx(-0, -0, -0),
+                _ALERT_ROW_HEIGHT_,
+                1, 1, 1
+            );
+        }
+    }
+
     glEnable(GL_DEPTH_TEST);
 }
 

@@ -10,6 +10,8 @@ void ui_list_build_house_button_callback(int32_t ui_list_id) {
         game_struct.players[0].stone < 1
     ) {
         // not enough resources
+        close_all_alerts();
+        add_alert_at_cursor("Not enough resources");
         // unselect tile
         selected_tile.x = -1;
         selected_tile.y = -1;

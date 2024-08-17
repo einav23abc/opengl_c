@@ -29,6 +29,7 @@ ivec2_t selected_tile;
 ivec2_t hovered_tiles[2];
 
 ui_list_t ui_lists[_MAX_UI_LISTS_AMOUNT_];
+alert_t alerts[_MAX_ALERTS_AMOUNT_];
 
 float sun_vector_x;
 float sun_vector_y;
@@ -98,14 +99,9 @@ uvec2_t get_ui_list_box_pos(int32_t i) {
 }
 uvec2_t get_ui_list_box_pos_padded(int32_t i) {
     uvec2_t box_pos = get_ui_list_box_pos(i);
-    
     box_pos.x -= _UI_LIST_PADDING_;
     box_pos.y -= _UI_LIST_PADDING_;
-
-    return (uvec2_t){
-        .x = box_pos.x,
-        .y = box_pos.y
-    };
+    return box_pos;
 }
 ivec3_t get_ui_list_inside_pos() {
     vec2_t outport_space_position = get_mouse_outport_space_position();
@@ -133,19 +129,20 @@ ivec3_t get_ui_list_inside_pos() {
     };
 }
 
-uvec2_t get_ui_button_info_size(char* info_str) {
+
+uvec2_t get_str_size(char* str, float row_height) {
     uint32_t w = 0;
-    uint32_t h = _UI_LIST_BUTTON_INFO_ROW_HEIGHT_;
+    uint32_t h = row_height;
     uint32_t x = 0;
 
-    int32_t info_str_len = strlen(info_str);
+    int32_t str_len = strlen(str);
     char ch;
 
-    for (uint32_t c = 0; c < info_str_len; c++) {
-        ch = info_str[c];
+    for (uint32_t c = 0; c < str_len; c++) {
+        ch = str[c];
         if (ch == '\n') {
             x = 0;
-            h += _UI_LIST_BUTTON_INFO_ROW_HEIGHT_;
+            h += row_height;
             continue;
         }
 
@@ -154,11 +151,89 @@ uvec2_t get_ui_button_info_size(char* info_str) {
     }
 
     return (uvec2_t){
-        .x = w * letters_font.letter_width*(_UI_LIST_BUTTON_INFO_ROW_HEIGHT_/letters_font.letter_height),
+        .x = w * letters_font.letter_width*(row_height/letters_font.letter_height),
         .y = h
     };
 }
 
+uvec2_t get_ui_button_info_size(char* info_str) {
+    return get_str_size(info_str, _UI_LIST_BUTTON_INFO_ROW_HEIGHT_);
+}
+
+
+int32_t new_alert_assign_id() {
+    for (int32_t i = 0; i < _MAX_ALERTS_AMOUNT_; i++) {
+        if (alerts[i].time_to_live <= 0) return i;
+    }
+    // get shortest time to live alert
+    int32_t min_time_to_live = alerts[0].time_to_live;
+    int32_t min_time_to_live_i = 0;
+    for (int32_t i = 1; i < _MAX_ALERTS_AMOUNT_; i++) {
+        if (alerts[i].time_to_live < min_time_to_live) {
+            min_time_to_live = alerts[i].time_to_live;
+            min_time_to_live_i = i;
+        }
+    }
+    return min_time_to_live_i;
+}
+uvec2_t get_alert_box_size(int32_t i) {
+    return get_str_size(alerts[i].string, _ALERT_ROW_HEIGHT_);
+}
+uvec2_t get_alert_box_pos(int32_t i) {
+    float x = 0;
+    float y = 0;
+    if (alerts[i].box_pos_from_world_pos == 1) {
+        vec2_t screen_cord = outport_space_position_from_world_space(vec3(alerts[i].box_world_pos_x, alerts[i].box_world_pos_y, alerts[i].box_world_pos_z));
+        x = screen_cord.x;
+        y = screen_cord.y;
+    }
+
+    x += alerts[i].x;
+    y += alerts[i].y;
+
+    if (&(alerts[i].easing_function) != NULL) {
+        float t = 1-(((float)alerts[i].time_to_live) / (alerts[i].initial_time_to_live));
+        y += alerts[i].easing_function(t) * alerts[i].y_full_transform;
+    }
+
+    if (x < _ALERT_PADDING_) x = _ALERT_PADDING_;
+    if (y < _ALERT_PADDING_) y = _ALERT_PADDING_;
+
+    return (uvec2_t){
+        .x = x,
+        .y = y
+    };
+}
+uvec2_t get_alert_box_pos_padded(int32_t i) {
+    uvec2_t box_pos = get_alert_box_pos(i);
+    box_pos.x -= _ALERT_PADDING_;
+    box_pos.y -= _ALERT_PADDING_;
+    return box_pos;
+}
+void add_alert_at_cursor(char* string) {
+    vec2_t mouse_outport_space_position = get_mouse_outport_space_position();
+
+    int32_t new_alert_id = new_alert_assign_id();
+
+    uvec2_t string_size = get_str_size(string, _ALERT_ROW_HEIGHT_);
+    
+    alerts[new_alert_id] = (alert_t){
+        .time_to_live = 3000,
+
+        .initial_time_to_live = 3000,
+        .y_full_transform = string_size.y*3,
+        .easing_function = &ease_out_sine,
+
+        .box_pos_from_world_pos = 0,
+        .x = mouse_outport_space_position.x - string_size.x*0.5,
+        .y = mouse_outport_space_position.y - string_size.y*0.5,
+
+        .string = string
+    };
+}
+void close_all_alerts() {
+    for (int32_t i = 0; i < _MAX_ALERTS_AMOUNT_; i++) alerts[i].time_to_live = 0;
+}
 
 
 vec2_t outport_space_position_from_world_space(vec3_t pos) {
@@ -172,7 +247,6 @@ vec2_t outport_space_position_from_world_space(vec3_t pos) {
         )
     );
 }
-
 vec2_t get_mouse_outport_space_position() {
     uint32_t outport_fbo_pixel_scale = uintmin(window_drawable_width/_OUTPORT_WIDTH_, window_drawable_height/_OUTPORT_HEIGHT_);
     uint32_t outport_fbo_w = _OUTPORT_WIDTH_*outport_fbo_pixel_scale;
@@ -183,7 +257,6 @@ vec2_t get_mouse_outport_space_position() {
         .y = -((float)(mouse.y - 0.5*window_drawable_height))*_OUTPORT_HEIGHT_/outport_fbo_h + _OUTPORT_HEIGHT_*0.5
     };
 }
-
 vec2_t get_mouse_camera_space_position() {
     uint32_t outport_fbo_pixel_scale = uintmin(window_drawable_width/_OUTPORT_WIDTH_, window_drawable_height/_OUTPORT_HEIGHT_);
     uint32_t outport_fbo_w = _OUTPORT_WIDTH_*outport_fbo_pixel_scale;
@@ -194,7 +267,6 @@ vec2_t get_mouse_camera_space_position() {
         .y = -((float)(mouse.y - 0.5*window_drawable_height))*camera->height/outport_fbo_h
     };
 }
-
 vec3_t get_mouse_world_space_position_at_y(float at_y) {
     // assuming using `camera`-ortho and `outport_fbo`
     // very unoptimised, quickly hacked together
@@ -218,7 +290,6 @@ vec3_t get_mouse_world_space_position_at_y(float at_y) {
     
     return pos;
 }
-
 ivec2_t get_hovered_tile_position(uint8_t player_i) {
     vec3_t world_space_position = get_mouse_world_space_position_at_y(game_struct.players[player_i].y_current_translation);
 
@@ -226,4 +297,18 @@ ivec2_t get_hovered_tile_position(uint8_t player_i) {
         .x = (int32_t)floor((world_space_position.x - game_struct.players[player_i].x_current_translation)/_TILE_SIZE_),
         .y = (int32_t)floor((world_space_position.z - _PLAYER_CONSTANT_Z_TRANSLATION_)                    /_TILE_SIZE_)
     };
+}
+
+
+void switch_turn() {
+    game_struct.player_turn = !game_struct.player_turn;
+    selected_tile.x = -1;
+    selected_tile.y = -1;
+    close_all_ui_lists();
+}
+void player_1_turn() {
+    player_1_ai_turn();
+}
+void player_1_ai_turn() {
+
 }

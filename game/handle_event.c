@@ -4,6 +4,26 @@ void handle_event() {
     switch(event.type) {
         
         case SDL_MOUSEBUTTONDOWN: {
+            // ui-lists handling
+            vec2_t outport_space_position = get_mouse_outport_space_position();
+    
+            set_ui_lists_to_unsafe();
+            ivec3_t in_ui_box = get_ui_list_inside_pos();
+            if (in_ui_box.z != -1) {
+                make_ui_list_safe(in_ui_box.z);
+
+                int32_t in_button = floor(((float)in_ui_box.y)/_UI_LIST_BUTTON_HEIGHT_);
+                button_callback_t button_callback = ui_lists[in_ui_box.z].button_callbacks[in_button];
+                if (button_callback != NULL){
+                    button_callback(in_ui_box.z);
+                }
+
+                close_unsafe_ui_lists();
+                return;
+            }
+            close_unsafe_ui_lists();
+
+            // page specific
             switch(page) {
                 case PAGE_IN_GAME:
                     mouse_press_in_game();
@@ -20,24 +40,11 @@ void handle_event() {
 #include "ui_list_button_callbacks.c"
 
 void mouse_press_in_game() {
-    vec2_t outport_space_position = get_mouse_outport_space_position();
-    
-    set_ui_lists_to_unsafe();
-    ivec3_t in_ui_box = get_ui_list_inside_pos();
-    if (in_ui_box.z != -1) {
-        make_ui_list_safe(in_ui_box.z);
-
-        int32_t in_button = floor(((float)in_ui_box.y)/_UI_LIST_BUTTON_HEIGHT_);
-        button_callback_t button_callback = ui_lists[in_ui_box.z].button_callbacks[in_button];
-        if (button_callback != NULL){
-            button_callback(in_ui_box.z);
-        }
-
-        close_unsafe_ui_lists();
+    if (game_struct.player_turn == 1) {
+        close_all_alerts();
+        add_alert_at_cursor("It is not your turn.");
         return;
     }
-    close_unsafe_ui_lists();
-
 
     ivec2_t pressed_on_tile = get_hovered_tile_position(0);
     if (

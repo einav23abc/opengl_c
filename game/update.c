@@ -6,7 +6,13 @@
 
 void update() {
     update_game();
-    update_hovered_tile();
+
+    // update alerts' time to live
+    for (int32_t i = 0; i < _MAX_ALERTS_AMOUNT_; i++) {
+        if (alerts[i].time_to_live > 0) {
+            alerts[i].time_to_live -= delta_time;
+        }
+    }
     
     return;
 }
@@ -20,10 +26,18 @@ void update_game() {
         game_struct.players[0].wheight -= 1;
         game_struct.players[1].wheight += 1;
     }
+    if (keys[SDL_SCANCODE_J] == 1) {
+        switch_turn();
+    }
+    
+    if (game_struct.player_turn == 1) {
+        player_1_turn();
+    }
 
     player_translations_update();
     camera_update();
     sun_shadow_map_update();
+    update_hovered_tile();
 }
 
 void camera_update() {

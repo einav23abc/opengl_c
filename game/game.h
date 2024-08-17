@@ -34,6 +34,10 @@
 #define _UI_LIST_BUTTON_HEIGHT_ (12)
 #define _UI_LIST_BUTTON_INFO_ROW_HEIGHT_ (12)
 
+#define _MAX_ALERTS_AMOUNT_ (8)
+#define _ALERT_PADDING_ (3)
+#define _ALERT_ROW_HEIGHT_ (12)
+
 
 enum TILE_TYPES {
     TILE_TYPE_EMPTY = 0,
@@ -91,9 +95,9 @@ typedef struct {
     float box_world_pos_y;
     float box_world_pos_z;
     // if box_pos_from_world_pos = 1, this is a screen-x translation
-    uint32_t x;
+    int32_t x;
     // if box_pos_from_world_pos = 1, this is a screen-y translation
-    uint32_t y;
+    int32_t y;
 
     uint32_t buttons_amount;
     char* button_strings[_UI_LIST_MAX_BUTTONS_AMOUNT_];
@@ -104,6 +108,26 @@ typedef struct {
     int32_t parent_ui_list;
     int32_t child_ui_list;
 } ui_list_t;
+
+
+typedef struct {
+    int32_t time_to_live;
+
+    int32_t initial_time_to_live;
+    float y_full_transform;
+    easing_function_t easing_function;
+
+    uint8_t box_pos_from_world_pos : 1;
+    float box_world_pos_x;
+    float box_world_pos_y;
+    float box_world_pos_z;
+    // if box_pos_from_world_pos = 1, this is a screen-x translation
+    int32_t x;
+    // if box_pos_from_world_pos = 1, this is a screen-y translation
+    int32_t y;
+
+    char* string;
+} alert_t;
 
 
 enum PAGES {
@@ -137,6 +161,7 @@ extern ivec2_t selected_tile;
 extern ivec2_t hovered_tiles[2];
 
 extern ui_list_t ui_lists[_MAX_UI_LISTS_AMOUNT_];
+extern alert_t alerts[_MAX_ALERTS_AMOUNT_];
 
 extern float sun_vector_x;
 extern float sun_vector_y;
@@ -182,7 +207,16 @@ uvec2_t get_ui_list_box_pos_padded(int32_t i);
  */
 ivec3_t get_ui_list_inside_pos();
 
+uvec2_t get_str_size(char* str, float row_height);
+
 uvec2_t get_ui_button_info_size(char* info_str);
+
+int32_t new_alert_assign_id();
+uvec2_t get_alert_box_size(int32_t i);
+uvec2_t get_alert_box_pos(int32_t i);
+uvec2_t get_alert_box_pos_padded(int32_t i);
+void add_alert_at_cursor(char* string);
+void close_all_alerts();
 
 vec2_t outport_space_position_from_world_space(vec3_t pos);
 vec2_t get_mouse_outport_space_position();
@@ -190,5 +224,8 @@ vec2_t get_mouse_camera_space_position();
 vec3_t get_mouse_world_space_position_at_y(float at_y);
 ivec2_t get_hovered_tile_position(uint8_t player_i);
 
+void switch_turn();
+void player_1_turn();
+void player_1_ai_turn();
 
 #endif

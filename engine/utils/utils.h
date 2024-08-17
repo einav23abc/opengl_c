@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 uint32_t hash(uint32_t x);
@@ -26,6 +27,16 @@ int32_t* str_to_int_array(char* str, uint64_t arr_size);
 // array needs to be bigger/equal to floats_amount
 void str_to_existing_float_array(char* str, uint64_t floats_amount, float* arr);
 
+
+typedef double(*easing_function_t)(double);
+
+double ease_linear(double x);
+// https://easings.net/#easeInSine
+double ease_in_sine(double x);
+// https://easings.net/#easeOutSine
+double ease_out_sine(double x);
+// https://easings.net/#easeInOutSine
+double ease_in_out_sine(double x);
 // https://easings.net/#easeOutBack
 double ease_out_back(double x);
 // https://easings.net/#easeInOutBack

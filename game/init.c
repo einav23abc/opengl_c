@@ -250,6 +250,7 @@ uint8_t init() {
     // </shaders>
 
     for (int32_t i = 0; i < _MAX_UI_LISTS_AMOUNT_; i++) ui_lists[i].active = 0;
+    for (int32_t i = 0; i < _MAX_ALERTS_AMOUNT_; i++) alerts[i].time_to_live = 0;
 
     init_game();
 

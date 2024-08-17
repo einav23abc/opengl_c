@@ -146,7 +146,18 @@ void str_to_existing_float_array(char* str, uint64_t floats_amount, float* arr) 
     return;
 }
 
-
+double ease_linear(double x) {
+    return x;
+}
+double ease_in_sine(double x) {
+    return 1 - cos((x * M_PI) / 2);
+}
+double ease_out_sine(double x) {
+    return sin((x * M_PI) / 2);
+}
+double ease_in_out_sine(double x) {
+    return -(cos(M_PI * x) - 1) / 2;
+}
 double ease_out_back(double x) {
     const double c1 = 1.70158;
     const double c3 = c1 + 1;
