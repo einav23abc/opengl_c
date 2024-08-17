@@ -185,26 +185,6 @@ uint8_t init() {
         ui_camera->active = 0;
     // </cameras>
 
-    // <game_struct>
-        selected_tile.x = -1;
-        selected_tile.y = -1;
-
-        game_struct.player_turn = 0;
-        game_struct.players[0].wheight = 1;
-        game_struct.players[1].wheight = -1;
-        player_translations_update();
-        game_struct.players[0].y_lerp_start_translation = game_struct.players[0].y_translation;
-        game_struct.players[1].y_lerp_start_translation = game_struct.players[1].y_translation;
-        game_struct.players[0].y_current_translation = game_struct.players[0].y_translation;
-        game_struct.players[1].y_current_translation = game_struct.players[1].y_translation;
-        game_struct.players[0].translation_lerp_time = 0;
-        game_struct.players[1].translation_lerp_time = 0;
-        for (uint32_t i = 0; i < _PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_; i++) {
-            game_struct.players[0].tiles[i] = 0;//(i+(i/4))%2;
-            game_struct.players[1].tiles[i] = 0;//(i+(i/4))%2;
-        }
-    // </game_struct>
-
     // <sun shadow map>
         sun_shadow_map_camera = create_camera(
             0, 0, 0,
@@ -270,8 +250,35 @@ uint8_t init() {
         );
     // </shaders>
 
-
     for (int32_t i = 0; i < _MAX_UI_LISTS_AMOUNT_; i++) ui_lists[i].active = 0;
 
+    init_game();
+
     return 0;
+}
+
+void init_game() {
+    selected_tile.x = -1;
+    selected_tile.y = -1;
+    hovered_tiles[0].x = -1;
+    hovered_tiles[0].y = -1;
+    hovered_tiles[1].x = -1;
+    hovered_tiles[1].y = -1;
+
+    game_struct.player_turn = 0;
+    game_struct.players[0].wheight = 1;
+    game_struct.players[1].wheight = -1;
+    player_translations_update();
+    game_struct.players[0].y_lerp_start_translation = game_struct.players[0].y_translation;
+    game_struct.players[1].y_lerp_start_translation = game_struct.players[1].y_translation;
+    game_struct.players[0].y_current_translation = game_struct.players[0].y_translation;
+    game_struct.players[1].y_current_translation = game_struct.players[1].y_translation;
+    game_struct.players[0].translation_lerp_time = 0;
+    game_struct.players[1].translation_lerp_time = 0;
+    for (uint32_t i = 0; i < _PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_; i++) {
+        game_struct.players[0].tiles[i] = 0;
+        game_struct.players[1].tiles[i] = 0;
+    }
+
+    page = IN_GAME;
 }

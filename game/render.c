@@ -216,41 +216,109 @@ void render_game_world() {
     // </player tiles>
 }
 
+
 void render_game_ui() {
     glClear(GL_DEPTH_BUFFER_BIT);
     glDisable(GL_DEPTH_TEST);
 
     // draw ui lists
+    ivec3_t cursor_inside_box_pos = get_ui_list_inside_pos();
+
     for (int32_t i = 0; i < _MAX_UI_LISTS_AMOUNT_; i++) {
         if (ui_lists[i].active == 1) {
 
             uvec2_t box_pos = get_ui_list_box_pos(i);
-            ivec3_t cursor_inside_box = get_ui_list_inside_pos();
+            uvec2_t box_padded_pos = get_ui_list_box_pos_padded(i);
+            int32_t cursor_inside_button = -1;
+            if (cursor_inside_box_pos.z == i) {
+                cursor_inside_button = floor(((float)cursor_inside_box_pos.y)/_UI_LIST_BUTTON_HEIGHT_);
+            }
+
+            uint32_t box_width = get_ui_list_width(i);
+            uint32_t box_height = get_ui_list_height(i);
 
             sdm_set_color(1,0,0,1);
-            sdm_draw_rect(box_pos.x, box_pos.y, ui_lists[i].box_w, ui_lists[i].box_h);
-            sdm_set_color(0,1,0,1);
-            sdm_draw_rect(box_pos.x+cursor_inside_box.x, box_pos.y+cursor_inside_box.y, 5, 5);
+            sdm_draw_rect(box_padded_pos.x, box_padded_pos.y, box_width+_UI_LIST_PADDING_*2, box_height+_UI_LIST_PADDING_*2);
+            
+            // buttons
+            for (int32_t j = 0; j < ui_lists[i].buttons_amount; j++) {
+                if (cursor_inside_button == j) {
+                    sdm_set_color(0.5,0.5,0,1);
+                    sdm_draw_rect(box_pos.x, box_pos.y + j*_UI_LIST_BUTTON_HEIGHT_, box_width, _UI_LIST_BUTTON_HEIGHT_);
+                }
+                draw_string(
+                    letters_font,
+                    ui_lists[i].button_strings[j],
+                    (vec3_t){
+                        .x = box_pos.x,
+                        .y = box_pos.y + j*_UI_LIST_BUTTON_HEIGHT_,
+                        .z = 0
+                    },
+                    quat_from_axis_angles_yzx(-0, -0, -0),
+                    _UI_LIST_BUTTON_HEIGHT_,
+                    1, 1, 1
+                );
+            }
+            
+            // button info string
+            if (cursor_inside_box_pos.z == i) {
+                if (cursor_inside_button < 0 || cursor_inside_button >= ui_lists[i].buttons_amount) continue;
+
+                if (ui_lists[i].button_info_strings[cursor_inside_button][0] == '\0') continue;
+
+
+                uvec2_t info_size = get_ui_button_info_size(ui_lists[i].button_info_strings[cursor_inside_button]);
+                
+                uint32_t left_x = box_pos.x + cursor_inside_box_pos.x + _UI_LIST_PADDING_;
+                uint32_t top_y = box_padded_pos.y + box_height+_UI_LIST_PADDING_*2 + _UI_LIST_PADDING_ + info_size.y - _UI_LIST_BUTTON_INFO_ROW_HEIGHT_;
+                uint32_t x = 0;
+                uint32_t y = 0;
+
+                sdm_set_color(0,1,0,1);
+                sdm_draw_rect(
+                    box_pos.x + cursor_inside_box_pos.x,
+                    box_padded_pos.y + box_height+_UI_LIST_PADDING_*2,
+                    2*_UI_LIST_PADDING_ + info_size.x,
+                    2*_UI_LIST_PADDING_ + info_size.y
+                );
+                
+                char one_char_str[2] = "X\0";
+                int32_t info_str_len = strlen(ui_lists[i].button_info_strings[cursor_inside_button]);
+
+                for (uint32_t c = 0; c < info_str_len; c++) {
+                    one_char_str[0] = ui_lists[i].button_info_strings[cursor_inside_button][c];
+                    if (one_char_str[0] == '\n') {
+                        x = 0;
+                        y -= _UI_LIST_BUTTON_INFO_ROW_HEIGHT_;
+                        continue;
+                    }
+                    
+                    if (x >= info_size.x) {
+                        x = 0;
+                        y -= _UI_LIST_BUTTON_INFO_ROW_HEIGHT_;
+                    }
+
+                    x += draw_string(
+                        letters_font,
+                        one_char_str,
+                        (vec3_t){
+                            .x = left_x + x,
+                            .y = top_y + y,
+                            .z = 0
+                        },
+                        quat_from_axis_angles_yzx(-0, -0, -0),
+                        _UI_LIST_BUTTON_INFO_ROW_HEIGHT_,
+                        1, 1, 1
+                    );
+                }
+            }
         }
     }
-
-    // draw_string(
-    //     letters_font,
-    //     "Hello World!",
-    //     (vec3_t){
-    //         .x = 0,
-    //         .y = 248,
-    //         .z = 0
-    //     },
-    //     quat_from_axis_angles_yzx(-0, -0, -0),
-    //     12,
-    //     1, 1, 1
-    // );
     
     glEnable(GL_DEPTH_TEST);
 }
 
-void draw_string(font_t font, char* str, vec3_t pos, quat_t rot, float height, float color_r, float color_b, float color_g) {
+float draw_string(font_t font, char* str, vec3_t pos, quat_t rot, float height, float color_r, float color_b, float color_g) {
     int32_t string_len = min(strlen(str), _MAX_TEXT_ROW_LENGTH);
 
     shader_t* last_shader = shaders_list[current_shader];
@@ -266,9 +334,10 @@ void draw_string(font_t font, char* str, vec3_t pos, quat_t rot, float height, f
         pos.z
     );
     // u_scale
+    float size_x = string_len*font.letter_width*(height/font.letter_height);
     glUniform3f(
         shaders_list[current_shader]->uniform_locations[1],
-        string_len*font.letter_width*(height/font.letter_height),
+        size_x,
         height,
         0
     );
@@ -311,4 +380,6 @@ void draw_string(font_t font, char* str, vec3_t pos, quat_t rot, float height, f
     draw_mesh(rect_plane_mesh);
 
     use_shader(last_shader);
+
+    return size_x;
 }

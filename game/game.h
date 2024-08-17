@@ -29,6 +29,10 @@
 #define _MAX_TEXT_ROW_LENGTH (64)
 
 #define _MAX_UI_LISTS_AMOUNT_ (4)
+#define _UI_LIST_MAX_BUTTONS_AMOUNT_ (8)
+#define _UI_LIST_PADDING_ (3)
+#define _UI_LIST_BUTTON_HEIGHT_ (12)
+#define _UI_LIST_BUTTON_INFO_ROW_HEIGHT_ (12)
 
 
 typedef struct {
@@ -61,6 +65,8 @@ typedef struct {
     texture_t* font_texture;
 } font_t;
 
+typedef void(*button_callback_t)(int32_t);
+
 typedef struct {
     uint8_t active : 1;
 
@@ -68,19 +74,28 @@ typedef struct {
     float box_world_pos_x;
     float box_world_pos_y;
     float box_world_pos_z;
+    // if box_pos_from_world_pos = 1, this is a screen-x translation
     uint32_t x;
+    // if box_pos_from_world_pos = 1, this is a screen-y translation
     uint32_t y;
-    
-    uint8_t height_down : 1;
 
-    uint32_t box_w;
-    uint32_t box_h;
+    uint32_t buttons_amount;
+    char* button_strings[_UI_LIST_MAX_BUTTONS_AMOUNT_];
+    char* button_info_strings[_UI_LIST_MAX_BUTTONS_AMOUNT_];
+    button_callback_t button_callbacks[_UI_LIST_MAX_BUTTONS_AMOUNT_];
 
     uint8_t safe : 1;
     int32_t parent_ui_list;
     int32_t child_ui_list;
 } ui_list_t;
 
+
+enum PAGES {
+    IN_GAME
+};
+
+
+int32_t page;
 
 extern fbo_t* outport_fbo;
 
@@ -117,6 +132,10 @@ extern shader_t* sun_shadow_map_shader;
 
 
 
+void init_game();
+
+void mouse_press_in_game();
+
 void update_game();
 void render_game();
 
@@ -127,20 +146,27 @@ void sun_shadow_map_update();
 
 void render_game_world();
 void render_game_ui();
-void draw_string(font_t font, char* str, vec3_t pos, quat_t rot, float height, float color_r, float color_b, float color_g);
+// returns the drawn width
+float draw_string(font_t font, char* str, vec3_t pos, quat_t rot, float height, float color_r, float color_b, float color_g);
 
 int32_t new_ui_list_assign_id();
 void set_ui_lists_to_unsafe();
 void close_ui_list(int32_t i);
 void make_ui_list_safe(int32_t i);
 void close_unsafe_ui_lists();
+void close_all_ui_lists();
+uint32_t get_ui_list_width(int32_t i);
+uint32_t get_ui_list_height(int32_t i);
 uvec2_t get_ui_list_box_pos(int32_t i);
+uvec2_t get_ui_list_box_pos_padded(int32_t i);
 /* x = x pos inside box
  * y = y pos inside box
  * z = ui_list-index
  * or `-1` in everything if not inside ui_list
  */
 ivec3_t get_ui_list_inside_pos();
+
+uvec2_t get_ui_button_info_size(char* info_str);
 
 vec2_t outport_space_position_from_world_space(vec3_t pos);
 vec2_t get_mouse_outport_space_position();
