@@ -5,7 +5,7 @@ void handle_event() {
         
         case SDL_MOUSEBUTTONDOWN: {
             switch(page) {
-                case IN_GAME:
+                case PAGE_IN_GAME:
                     mouse_press_in_game();
                     break;
             }

@@ -145,3 +145,20 @@ void str_to_existing_float_array(char* str, uint64_t floats_amount, float* arr) 
     }
     return;
 }
+
+
+double ease_out_back(double x) {
+    const double c1 = 1.70158;
+    const double c3 = c1 + 1;
+
+    return (1 + c3*pow(x - 1, 3) + c1 * pow(x - 1, 2));
+}
+double ease_in_out_back(double x) {
+    const double c1 = 1.70158;
+    const double c2 = c1*1.525;
+
+    if (x < 0.5) {
+        return (pow(2*x, 2) * ((c2+1)*2*x - c2))/2;
+    }
+    return (pow(2*x - 2, 2) * ((c2+1)*(2*x - 2) + c2) + 2)/2;
+}

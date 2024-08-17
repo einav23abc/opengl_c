@@ -161,14 +161,14 @@ uint8_t init() {
 
     // <cameras>
         camera_pos = (vec3_t){
-            .x = 0,
+            .x = -_TILE_SIZE_,
             .y = _SCALE_AXIS_POINT_Y_,
             .z = -_TILE_SIZE_*2
         };
         camera = create_camera(
             0, 0, 0,
             M_PI*1.8, -M_PI*0.15, 0,
-            320, 260, 1600,
+            340, 260, 1600,
             -32000, 32000,
             0, 60,
             0, 0, _OUTPORT_WIDTH_, _OUTPORT_HEIGHT_
@@ -212,13 +212,12 @@ uint8_t init() {
             letters_font = (font_t){
                 .font_texture = load_texture("./game/textures/font.png"),
                 .letters_in_row = 16,
-                .letters_in_col = 8,
+                .letters_in_col = 10,
                 .letter_width = 6,
                 .letter_height = 12
             };
         // </letters_font>
     // </textures>
-    
 
     // <shaders>
         global_shader = create_shader_from_files(
@@ -266,19 +265,38 @@ void init_game() {
     hovered_tiles[1].y = -1;
 
     game_struct.player_turn = 0;
-    game_struct.players[0].wheight = 1;
-    game_struct.players[1].wheight = -1;
+
+
     player_translations_update();
     game_struct.players[0].y_lerp_start_translation = game_struct.players[0].y_translation;
-    game_struct.players[1].y_lerp_start_translation = game_struct.players[1].y_translation;
     game_struct.players[0].y_current_translation = game_struct.players[0].y_translation;
+    game_struct.players[1].y_lerp_start_translation = game_struct.players[1].y_translation;
     game_struct.players[1].y_current_translation = game_struct.players[1].y_translation;
+
     game_struct.players[0].translation_lerp_time = 0;
     game_struct.players[1].translation_lerp_time = 0;
-    for (uint32_t i = 0; i < _PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_; i++) {
-        game_struct.players[0].tiles[i] = 0;
-        game_struct.players[1].tiles[i] = 0;
-    }
 
-    page = IN_GAME;
+    for (uint32_t i = 0; i < _PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_; i++) {
+        game_struct.players[0].tiles[i].type = TILE_TYPE_EMPTY;
+        game_struct.players[0].tiles[i].camoflauged = 0;
+        game_struct.players[1].tiles[i].type = TILE_TYPE_EMPTY;
+        game_struct.players[1].tiles[i].camoflauged = 0;
+    }
+    game_struct.players[0].tiles[14].type = TILE_TYPE_HOUSE;
+    game_struct.players[1].tiles[14].type = TILE_TYPE_HOUSE;
+
+    game_struct.players[0].wheight = 0;
+    game_struct.players[0].wood = 2;
+    game_struct.players[0].stone = 2;
+    game_struct.players[0].wheat = 2;
+    game_struct.players[0].soldiers = 0;
+    game_struct.players[0].population = 2;
+    game_struct.players[1].wheight = 0;
+    game_struct.players[1].wood = 2;
+    game_struct.players[1].stone = 2;
+    game_struct.players[1].wheat = 2;
+    game_struct.players[1].soldiers = 0;
+    game_struct.players[1].population = 2;
+
+    page = PAGE_IN_GAME;
 }

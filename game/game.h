@@ -8,7 +8,7 @@
 
 
 
-#define _OUTPORT_WIDTH_ (320*2)
+#define _OUTPORT_WIDTH_ (340*2)
 #define _OUTPORT_HEIGHT_ (260*2)
 
 #define _OUTPORT_BACKGROUND_COLOR_R_ (0.2)
@@ -16,8 +16,8 @@
 #define _OUTPORT_BACKGROUND_COLOR_B_ (0.3)
 
 
-#define _PLAYER_GRID_WIDTH_ (4)
-#define _PLAYER_GRID_DEPTH_ (4)
+#define _PLAYER_GRID_WIDTH_ (5)
+#define _PLAYER_GRID_DEPTH_ (5)
 #define _TILE_SIZE_ (16)
 #define _PLAYER_CONSTANT_Z_TRANSLATION_ (-_PLAYER_GRID_DEPTH_*_TILE_SIZE_*0.5)
 #define _PLAYER_TRANSLATION_LERP_DURATION_ (500)
@@ -35,9 +35,19 @@
 #define _UI_LIST_BUTTON_INFO_ROW_HEIGHT_ (12)
 
 
-typedef struct {
+enum TILE_TYPES {
+    TILE_TYPE_EMPTY = 0,
+    TILE_TYPE_HOUSE,
+    TILE_TYPE_BARRACKS,
+    TILE_TYPE_FIELD,
+    TILE_TYPE_MINE,
+    TILE_TYPE_FOREST
+};
 
-} tile_type_t;
+typedef struct {
+    int32_t type;
+    uint8_t camoflauged : 1;
+} tile_t;
 
 typedef struct {
     float y_lerp_start_translation;
@@ -47,8 +57,14 @@ typedef struct {
     float hinge_y_position;
     float hinge_x_position;
     uint32_t translation_lerp_time;
+    
     int32_t wheight;
-    int32_t tiles[_PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_];
+    int32_t wood;
+    int32_t stone;
+    int32_t wheat;
+    int32_t soldiers;
+    int32_t population;
+    tile_t tiles[_PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_];
 } player_t;
 
 typedef struct {
@@ -91,7 +107,7 @@ typedef struct {
 
 
 enum PAGES {
-    IN_GAME
+    PAGE_IN_GAME
 };
 
 

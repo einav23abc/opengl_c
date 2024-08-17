@@ -2,10 +2,31 @@
 #include "game.h"
 
 void ui_list_build_house_button_callback(int32_t ui_list_id) {
-    game_struct.players[0].tiles[selected_tile.y*_PLAYER_GRID_WIDTH_ + selected_tile.x] = 1;
+
+    // enough resources?
+    if (
+        game_struct.players[0].wood  < 1 ||
+        game_struct.players[0].wheat < 2 ||
+        game_struct.players[0].stone < 1
+    ) {
+        // not enough resources
+        // unselect tile
+        selected_tile.x = -1;
+        selected_tile.y = -1;
+        close_all_ui_lists();
+        return;
+    }
+
+    game_struct.players[0].wheight -= 1;
+    game_struct.players[1].wheight += 1;
+    game_struct.players[0].wood  -= 1;
+    game_struct.players[0].wheat -= 2;
+    game_struct.players[0].stone -= 1;
+    game_struct.players[0].tiles[selected_tile.y*_PLAYER_GRID_WIDTH_ + selected_tile.x].type = 1;
+    close_all_ui_lists();
+    // unselect tile
     selected_tile.x = -1;
     selected_tile.y = -1;
-    close_all_ui_lists();
 }
 
 void ui_list_build_button_callback(int32_t ui_list_id) {
@@ -26,7 +47,7 @@ void ui_list_build_button_callback(int32_t ui_list_id) {
 
         .buttons_amount = 1,
         .button_strings = {"house"},
-        .button_info_strings = {"this is a info string\nnew line"},
+        .button_info_strings = {"* \02: -2\n* \03: -1\n* \04: -1\nevery 3 turns:\n* \01: +1"},
         .button_callbacks = {&ui_list_build_house_button_callback},
 
         .child_ui_list = -1,
