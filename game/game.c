@@ -24,6 +24,8 @@ mesh_t* rect_plane_mesh;
 mesh_t* cube_mesh;
 mesh_t* centered_cube_mesh;
 
+tile_type_t tile_type_properties[_TILE_TYPES_AMOUNT_];
+
 game_t game_struct;
 ivec2_t selected_tile;
 ivec2_t hovered_tiles[2];
@@ -154,6 +156,52 @@ uvec2_t get_str_size(char* str, float row_height) {
         .x = w * letters_font.letter_width*(row_height/letters_font.letter_height),
         .y = h
     };
+}
+void draw_str_boxed(char* str, uint32_t left_x, uint32_t bottom_y, uint32_t padding, uint32_t row_height) {
+    uvec2_t str_size = get_str_size(str, row_height);
+    
+    uint32_t top_y = bottom_y + str_size.y;
+
+    uint32_t x = 0;
+    uint32_t y = -row_height;
+
+    sdm_set_color(0,0.25,0,1);
+    sdm_draw_rect(
+        left_x - padding,
+        top_y - str_size.y - padding,
+        2*padding + str_size.x,
+        2*padding + str_size.y
+    );
+    
+    char one_char_str[2] = "X\0";
+    int32_t info_str_len = strlen(str);
+
+    for (uint32_t c = 0; c < info_str_len; c++) {
+        one_char_str[0] = str[c];
+        if (one_char_str[0] == '\n') {
+            x = 0;
+            y -= row_height;
+            continue;
+        }
+
+        if (x >= str_size.x) {
+            x = 0;
+            y -= row_height;
+        }
+
+        x += draw_string(
+            letters_font,
+            one_char_str,
+            (vec3_t){
+                .x = left_x + x,
+                .y = top_y + y,
+                .z = 0
+            },
+            quat_from_axis_angles_yzx(-0, -0, -0),
+            row_height,
+            1, 1, 1
+        );
+    }
 }
 
 uvec2_t get_ui_button_info_size(char* info_str) {

@@ -249,6 +249,224 @@ uint8_t init() {
         );
     // </shaders>
 
+
+    // <tile_type_properties>
+        tile_type_properties[TILE_TYPE_HOUSE] = (tile_type_t){
+            .cost = (resources_t){
+                .wood = 1,
+                .stone = 1,
+                .wheat = 2,
+                .population = 0,
+                .soldiers = 0
+            },
+            .give_cooldown = 2,
+            .give = (resources_t){
+                .wood = 0,
+                .stone = 0,
+                .wheat = 0,
+                .population = 1,
+                .soldiers = 0
+            }
+        };
+        tile_type_properties[TILE_TYPE_BARRACKS] = (tile_type_t){
+            .cost = (resources_t){
+                .wood = 0,
+                .stone = 2,
+                .wheat = 1,
+                .population = 1,
+                .soldiers = 0
+            },
+            .give_cooldown = 3,
+            .give = (resources_t){
+                .wood = 0,
+                .stone = 0,
+                .wheat = 0,
+                .population = 0,
+                .soldiers = 1
+            }
+        };
+        tile_type_properties[TILE_TYPE_FIELD] = (tile_type_t){
+            .cost = (resources_t){
+                .wood = 1,
+                .stone = 0,
+                .wheat = 0,
+                .population = 1,
+                .soldiers = 0
+            },
+            .give_cooldown = 2,
+            .give = (resources_t){
+                .wood = 0,
+                .stone = 0,
+                .wheat = 1,
+                .population = 0,
+                .soldiers = 0
+            }
+        };
+        tile_type_properties[TILE_TYPE_MINE] = (tile_type_t){
+            .cost = (resources_t){
+                .wood = 1,
+                .stone = 0,
+                .wheat = 0,
+                .population = 2,
+                .soldiers = 0
+            },
+            .give_cooldown = 2,
+            .give = (resources_t){
+                .wood = 0,
+                .stone = 1,
+                .wheat = 0,
+                .population = 0,
+                .soldiers = 0
+            }
+        };
+        tile_type_properties[TILE_TYPE_FOREST] = (tile_type_t){
+            .cost = (resources_t){
+                .wood = 1,
+                .stone = 0,
+                .wheat = 1,
+                .population = 1,
+                .soldiers = 0
+            },
+            .give_cooldown = 2,
+            .give = (resources_t){
+                .wood = 1,
+                .stone = 0,
+                .wheat = 0,
+                .population = 0,
+                .soldiers = 0
+            }
+        };
+
+        for (uint32_t i = 0; i < _TILE_TYPES_AMOUNT_; i++) {
+            char build_info_string[_TILE_BUILD_INFO_STRING_MAX_LENGTH_];
+            uint32_t c = 0;
+
+            strcpy(&(build_info_string[c]), "costs:\n");
+            c += strlen("costs:\n");
+            
+            if (tile_type_properties[i].cost.population > 0) {
+                build_info_string[c  ] = '*';
+                build_info_string[c+1] = ' ';
+                build_info_string[c+2] = '-';
+                build_info_string[c+3] = '0' + tile_type_properties[i].cost.population;
+                build_info_string[c+4] = '\1';
+                build_info_string[c+5] = '\n';
+                c += 6;
+            }
+            if (tile_type_properties[i].cost.wheat > 0) {
+                build_info_string[c  ] = '*';
+                build_info_string[c+1] = ' ';
+                build_info_string[c+2] = '-';
+                build_info_string[c+3] = '0' + tile_type_properties[i].cost.wheat;
+                build_info_string[c+4] = '\2';
+                build_info_string[c+5] = '\n';
+                c += 6;
+            }
+            if (tile_type_properties[i].cost.wood > 0) {
+                build_info_string[c  ] = '*';
+                build_info_string[c+1] = ' ';
+                build_info_string[c+2] = '-';
+                build_info_string[c+3] = '0' + tile_type_properties[i].cost.wood;
+                build_info_string[c+4] = '\3';
+                build_info_string[c+5] = '\n';
+                c += 6;
+            }
+            if (tile_type_properties[i].cost.stone > 0) {
+                build_info_string[c  ] = '*';
+                build_info_string[c+1] = ' ';
+                build_info_string[c+2] = '-';
+                build_info_string[c+3] = '0' + tile_type_properties[i].cost.stone;
+                build_info_string[c+4] = '\4';
+                build_info_string[c+5] = '\n';
+                c += 6;
+            }
+            if (tile_type_properties[i].cost.soldiers > 0) {
+                build_info_string[c  ] = '*';
+                build_info_string[c+1] = ' ';
+                build_info_string[c+2] = '-';
+                build_info_string[c+3] = '0' + tile_type_properties[i].cost.soldiers;
+                build_info_string[c+4] = '\5';
+                build_info_string[c+5] = '\n';
+                c += 6;
+            }
+            
+
+            if (tile_type_properties[i].give_cooldown == 1) {
+                strcpy(&(build_info_string[c]), "Every turn:\n");
+                c += strlen("Every turn:\n");
+            }else {
+                build_info_string[c  ]  = 'E';
+                build_info_string[c+1]  = 'v';
+                build_info_string[c+2]  = 'e';
+                build_info_string[c+3]  = 'r';
+                build_info_string[c+4]  = 'y';
+                build_info_string[c+5]  = ' ';
+                build_info_string[c+6]  = '0' + tile_type_properties[i].give_cooldown;
+                build_info_string[c+7]  = ' ';
+                build_info_string[c+8]  = 't';
+                build_info_string[c+9]  = 'u';
+                build_info_string[c+10] = 'r';
+                build_info_string[c+11] = 'n';
+                build_info_string[c+12] = 's';
+                build_info_string[c+13] = ':';
+                build_info_string[c+14] = '\n';
+                c += 15;
+            }
+            
+            if (tile_type_properties[i].give.population > 0) {
+                build_info_string[c  ] = '*';
+                build_info_string[c+1] = ' ';
+                build_info_string[c+2] = '+';
+                build_info_string[c+3] = '0' + tile_type_properties[i].give.population;
+                build_info_string[c+4] = '\1';
+                build_info_string[c+5] = '\n';
+                c += 6;
+            }
+            if (tile_type_properties[i].give.wheat > 0) {
+                build_info_string[c  ] = '*';
+                build_info_string[c+1] = ' ';
+                build_info_string[c+2] = '+';
+                build_info_string[c+3] = '0' + tile_type_properties[i].give.wheat;
+                build_info_string[c+4] = '\2';
+                build_info_string[c+5] = '\n';
+                c += 6;
+            }
+            if (tile_type_properties[i].give.wood > 0) {
+                build_info_string[c  ] = '*';
+                build_info_string[c+1] = ' ';
+                build_info_string[c+2] = '+';
+                build_info_string[c+3] = '0' + tile_type_properties[i].give.wood;
+                build_info_string[c+4] = '\3';
+                build_info_string[c+5] = '\n';
+                c += 6;
+            }
+            if (tile_type_properties[i].give.stone > 0) {
+                build_info_string[c  ] = '*';
+                build_info_string[c+1] = ' ';
+                build_info_string[c+2] = '+';
+                build_info_string[c+3] = '0' + tile_type_properties[i].give.stone;
+                build_info_string[c+4] = '\4';
+                build_info_string[c+5] = '\n';
+                c += 6;
+            }
+            if (tile_type_properties[i].give.soldiers > 0) {
+                build_info_string[c  ] = '*';
+                build_info_string[c+1] = ' ';
+                build_info_string[c+2] = '+';
+                build_info_string[c+3] = '0' + tile_type_properties[i].give.soldiers;
+                build_info_string[c+4] = '\5';
+                build_info_string[c+5] = '\n';
+                c += 6;
+            }
+
+            // remove newline and add null terminator
+            build_info_string[c-1] = '\0';
+
+            strcpy(tile_type_properties[i].build_info_string, build_info_string);
+        }
+    // </tile_type_properties>
+
+
     for (int32_t i = 0; i < _MAX_UI_LISTS_AMOUNT_; i++) ui_lists[i].active = 0;
     for (int32_t i = 0; i < _MAX_ALERTS_AMOUNT_; i++) alerts[i].time_to_live = 0;
 
@@ -287,17 +505,17 @@ void init_game() {
     game_struct.players[1].tiles[14].type = TILE_TYPE_HOUSE;
 
     game_struct.players[0].wheight = 0;
-    game_struct.players[0].wood = 2;
-    game_struct.players[0].stone = 2;
-    game_struct.players[0].wheat = 2;
-    game_struct.players[0].soldiers = 0;
-    game_struct.players[0].population = 2;
+    game_struct.players[0].resources.wood = 2;
+    game_struct.players[0].resources.stone = 2;
+    game_struct.players[0].resources.wheat = 2;
+    game_struct.players[0].resources.soldiers = 0;
+    game_struct.players[0].resources.population = 2;
     game_struct.players[1].wheight = 0;
-    game_struct.players[1].wood = 2;
-    game_struct.players[1].stone = 2;
-    game_struct.players[1].wheat = 2;
-    game_struct.players[1].soldiers = 0;
-    game_struct.players[1].population = 2;
+    game_struct.players[1].resources.wood = 2;
+    game_struct.players[1].resources.stone = 2;
+    game_struct.players[1].resources.wheat = 2;
+    game_struct.players[1].resources.soldiers = 0;
+    game_struct.players[1].resources.population = 2;
 
     page = PAGE_IN_GAME;
 }

@@ -156,11 +156,11 @@ void render_game_world() {
     // <player 0 resources on tile base>
         glDisable(GL_DEPTH_TEST);
         char resources_string[11] = "X\01X\02X\03X\04X\05";
-        resources_string[0] = '0' + game_struct.players[0].population;
-        resources_string[2] = '0' + game_struct.players[0].wheat;
-        resources_string[4] = '0' + game_struct.players[0].wood;
-        resources_string[6] = '0' + game_struct.players[0].stone;
-        resources_string[8] = '0' + game_struct.players[0].soldiers;
+        resources_string[0] = '0' + game_struct.players[0].resources.population;
+        resources_string[2] = '0' + game_struct.players[0].resources.wheat;
+        resources_string[4] = '0' + game_struct.players[0].resources.wood;
+        resources_string[6] = '0' + game_struct.players[0].resources.stone;
+        resources_string[8] = '0' + game_struct.players[0].resources.soldiers;
         draw_string(
             letters_font,
             resources_string,
@@ -290,51 +290,9 @@ void render_game_ui() {
 
                 if (ui_lists[i].button_info_strings[cursor_inside_button][0] == '\0') continue;
 
-
-                uvec2_t info_size = get_ui_button_info_size(ui_lists[i].button_info_strings[cursor_inside_button]);
-                
                 uint32_t left_x = box_pos.x + cursor_inside_box_pos.x + _UI_LIST_PADDING_;
-                uint32_t top_y = box_padded_pos.y + box_height+_UI_LIST_PADDING_*2 + _UI_LIST_PADDING_ + info_size.y - _UI_LIST_BUTTON_INFO_ROW_HEIGHT_;
-                uint32_t x = 0;
-                uint32_t y = 0;
-
-                sdm_set_color(0,0.25,0,1);
-                sdm_draw_rect(
-                    box_pos.x + cursor_inside_box_pos.x,
-                    box_padded_pos.y + box_height+_UI_LIST_PADDING_*2,
-                    2*_UI_LIST_PADDING_ + info_size.x,
-                    2*_UI_LIST_PADDING_ + info_size.y
-                );
-                
-                char one_char_str[2] = "X\0";
-                int32_t info_str_len = strlen(ui_lists[i].button_info_strings[cursor_inside_button]);
-
-                for (uint32_t c = 0; c < info_str_len; c++) {
-                    one_char_str[0] = ui_lists[i].button_info_strings[cursor_inside_button][c];
-                    if (one_char_str[0] == '\n') {
-                        x = 0;
-                        y -= _UI_LIST_BUTTON_INFO_ROW_HEIGHT_;
-                        continue;
-                    }
-
-                    if (x >= info_size.x) {
-                        x = 0;
-                        y -= _UI_LIST_BUTTON_INFO_ROW_HEIGHT_;
-                    }
-
-                    x += draw_string(
-                        letters_font,
-                        one_char_str,
-                        (vec3_t){
-                            .x = left_x + x,
-                            .y = top_y + y,
-                            .z = 0
-                        },
-                        quat_from_axis_angles_yzx(-0, -0, -0),
-                        _UI_LIST_BUTTON_INFO_ROW_HEIGHT_,
-                        1, 1, 1
-                    );
-                }
+                uint32_t bottom_y = box_pos.y + _UI_LIST_BUTTON_HEIGHT_ + cursor_inside_button*_UI_LIST_BUTTON_INFO_ROW_HEIGHT_ + _UI_LIST_PADDING_;
+                draw_str_boxed(ui_lists[i].button_info_strings[cursor_inside_button], left_x, bottom_y, _UI_LIST_PADDING_, _UI_LIST_BUTTON_INFO_ROW_HEIGHT_);
             }
         }
     }
@@ -342,53 +300,10 @@ void render_game_ui() {
     // draw alerts
     for (int32_t i = 0; i < _MAX_ALERTS_AMOUNT_; i++) {
         if (alerts[i].time_to_live <= 0) continue;
-
         uvec2_t box_pos = get_alert_box_pos(i);
-        uvec2_t box_padded_pos = get_alert_box_pos_padded(i);
-        uvec2_t box_size = get_alert_box_size(i);
-
         uint32_t left_x = box_pos.x;
-        uint32_t top_y = box_pos.y;
-        uint32_t x = 0;
-        uint32_t y = 0;
-
-        sdm_set_color(0,0.25,0,1);
-        sdm_draw_rect(
-            box_padded_pos.x,
-            box_padded_pos.y,
-            2*_ALERT_PADDING_ + box_size.x,
-            2*_ALERT_PADDING_ + box_size.y
-        );
-        
-        char one_char_str[2] = "X\0";
-        int32_t str_len = strlen(alerts[i].string);
-
-        for (uint32_t c = 0; c < str_len; c++) {
-            one_char_str[0] = alerts[i].string[c];
-            if (one_char_str[0] == '\n') {
-                x = 0;
-                y -= _ALERT_ROW_HEIGHT_;
-                continue;
-            }
-
-            if (x >= box_size.x) {
-                x = 0;
-                y -= _ALERT_ROW_HEIGHT_;
-            }
-
-            x += draw_string(
-                letters_font,
-                one_char_str,
-                (vec3_t){
-                    .x = left_x + x,
-                    .y = top_y + y,
-                    .z = 0
-                },
-                quat_from_axis_angles_yzx(-0, -0, -0),
-                _ALERT_ROW_HEIGHT_,
-                1, 1, 1
-            );
-        }
+        uint32_t bottom_y = box_pos.y;
+        draw_str_boxed(alerts[i].string, left_x, bottom_y, _ALERT_PADDING_, _ALERT_ROW_HEIGHT_);
     }
 
     glEnable(GL_DEPTH_TEST);

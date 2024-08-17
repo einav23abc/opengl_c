@@ -1,13 +1,16 @@
 // this is included inside "handle_event.c"
 #include "game.h"
 
-void ui_list_build_house_button_callback(int32_t ui_list_id) {
+void ui_list_build_specific_button_callback(int32_t ui_list_id, int32_t button_id) {
+    int32_t tile_type_id = button_id;
 
     // enough resources?
     if (
-        game_struct.players[0].wood  < 1 ||
-        game_struct.players[0].wheat < 2 ||
-        game_struct.players[0].stone < 1
+        game_struct.players[0].resources.wood       < tile_type_properties[tile_type_id].cost.wood       ||
+        game_struct.players[0].resources.stone      < tile_type_properties[tile_type_id].cost.stone      ||
+        game_struct.players[0].resources.wheat      < tile_type_properties[tile_type_id].cost.wheat      ||
+        game_struct.players[0].resources.population < tile_type_properties[tile_type_id].cost.population ||
+        game_struct.players[0].resources.soldiers   < tile_type_properties[tile_type_id].cost.soldiers
     ) {
         // not enough resources
         close_all_alerts();
@@ -21,17 +24,19 @@ void ui_list_build_house_button_callback(int32_t ui_list_id) {
 
     game_struct.players[0].wheight -= 1;
     game_struct.players[1].wheight += 1;
-    game_struct.players[0].wood  -= 1;
-    game_struct.players[0].wheat -= 2;
-    game_struct.players[0].stone -= 1;
-    game_struct.players[0].tiles[selected_tile.y*_PLAYER_GRID_WIDTH_ + selected_tile.x].type = 1;
+    game_struct.players[0].resources.wood       -= tile_type_properties[tile_type_id].cost.wood;
+    game_struct.players[0].resources.stone      -= tile_type_properties[tile_type_id].cost.stone;
+    game_struct.players[0].resources.wheat      -= tile_type_properties[tile_type_id].cost.wheat;
+    game_struct.players[0].resources.population -= tile_type_properties[tile_type_id].cost.population;
+    game_struct.players[0].resources.soldiers   -= tile_type_properties[tile_type_id].cost.soldiers;
+    game_struct.players[0].tiles[selected_tile.y*_PLAYER_GRID_WIDTH_ + selected_tile.x].type = tile_type_id;
     close_all_ui_lists();
     // unselect tile
     selected_tile.x = -1;
     selected_tile.y = -1;
 }
 
-void ui_list_build_button_callback(int32_t ui_list_id) {
+void ui_list_build_button_callback(int32_t ui_list_id, int32_t button_id) {
     // close child (if exists)
     close_ui_list(ui_lists[ui_list_id].child_ui_list);
 
@@ -47,14 +52,27 @@ void ui_list_build_button_callback(int32_t ui_list_id) {
         .x = get_ui_list_width(ui_list_id) + 2*_UI_LIST_PADDING_,
         .y = 0,
 
-        .buttons_amount = 1,
-        .button_strings = {"house"},
-        .button_info_strings = {"* \02: -2\n* \03: -1\n* \04: -1\nevery 3 turns:\n* \01: +1"},
-        .button_callbacks = {&ui_list_build_house_button_callback},
+        .buttons_amount = _TILE_TYPES_AMOUNT_,
+        .button_strings = {"house", "barracks", "field", "mine", "forest"},
+        .button_info_strings = {
+            tile_type_properties[0].build_info_string,
+            tile_type_properties[1].build_info_string,
+            tile_type_properties[2].build_info_string,
+            tile_type_properties[3].build_info_string,
+            tile_type_properties[4].build_info_string
+        },
+        .button_callbacks = {
+            &ui_list_build_specific_button_callback,
+            &ui_list_build_specific_button_callback,
+            &ui_list_build_specific_button_callback,
+            &ui_list_build_specific_button_callback,
+            &ui_list_build_specific_button_callback
+        },
 
         .child_ui_list = -1,
         .parent_ui_list = ui_list_id
     };
+
     ui_lists[ui_list_id].child_ui_list = new_ui_list_id;
 
     make_ui_list_safe(new_ui_list_id);

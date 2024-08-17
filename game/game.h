@@ -39,14 +39,32 @@
 #define _ALERT_ROW_HEIGHT_ (12)
 
 
+typedef struct {
+    int32_t wood;
+    int32_t stone;
+    int32_t wheat;
+    int32_t population;
+    int32_t soldiers;
+} resources_t;
+
+#define _TILE_BUILD_INFO_STRING_MAX_LENGTH_ (64)
+typedef struct {
+    resources_t cost;
+    int32_t give_cooldown;
+    resources_t give;
+    char build_info_string[_TILE_BUILD_INFO_STRING_MAX_LENGTH_];
+} tile_type_t;
+
 enum TILE_TYPES {
-    TILE_TYPE_EMPTY = 0,
-    TILE_TYPE_HOUSE,
-    TILE_TYPE_BARRACKS,
-    TILE_TYPE_FIELD,
-    TILE_TYPE_MINE,
-    TILE_TYPE_FOREST
+    TILE_TYPE_EMPTY = -1,
+    TILE_TYPE_HOUSE = 0,
+    TILE_TYPE_BARRACKS = 1,
+    TILE_TYPE_FIELD = 2,
+    TILE_TYPE_MINE = 3,
+    TILE_TYPE_FOREST = 4
 };
+// excluding TILE_TYPE_EMPTY
+#define _TILE_TYPES_AMOUNT_ (5)
 
 typedef struct {
     int32_t type;
@@ -63,11 +81,7 @@ typedef struct {
     uint32_t translation_lerp_time;
     
     int32_t wheight;
-    int32_t wood;
-    int32_t stone;
-    int32_t wheat;
-    int32_t soldiers;
-    int32_t population;
+    resources_t resources;
     tile_t tiles[_PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_];
 } player_t;
 
@@ -85,7 +99,10 @@ typedef struct {
     texture_t* font_texture;
 } font_t;
 
-typedef void(*button_callback_t)(int32_t);
+/* param 1: the ui_list id
+ * param 2: the button id
+ */
+typedef void(*button_callback_t)(int32_t, int32_t);
 
 typedef struct {
     uint8_t active : 1;
@@ -156,6 +173,8 @@ extern mesh_t* rect_plane_mesh;
 extern mesh_t* cube_mesh;
 extern mesh_t* centered_cube_mesh;
 
+extern tile_type_t tile_type_properties[_TILE_TYPES_AMOUNT_];
+
 extern game_t game_struct;
 extern ivec2_t selected_tile;
 extern ivec2_t hovered_tiles[2];
@@ -208,6 +227,7 @@ uvec2_t get_ui_list_box_pos_padded(int32_t i);
 ivec3_t get_ui_list_inside_pos();
 
 uvec2_t get_str_size(char* str, float row_height);
+void draw_str_boxed(char* str, uint32_t left_x, uint32_t bottom_y, uint32_t padding, uint32_t row_height);
 
 uvec2_t get_ui_button_info_size(char* info_str);
 
