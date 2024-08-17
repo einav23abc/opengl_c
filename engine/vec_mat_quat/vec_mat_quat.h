@@ -18,6 +18,13 @@ typedef struct {
 } vec3_t;
 
 typedef struct {
+    float x;
+    float y;
+    float z;
+    float w;
+} vec4_t;
+
+typedef struct {
     int32_t x;
     int32_t y;
 } ivec2_t;
@@ -38,6 +45,14 @@ typedef struct {
     uint32_t y;
     uint32_t z;
 } uvec3_t;
+
+typedef struct {
+    uint32_t x;
+    uint32_t y;
+    uint32_t z;
+    uint32_t w;
+} uvec4_t;
+
 
 typedef struct {
     float w;
@@ -62,11 +77,25 @@ typedef struct {
 
 
 
+vec2_t vec2_from_vec3(vec3_t vec);
+vec2_t vec2_from_vec4(vec4_t vec);
 vec3_t vec3_from_vec2(vec2_t vec);
+vec3_t vec3_from_vec4(vec4_t vec);
+vec4_t vec4_from_vec2(vec2_t vec);
+vec4_t vec4_from_vec3(vec3_t vec);
 
+vec2_t vec2(float x, float y);
+vec2_t vec2_add(vec2_t vec1, vec2_t vec2);
+vec2_t vec2_mul(vec2_t vec1, vec2_t vec2);
+vec2_t vec2_mul_by_scalar(vec2_t vec, float scalar);
+vec3_t vec3(float x, float y, float z);
 vec3_t vec3_add(vec3_t vec1, vec3_t vec2);
 vec3_t vec3_mul(vec3_t vec1, vec3_t vec2);
 vec3_t vec3_mul_by_scalar(vec3_t vec, float scalar);
+vec4_t vec4(float x, float y, float z, float w);
+vec4_t vec4_add(vec4_t vec1, vec4_t vec2);
+vec4_t vec4_mul(vec4_t vec1, vec4_t vec2);
+vec4_t vec4_mul_by_scalar(vec4_t vec, float scalar);
 
 float dot_product(vec3_t vec1, vec3_t vec2);
 vec3_t cross_product(vec3_t vec1, vec3_t vec2);
@@ -84,6 +113,7 @@ void mat_mul(float* mat1, float* mat2, float* restrict mat3, uint8_t m, uint8_t 
 mat3_t mat3_mul(mat3_t mat1, mat3_t mat2);
 mat4_t mat4_mul(mat4_t mat1, mat4_t mat2);
 vec3_t vec3_mul_by_mat3(vec3_t vec, mat3_t mat);
+vec4_t vec4_mul_by_mat4(vec4_t vec, mat4_t mat);
 
 mat3_t mat3_mul_by_scalar(mat3_t mat, float scalar);
 mat4_t mat4_mul_by_scalar(mat4_t mat, float scalar);

@@ -182,6 +182,7 @@ uint8_t init() {
             0, 60,
             0, 0, _OUTPORT_WIDTH_, _OUTPORT_HEIGHT_
         );
+        ui_camera->active = 0;
     // </cameras>
 
     // <game_struct>
@@ -232,6 +233,8 @@ uint8_t init() {
                 .font_texture = load_texture("./game/textures/font.png"),
                 .letters_in_row = 16,
                 .letters_in_col = 8,
+                .letter_width = 6,
+                .letter_height = 12
             };
         // </letters_font>
     // </textures>
@@ -266,6 +269,9 @@ uint8_t init() {
             "u_position\0u_scale\0u_quat_rotation", 3
         );
     // </shaders>
+
+
+    for (int32_t i = 0; i < _MAX_UI_LISTS_AMOUNT_; i++) ui_lists[i].active = 0;
 
     return 0;
 }

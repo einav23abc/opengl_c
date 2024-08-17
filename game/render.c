@@ -157,11 +157,9 @@ void render_game_world() {
     // u_texture
     bind_texture(global_texture, shaders_list[current_shader]->u_texture_loc, 0);
     for (int8_t i = 0; i < 2; i ++) {
-        ivec2_t hovered_tile = get_hovered_tile_position(i);
-
         for (uint32_t x = 0; x < _PLAYER_GRID_WIDTH_; x++) {
             for (uint32_t z = 0; z < _PLAYER_GRID_DEPTH_; z++) {
-                uint8_t hovered = (hovered_tile.x == x && hovered_tile.y == z);
+                uint8_t hovered = (hovered_tiles[i].x == x && hovered_tiles[i].y == z);
                 uint8_t selected = (selected_tile.x == x && selected_tile.y == z && i == 0);
                 int32_t tile = game_struct.players[i].tiles[z*_PLAYER_GRID_DEPTH_ + x];
 
@@ -216,37 +214,39 @@ void render_game_world() {
         }
     }
     // </player tiles>
-
-    draw_string(
-        letters_font,
-        "Hello World!",
-        (vec3_t){
-            .x = 0,
-            .y = 0,
-            .z = -20
-        },
-        quat_from_axis_angles_yzx(-0, -0, -0),
-        24,
-        1, 1, 1
-    );
 }
 
 void render_game_ui() {
+    glClear(GL_DEPTH_BUFFER_BIT);
     glDisable(GL_DEPTH_TEST);
 
-    draw_string(
-        letters_font,
-        "Hello World!",
-        (vec3_t){
-            .x = 0,
-            .y = 248,
-            .z = 0
-        },
-        quat_from_axis_angles_yzx(-0, -0, -0),
-        12,
-        1, 1, 1
-    );
+    // draw ui lists
+    for (int32_t i = 0; i < _MAX_UI_LISTS_AMOUNT_; i++) {
+        if (ui_lists[i].active == 1) {
 
+            uvec2_t box_pos = get_ui_list_box_pos(i);
+            ivec3_t cursor_inside_box = get_ui_list_inside_pos();
+
+            sdm_set_color(1,0,0,1);
+            sdm_draw_rect(box_pos.x, box_pos.y, ui_lists[i].box_w, ui_lists[i].box_h);
+            sdm_set_color(0,1,0,1);
+            sdm_draw_rect(box_pos.x+cursor_inside_box.x, box_pos.y+cursor_inside_box.y, 5, 5);
+        }
+    }
+
+    // draw_string(
+    //     letters_font,
+    //     "Hello World!",
+    //     (vec3_t){
+    //         .x = 0,
+    //         .y = 248,
+    //         .z = 0
+    //     },
+    //     quat_from_axis_angles_yzx(-0, -0, -0),
+    //     12,
+    //     1, 1, 1
+    // );
+    
     glEnable(GL_DEPTH_TEST);
 }
 
@@ -268,7 +268,7 @@ void draw_string(font_t font, char* str, vec3_t pos, quat_t rot, float height, f
     // u_scale
     glUniform3f(
         shaders_list[current_shader]->uniform_locations[1],
-        string_len*height,
+        string_len*font.letter_width*(height/font.letter_height),
         height,
         0
     );

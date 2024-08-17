@@ -28,6 +28,8 @@
 
 #define _MAX_TEXT_ROW_LENGTH (64)
 
+#define _MAX_UI_LISTS_AMOUNT_ (4)
+
 
 typedef struct {
 
@@ -54,8 +56,30 @@ typedef struct {
 typedef struct {
     int32_t letters_in_row;
     int32_t letters_in_col;
+    int32_t letter_width;
+    int32_t letter_height;
     texture_t* font_texture;
 } font_t;
+
+typedef struct {
+    uint8_t active : 1;
+
+    uint8_t box_pos_from_world_pos : 1;
+    float box_world_pos_x;
+    float box_world_pos_y;
+    float box_world_pos_z;
+    uint32_t x;
+    uint32_t y;
+    
+    uint8_t height_down : 1;
+
+    uint32_t box_w;
+    uint32_t box_h;
+
+    uint8_t safe : 1;
+    int32_t parent_ui_list;
+    int32_t child_ui_list;
+} ui_list_t;
 
 
 extern fbo_t* outport_fbo;
@@ -79,6 +103,9 @@ extern mesh_t* centered_cube_mesh;
 
 extern game_t game_struct;
 extern ivec2_t selected_tile;
+extern ivec2_t hovered_tiles[2];
+
+extern ui_list_t ui_lists[_MAX_UI_LISTS_AMOUNT_];
 
 extern float sun_vector_x;
 extern float sun_vector_y;
@@ -94,6 +121,7 @@ void update_game();
 void render_game();
 
 void player_translations_update();
+void update_hovered_tile();
 void camera_update();
 void sun_shadow_map_update();
 
@@ -101,6 +129,21 @@ void render_game_world();
 void render_game_ui();
 void draw_string(font_t font, char* str, vec3_t pos, quat_t rot, float height, float color_r, float color_b, float color_g);
 
+int32_t new_ui_list_assign_id();
+void set_ui_lists_to_unsafe();
+void close_ui_list(int32_t i);
+void make_ui_list_safe(int32_t i);
+void close_unsafe_ui_lists();
+uvec2_t get_ui_list_box_pos(int32_t i);
+/* x = x pos inside box
+ * y = y pos inside box
+ * z = ui_list-index
+ * or `-1` in everything if not inside ui_list
+ */
+ivec3_t get_ui_list_inside_pos();
+
+vec2_t outport_space_position_from_world_space(vec3_t pos);
+vec2_t get_mouse_outport_space_position();
 vec2_t get_mouse_camera_space_position();
 vec3_t get_mouse_world_space_position_at_y(float at_y);
 ivec2_t get_hovered_tile_position(uint8_t player_i);

@@ -1,6 +1,19 @@
 #include "vec_mat_quat.h"
 
 
+
+vec2_t vec2_from_vec3(vec3_t vec) {
+    return (vec2_t){
+        .x = vec.x,
+        .y = vec.y
+    };
+}
+vec2_t vec2_from_vec4(vec4_t vec) {
+    return (vec2_t){
+        .x = vec.x,
+        .y = vec.y
+    };
+}
 vec3_t vec3_from_vec2(vec2_t vec) {
     return (vec3_t){
         .x = vec.x,
@@ -8,7 +21,61 @@ vec3_t vec3_from_vec2(vec2_t vec) {
         .z = 0
     };
 }
+vec3_t vec3_from_vec4(vec4_t vec) {
+    return (vec3_t){
+        .x = vec.x,
+        .y = vec.y,
+        .z = vec.z
+    };
+}
+vec4_t vec4_from_vec2(vec2_t vec) {
+    return (vec4_t){
+        .x = vec.x,
+        .y = vec.y,
+        .z = 0,
+        .w = 0
+    };
+}
+vec4_t vec4_from_vec3(vec3_t vec) {
+    return (vec4_t){
+        .x = vec.x,
+        .y = vec.y,
+        .z = vec.z,
+        .w = 0
+    };
+}
 
+vec2_t vec2(float x, float y) {
+    return (vec2_t){
+        .x = x,
+        .y = y
+    };
+}
+vec2_t vec2_add(vec2_t vec1, vec2_t vec2) {
+    return (vec2_t){
+        .x = vec1.x+vec2.x,
+        .y = vec1.y+vec2.y
+    };
+}
+vec2_t vec2_mul(vec2_t vec1, vec2_t vec2) {
+    return (vec2_t){
+        .x = vec1.x*vec2.x,
+        .y = vec1.y*vec2.y
+    };
+}
+vec2_t vec2_mul_by_scalar(vec2_t vec, float scalar) {
+    return (vec2_t){
+        .x = vec.x*scalar,
+        .y = vec.y*scalar
+    };
+}
+vec3_t vec3(float x, float y, float z) {
+    return (vec3_t){
+        .x = x,
+        .y = y,
+        .z = z
+    };
+}
 vec3_t vec3_add(vec3_t vec1, vec3_t vec2) {
     return (vec3_t){
         .x = vec1.x+vec2.x,
@@ -28,6 +95,38 @@ vec3_t vec3_mul_by_scalar(vec3_t vec, float scalar) {
         .x = vec.x*scalar,
         .y = vec.y*scalar,
         .z = vec.z*scalar
+    };
+}
+vec4_t vec4(float x, float y, float z, float w) {
+    return (vec4_t){
+        .x = x,
+        .y = y,
+        .z = z,
+        .w = w
+    };
+}
+vec4_t vec4_add(vec4_t vec1, vec4_t vec2) {
+    return (vec4_t){
+        .x = vec1.x+vec2.x,
+        .y = vec1.y+vec2.y,
+        .z = vec1.z+vec2.z,
+        .w = vec1.w+vec2.w
+    };
+}
+vec4_t vec4_mul(vec4_t vec1, vec4_t vec2) {
+    return (vec4_t){
+        .x = vec1.x*vec2.x,
+        .y = vec1.y*vec2.y,
+        .z = vec1.z*vec2.z,
+        .w = vec1.w*vec2.w
+    };
+}
+vec4_t vec4_mul_by_scalar(vec4_t vec, float scalar) {
+    return (vec4_t){
+        .x = vec.x*scalar,
+        .y = vec.y*scalar,
+        .z = vec.z*scalar,
+        .w = vec.w*scalar
     };
 }
 
@@ -102,6 +201,24 @@ vec3_t vec3_mul_by_mat3(vec3_t vec, mat3_t mat) {
         .x = res_mat[0],
         .y = res_mat[1],
         .z = res_mat[2]
+    };
+}
+vec4_t vec4_mul_by_mat4(vec4_t vec, mat4_t mat) {
+    float vec_mat[4] = {
+        vec.x,
+        vec.y,
+        vec.z,
+        vec.w
+    };
+
+    float res_mat[4];
+    mat_mul(mat.mat, vec_mat, res_mat, 4, 4, 1);
+    
+    return (vec4_t){
+        .x = res_mat[0],
+        .y = res_mat[1],
+        .z = res_mat[2],
+        .w = res_mat[3]
     };
 }
 

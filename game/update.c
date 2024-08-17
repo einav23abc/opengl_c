@@ -6,6 +6,7 @@
 
 void update() {
     update_game();
+    update_hovered_tile();
     
     return;
 }
@@ -135,6 +136,21 @@ void player_translations_update() {
         }else {
             game_struct.players[i].x_current_translation = game_struct.players[i].hinge_x_position + _TILE_SIZE_;
         }
+    }
+}
+
+void update_hovered_tile() {
+    ivec3_t in_ui_box = get_ui_list_inside_pos();
+    if (in_ui_box.z != -1) {
+        hovered_tiles[0].x = -1;
+        hovered_tiles[0].y = -1;
+        hovered_tiles[1].x = -1;
+        hovered_tiles[1].y = -1;
+        return;
+    }
+    
+    for (int32_t i = 0; i < 2; i++) {
+        hovered_tiles[i] = get_hovered_tile_position(i);
     }
 }
 
