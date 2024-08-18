@@ -12,7 +12,9 @@ void handle_event() {
                 if (in_ui_box.z != -1) {
                     make_ui_list_safe(in_ui_box.z);
 
-                    int32_t in_button = floor(((float)in_ui_box.y)/_UI_LIST_BUTTON_HEIGHT_);
+                    int32_t in_button = floor(((float)in_ui_box.y)/(ui_lists[in_ui_box.z].font->letter_height + ui_lists[in_ui_box.z].button_padding*2));
+                    if (in_button < 0 || in_button >= ui_lists[in_ui_box.z].buttons_amount) return;
+
                     button_callback_t button_callback = ui_lists[in_ui_box.z].button_callbacks[in_button];
                     if (button_callback != NULL){
                         button_callback(in_ui_box.z, in_button);
@@ -38,7 +40,6 @@ void handle_event() {
     return;
 }
 
-#include "ui_list_button_callbacks.c"
 
 void mouse_press_in_game() {
     if (game_struct.game_ended == 1) {
@@ -94,6 +95,10 @@ void mouse_press_in_game() {
                 .active = 1,
                 .permenant = 0,
 
+                .font = &letters_font,
+                .padding = 2,
+                .button_padding = 2,
+
                 .box_pos_from_world_pos = 1,
                 .box_world_pos_x = selected_tile.x*_TILE_SIZE_ + game_struct.players[0].x_current_translation + _TILE_SIZE_*0.5,
                 .box_world_pos_y = game_struct.players[0].y_current_translation,
@@ -117,6 +122,10 @@ void mouse_press_in_game() {
             ui_lists[ui_list_id] = (ui_list_t){
                 .active = 1,
                 .permenant = 0,
+
+                .font = &letters_font,
+                .padding = 2,
+                .button_padding = 2,
 
                 .box_pos_from_world_pos = 1,
                 .box_world_pos_x = selected_tile.x*_TILE_SIZE_ + game_struct.players[0].x_current_translation + _TILE_SIZE_*0.5,
@@ -146,6 +155,10 @@ void mouse_press_in_game() {
                 .active = 1,
                 .permenant = 0,
 
+                .font = &letters_font,
+                .padding = 2,
+                .button_padding = 2,
+
                 .box_pos_from_world_pos = 1,
                 .box_world_pos_x = selected_tile.x*_TILE_SIZE_ + game_struct.players[1].x_current_translation + _TILE_SIZE_*0.5,
                 .box_world_pos_y = game_struct.players[1].y_current_translation,
@@ -155,7 +168,7 @@ void mouse_press_in_game() {
 
                 .buttons_amount = 1,
                 .button_strings = {"attack"},
-                .button_info_strings = {"destroy this building\n* -1\5"},
+                .button_info_strings = {"destroy this building\n* -1\x19\x1a"},
                 .button_callbacks = {&ui_list_attack_button_callback},
 
                 .child_ui_list = -1,

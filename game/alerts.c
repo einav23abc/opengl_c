@@ -19,7 +19,7 @@ int32_t new_alert_assign_id() {
     return min_time_to_live_i;
 }
 uvec2_t get_alert_box_size(int32_t i) {
-    return get_str_boxed_size(alerts[i].string, _ALERT_ROW_HEIGHT_);
+    return get_str_boxed_size(alerts[i].string, alerts[i].font->letter_height);
 }
 uvec2_t get_alert_box_pos(int32_t i) {
     float x = 0;
@@ -38,8 +38,8 @@ uvec2_t get_alert_box_pos(int32_t i) {
         y += alerts[i].easing_function(t) * alerts[i].y_full_transform;
     }
 
-    if (x < _ALERT_PADDING_) x = _ALERT_PADDING_;
-    if (y < _ALERT_PADDING_) y = _ALERT_PADDING_;
+    if (x < alerts[i].padding) x = alerts[i].padding;
+    if (y < alerts[i].padding) y = alerts[i].padding;
 
     return (uvec2_t){
         .x = x,
@@ -48,32 +48,35 @@ uvec2_t get_alert_box_pos(int32_t i) {
 }
 uvec2_t get_alert_box_pos_padded(int32_t i) {
     uvec2_t box_pos = get_alert_box_pos(i);
-    box_pos.x -= _ALERT_PADDING_;
-    box_pos.y -= _ALERT_PADDING_;
+    box_pos.x -= alerts[i].padding;
+    box_pos.y -= alerts[i].padding;
     return box_pos;
 }
 void add_error_alert_at_cursor(char* string) {
     vec2_t mouse_outport_space_position = get_mouse_outport_space_position();
 
-    uvec2_t string_size = get_str_boxed_size(string, _ALERT_ROW_HEIGHT_);
+    uvec2_t string_size = get_str_boxed_size(string, letters_font.letter_height);
 
     float x = mouse_outport_space_position.x - string_size.x*0.5;
     float y = mouse_outport_space_position.y - string_size.y*0.5;
-    if (x + string_size.x + _ALERT_PADDING_ >= _OUTPORT_WIDTH_) {
-        x = _OUTPORT_WIDTH_ - string_size.x - _ALERT_PADDING_;
+    if (x + string_size.x + 3 >= _OUTPORT_WIDTH_) {
+        x = _OUTPORT_WIDTH_ - string_size.x - 3;
     }
-    if (x - _ALERT_PADDING_ <= 0) {
-        x = _ALERT_PADDING_;
+    if (x - 3 <= 0) {
+        x = 3;
     }
-    if (y + string_size.y + _ALERT_PADDING_ >= _OUTPORT_HEIGHT_) {
-        y = _OUTPORT_HEIGHT_ - string_size.y - _ALERT_PADDING_;
+    if (y + string_size.y + 3 >= _OUTPORT_HEIGHT_) {
+        y = _OUTPORT_HEIGHT_ - string_size.y - 3;
     }
-    if (y - _ALERT_PADDING_ <= 0) {
-        y = _ALERT_PADDING_;
+    if (y - 3 <= 0) {
+        y = 3;
     }
     
     alerts[0] = (alert_t){
         .time_to_live = 3000,
+
+        .font = &letters_font,
+        .padding = 3,
 
         .initial_time_to_live = 3000,
         .y_full_transform = string_size.y*3,

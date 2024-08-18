@@ -4,6 +4,8 @@
         "*.asm": "nasm",
         "cmath": "c",
         "billboard_icon.h": "c",
-        "alerts.h": "c"
+        "alerts.h": "c",
+        "engine.h": "c",
+        "billboard.h": "c"
     }
 }

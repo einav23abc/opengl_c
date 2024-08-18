@@ -5,9 +5,6 @@
 #include <stdint.h>
 
 #include "../engine/engine.h"
-#include "billboard.h"
-#include "ui_lists.h"
-#include "alerts.h"
 
 
 #define _OUTPORT_WIDTH_ (380*2)
@@ -104,7 +101,8 @@ typedef struct {
 
 
 enum PAGES {
-    PAGE_IN_GAME
+    PAGE_IN_GAME,
+    PAGE_MAIN_MENU
 };
 
 
@@ -116,12 +114,14 @@ extern texture_t* floor_texture;
 extern texture_t* global_texture;
 
 extern font_t letters_font;
+extern font_t big_letters_font;
 
 extern shader_t* global_shader;
 extern shader_t* ui_shader;
 extern shader_t* font_shader;
 extern shader_t* cooldown_billboards_shader;
 extern shader_t* tile_effect_shader;
+extern shader_t* build_preview_shader;
 
 extern vec3_t camera_pos;
 extern camera_t* camera;
@@ -150,27 +150,27 @@ extern shader_t* sun_shadow_map_shader;
 
 
 
-
-void init_game();
-
 void mouse_press_in_game();
 
-void update_game();
-void render_game();
+void render_main_menu();
 
+void update_game();
 void player_translations_update();
 void tile_cooldowns_update();
 void update_hovered_tile();
 void camera_update();
 void sun_shadow_map_update();
 
+void render_game();
+void draw_tile(int32_t player_i, int32_t tile_x, int32_t tile_z, int32_t tile_type);
 void render_game_world();
+void render_game_effects();
 void render_game_ui();
 // returns the drawn width
 float draw_string(font_t font, char* str, vec3_t pos, quat_t rot, float height, float color_r, float color_b, float color_g);
 
 uvec2_t get_str_boxed_size(char* str, float row_height);
-void draw_str_boxed(char* str, uint32_t left_x, uint32_t bottom_y, uint32_t padding, uint32_t row_height);
+void draw_str_boxed(char* str, font_t font, uint32_t left_x, uint32_t bottom_y, uint32_t padding, uint32_t row_height);
 
 vec2_t outport_space_position_from_world_space(vec3_t pos);
 vec2_t get_mouse_outport_space_position();
@@ -180,10 +180,25 @@ ivec2_t get_hovered_tile_position(uint8_t player_i);
 
 int32_t has_enough_resources(int32_t player_id, int32_t tile_type_id);
 
+void enter_main_menu();
+void exit_main_menu();
+void enter_game();
 void exit_game_button_callback(int32_t ui_list_id, int32_t button_id);
 void switch_turn_button_callback(int32_t ui_list_id, int32_t button_id);
+void request_switch_turn();
 void switch_turn();
 void player_1_turn();
 void player_1_ai_turn();
+
+void ui_list_build_specific_button_callback(int32_t ui_list_id, int32_t button_id);
+void ui_list_build_button_callback(int32_t ui_list_id, int32_t button_id);
+void ui_list_attack_button_callback(int32_t ui_list_id, int32_t button_id);
+void ui_list_demolish_sure_button_callback(int32_t ui_list_id, int32_t button_id);
+void ui_list_demolish_button_callback(int32_t ui_list_id, int32_t button_id);
+
+
+#include "billboard.h"
+#include "ui_lists.h"
+#include "alerts.h"
 
 #endif

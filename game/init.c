@@ -360,6 +360,16 @@ uint8_t init() {
                 .letter_height = 12
             };
         // </letters_font>
+
+        // <big_letters_font>
+            big_letters_font = (font_t){
+                .font_texture = load_texture("./game/textures/font_big.png"),
+                .letters_in_row = 16,
+                .letters_in_col = 10,
+                .letter_width = 12,
+                .letter_height = 24
+            };
+        // </big_letters_font>
     // </textures>
 
     // <shaders>
@@ -394,6 +404,13 @@ uint8_t init() {
         tile_effect_shader = create_shader_from_files(
             "./game/shaders/tile_effect.vert",
             "./game/shaders/tile_effect.frag",
+            "in_vertex_position\0in_vertex_texcoord", 2,
+            "u_position\0u_scale\0u_quat_rotation\0u_color\0u_speed\0u_freq\0u_time", 7
+        );
+
+        build_preview_shader = create_shader_from_files(
+            "./game/shaders/build_preview.vert",
+            "./game/shaders/build_preview.frag",
             "in_vertex_position\0in_vertex_texcoord", 2,
             "u_position\0u_scale\0u_quat_rotation\0u_color\0u_speed\0u_freq\0u_time", 7
         );
@@ -507,45 +524,50 @@ uint8_t init() {
                 build_info_string[c+1] = ' ';
                 build_info_string[c+2] = '-';
                 build_info_string[c+3] = '0' + tile_type_properties[i].cost.population;
-                build_info_string[c+4] = '\1';
-                build_info_string[c+5] = '\n';
-                c += 6;
+                build_info_string[c+4] = '\x11';
+                build_info_string[c+5] = '\x12';
+                build_info_string[c+6] = '\n';
+                c += 7;
             }
             if (tile_type_properties[i].cost.wheat > 0) {
                 build_info_string[c  ] = '*';
                 build_info_string[c+1] = ' ';
                 build_info_string[c+2] = '-';
                 build_info_string[c+3] = '0' + tile_type_properties[i].cost.wheat;
-                build_info_string[c+4] = '\2';
-                build_info_string[c+5] = '\n';
-                c += 6;
+                build_info_string[c+4] = '\x13';
+                build_info_string[c+5] = '\x14';
+                build_info_string[c+6] = '\n';
+                c += 7;
             }
             if (tile_type_properties[i].cost.wood > 0) {
                 build_info_string[c  ] = '*';
                 build_info_string[c+1] = ' ';
                 build_info_string[c+2] = '-';
                 build_info_string[c+3] = '0' + tile_type_properties[i].cost.wood;
-                build_info_string[c+4] = '\3';
-                build_info_string[c+5] = '\n';
-                c += 6;
+                build_info_string[c+4] = '\x15';
+                build_info_string[c+5] = '\x16';
+                build_info_string[c+6] = '\n';
+                c += 7;
             }
             if (tile_type_properties[i].cost.stone > 0) {
                 build_info_string[c  ] = '*';
                 build_info_string[c+1] = ' ';
                 build_info_string[c+2] = '-';
                 build_info_string[c+3] = '0' + tile_type_properties[i].cost.stone;
-                build_info_string[c+4] = '\4';
-                build_info_string[c+5] = '\n';
-                c += 6;
+                build_info_string[c+4] = '\x17';
+                build_info_string[c+5] = '\x18';
+                build_info_string[c+6] = '\n';
+                c += 7;
             }
             if (tile_type_properties[i].cost.soldiers > 0) {
                 build_info_string[c  ] = '*';
                 build_info_string[c+1] = ' ';
                 build_info_string[c+2] = '-';
                 build_info_string[c+3] = '0' + tile_type_properties[i].cost.soldiers;
-                build_info_string[c+4] = '\5';
-                build_info_string[c+5] = '\n';
-                c += 6;
+                build_info_string[c+4] = '\x19';
+                build_info_string[c+5] = '\x1a';
+                build_info_string[c+6] = '\n';
+                c += 7;
             }
             
 
@@ -576,45 +598,50 @@ uint8_t init() {
                 build_info_string[c+1] = ' ';
                 build_info_string[c+2] = '+';
                 build_info_string[c+3] = '0' + tile_type_properties[i].give.population;
-                build_info_string[c+4] = '\1';
-                build_info_string[c+5] = '\n';
-                c += 6;
+                build_info_string[c+4] = '\x11';
+                build_info_string[c+5] = '\x12';
+                build_info_string[c+6] = '\n';
+                c += 7;
             }
             if (tile_type_properties[i].give.wheat > 0) {
                 build_info_string[c  ] = '*';
                 build_info_string[c+1] = ' ';
                 build_info_string[c+2] = '+';
                 build_info_string[c+3] = '0' + tile_type_properties[i].give.wheat;
-                build_info_string[c+4] = '\2';
-                build_info_string[c+5] = '\n';
-                c += 6;
+                build_info_string[c+4] = '\x13';
+                build_info_string[c+5] = '\x14';
+                build_info_string[c+6] = '\n';
+                c += 7;
             }
             if (tile_type_properties[i].give.wood > 0) {
                 build_info_string[c  ] = '*';
                 build_info_string[c+1] = ' ';
                 build_info_string[c+2] = '+';
                 build_info_string[c+3] = '0' + tile_type_properties[i].give.wood;
-                build_info_string[c+4] = '\3';
-                build_info_string[c+5] = '\n';
-                c += 6;
+                build_info_string[c+4] = '\x15';
+                build_info_string[c+5] = '\x16';
+                build_info_string[c+6] = '\n';
+                c += 7;
             }
             if (tile_type_properties[i].give.stone > 0) {
                 build_info_string[c  ] = '*';
                 build_info_string[c+1] = ' ';
                 build_info_string[c+2] = '+';
                 build_info_string[c+3] = '0' + tile_type_properties[i].give.stone;
-                build_info_string[c+4] = '\4';
-                build_info_string[c+5] = '\n';
-                c += 6;
+                build_info_string[c+4] = '\x17';
+                build_info_string[c+5] = '\x18';
+                build_info_string[c+6] = '\n';
+                c += 7;
             }
             if (tile_type_properties[i].give.soldiers > 0) {
                 build_info_string[c  ] = '*';
                 build_info_string[c+1] = ' ';
                 build_info_string[c+2] = '+';
                 build_info_string[c+3] = '0' + tile_type_properties[i].give.soldiers;
-                build_info_string[c+4] = '\5';
-                build_info_string[c+5] = '\n';
-                c += 6;
+                build_info_string[c+4] = '\x19';
+                build_info_string[c+5] = '\x1a';
+                build_info_string[c+6] = '\n';
+                c += 7;
             }
 
             // remove newline and add null terminator
@@ -631,37 +658,42 @@ uint8_t init() {
             if (tile_type_properties[i].give.population > 0) {
                 give_alert_string[c  ] = '+';
                 give_alert_string[c+1] = '0' + tile_type_properties[i].give.population;
-                give_alert_string[c+2] = '\1';
-                give_alert_string[c+3] = '\n';
-                c += 4;
+                give_alert_string[c+2] = '\x11';
+                give_alert_string[c+3] = '\x12';
+                give_alert_string[c+4] = '\n';
+                c += 5;
             }
             if (tile_type_properties[i].give.wheat > 0) {
                 give_alert_string[c  ] = '+';
                 give_alert_string[c+1] = '0' + tile_type_properties[i].give.wheat;
-                give_alert_string[c+2] = '\2';
-                give_alert_string[c+3] = '\n';
-                c += 4;
+                give_alert_string[c+2] = '\x13';
+                give_alert_string[c+3] = '\x14';
+                give_alert_string[c+4] = '\n';
+                c += 5;
             }
             if (tile_type_properties[i].give.wood > 0) {
                 give_alert_string[c  ] = '+';
                 give_alert_string[c+1] = '0' + tile_type_properties[i].give.wood;
-                give_alert_string[c+2] = '\3';
-                give_alert_string[c+3] = '\n';
-                c += 4;
+                give_alert_string[c+2] = '\x15';
+                give_alert_string[c+3] = '\x16';
+                give_alert_string[c+4] = '\n';
+                c += 5;
             }
             if (tile_type_properties[i].give.stone > 0) {
                 give_alert_string[c  ] = '+';
                 give_alert_string[c+1] = '0' + tile_type_properties[i].give.stone;
-                give_alert_string[c+2] = '\4';
-                give_alert_string[c+3] = '\n';
-                c += 4;
+                give_alert_string[c+2] = '\x17';
+                give_alert_string[c+3] = '\x18';
+                give_alert_string[c+4] = '\n';
+                c += 5;
             }
             if (tile_type_properties[i].give.soldiers > 0) {
                 give_alert_string[c  ] = '+';
                 give_alert_string[c+1] = '0' + tile_type_properties[i].give.soldiers;
-                give_alert_string[c+2] = '\5';
-                give_alert_string[c+3] = '\n';
-                c += 4;
+                give_alert_string[c+2] = '\x19';
+                give_alert_string[c+3] = '\x1a';
+                give_alert_string[c+4] = '\n';
+                c += 5;
             }
 
             // remove newline and add null terminator
@@ -683,45 +715,50 @@ uint8_t init() {
                 demolish_info_string[c+1] = ' ';
                 demolish_info_string[c+2] = '+';
                 demolish_info_string[c+3] = '0' + tile_type_properties[i].give.population;
-                demolish_info_string[c+4] = '\1';
-                demolish_info_string[c+5] = '\n';
-                c += 6;
+                demolish_info_string[c+4] = '\x11';
+                demolish_info_string[c+5] = '\x12';
+                demolish_info_string[c+6] = '\n';
+                c += 7;
             }
             if (tile_type_properties[i].give.wheat > 0) {
                 demolish_info_string[c  ] = '*';
                 demolish_info_string[c+1] = ' ';
                 demolish_info_string[c+2] = '+';
                 demolish_info_string[c+3] = '0' + tile_type_properties[i].give.wheat;
-                demolish_info_string[c+4] = '\2';
-                demolish_info_string[c+5] = '\n';
-                c += 6;
+                demolish_info_string[c+4] = '\x13';
+                demolish_info_string[c+5] = '\x14';
+                demolish_info_string[c+6] = '\n';
+                c += 7;
             }
             if (tile_type_properties[i].give.wood > 0) {
                 demolish_info_string[c  ] = '*';
                 demolish_info_string[c+1] = ' ';
                 demolish_info_string[c+2] = '+';
                 demolish_info_string[c+3] = '0' + tile_type_properties[i].give.wood;
-                demolish_info_string[c+4] = '\3';
-                demolish_info_string[c+5] = '\n';
-                c += 6;
+                demolish_info_string[c+4] = '\x15';
+                demolish_info_string[c+5] = '\x16';
+                demolish_info_string[c+6] = '\n';
+                c += 7;
             }
             if (tile_type_properties[i].give.stone > 0) {
                 demolish_info_string[c  ] = '*';
                 demolish_info_string[c+1] = ' ';
                 demolish_info_string[c+2] = '+';
                 demolish_info_string[c+3] = '0' + tile_type_properties[i].give.stone;
-                demolish_info_string[c+4] = '\4';
-                demolish_info_string[c+5] = '\n';
-                c += 6;
+                demolish_info_string[c+4] = '\x17';
+                demolish_info_string[c+5] = '\x18';
+                demolish_info_string[c+6] = '\n';
+                c += 7;
             }
             if (tile_type_properties[i].give.soldiers > 0) {
                 demolish_info_string[c  ] = '*';
                 demolish_info_string[c+1] = ' ';
                 demolish_info_string[c+2] = '+';
                 demolish_info_string[c+3] = '0' + tile_type_properties[i].give.soldiers;
-                demolish_info_string[c+4] = '\5';
-                demolish_info_string[c+5] = '\n';
-                c += 6;
+                demolish_info_string[c+4] = '\x19';
+                demolish_info_string[c+5] = '\x1a';
+                demolish_info_string[c+6] = '\n';
+                c += 7;
             }
 
             // remove newline and add null terminator
@@ -735,87 +772,7 @@ uint8_t init() {
     for (int32_t i = 0; i < _MAX_UI_LISTS_AMOUNT_; i++) ui_lists[i].active = 0;
     for (int32_t i = 0; i < _MAX_ALERTS_AMOUNT_; i++) alerts[i].time_to_live = 0;
 
-    init_game();
+    enter_game();
 
     return 0;
-}
-
-void init_game() {
-    selected_tile.x = -1;
-    selected_tile.y = -1;
-    hovered_tiles[0].x = -1;
-    hovered_tiles[0].y = -1;
-    hovered_tiles[1].x = -1;
-    hovered_tiles[1].y = -1;
-
-    game_struct.player_turn = 0;
-    game_struct.game_ended = 0;
-
-    in_cooldowns_translation = 0;
-
-    player_translations_update();
-    game_struct.players[0].y_lerp_start_translation = game_struct.players[0].y_translation;
-    game_struct.players[0].y_current_translation = game_struct.players[0].y_translation;
-    game_struct.players[1].y_lerp_start_translation = game_struct.players[1].y_translation;
-    game_struct.players[1].y_current_translation = game_struct.players[1].y_translation;
-
-    game_struct.players[0].translation_lerp_time = 0;
-    game_struct.players[1].translation_lerp_time = 0;
-
-    for (uint32_t i = 0; i < _PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_; i++) {
-        game_struct.players[0].tiles[i].type = TILE_TYPE_EMPTY;
-        game_struct.players[0].tiles[i].camoflauged = 0;
-        game_struct.players[0].tiles[i].cooldown_timer = 0;
-        game_struct.players[0].tiles[i].curent_cooldown_timer = 0;
-        game_struct.players[1].tiles[i].type = TILE_TYPE_EMPTY;
-        game_struct.players[1].tiles[i].camoflauged = 0;
-        game_struct.players[1].tiles[i].cooldown_timer = 0;
-        game_struct.players[1].tiles[i].curent_cooldown_timer = 0;
-    }
-    game_struct.players[0].tiles[13].type = TILE_TYPE_HOUSE;
-    game_struct.players[0].tiles[13].cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
-    game_struct.players[0].tiles[13].curent_cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
-    game_struct.players[0].tiles[19].type = TILE_TYPE_MINE;
-    game_struct.players[0].tiles[19].cooldown_timer = tile_type_properties[TILE_TYPE_MINE].give_cooldown;
-    game_struct.players[0].tiles[19].curent_cooldown_timer = tile_type_properties[TILE_TYPE_MINE].give_cooldown;
-    game_struct.players[1].tiles[13].type = TILE_TYPE_HOUSE;
-    game_struct.players[1].tiles[13].cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
-    game_struct.players[1].tiles[13].curent_cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
-    game_struct.players[1].tiles[19].type = TILE_TYPE_MINE;
-    game_struct.players[1].tiles[19].cooldown_timer = tile_type_properties[TILE_TYPE_MINE].give_cooldown;
-    game_struct.players[1].tiles[19].curent_cooldown_timer = tile_type_properties[TILE_TYPE_MINE].give_cooldown;
-
-    game_struct.players[0].wheight = -6;
-    game_struct.players[0].resources.wood = 2;
-    game_struct.players[0].resources.stone = 2;
-    game_struct.players[0].resources.wheat = 2;
-    game_struct.players[0].resources.soldiers = 0;
-    game_struct.players[0].resources.population = 2;
-    game_struct.players[1].wheight = 6;
-    game_struct.players[1].resources.wood = 2;
-    game_struct.players[1].resources.stone = 2;
-    game_struct.players[1].resources.wheat = 2;
-    game_struct.players[1].resources.soldiers = 0;
-    game_struct.players[1].resources.population = 2;
-
-    // next turn - ui list
-    int32_t ui_list_id = new_ui_list_assign_id();
-    ui_lists[ui_list_id] = (ui_list_t){
-        .active = 1,
-        .permenant = 1,
-
-        .box_pos_from_world_pos = 0,
-        .x = _UI_LIST_PADDING_,
-        .y = _OUTPORT_HEIGHT_ - _UI_LIST_PADDING_,
-
-        .buttons_amount = 1,
-        .button_strings = {"end turn"},
-        .button_info_strings = {""},
-        .button_callbacks = {&switch_turn_button_callback},
-
-        .child_ui_list = -1,
-        .parent_ui_list = -1
-    };
-
-    page = PAGE_IN_GAME;
 }

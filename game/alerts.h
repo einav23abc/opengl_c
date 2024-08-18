@@ -5,8 +5,6 @@
 
 
 #define _MAX_ALERTS_AMOUNT_ (8)
-#define _ALERT_PADDING_ (3)
-#define _ALERT_ROW_HEIGHT_ (12)
 
 typedef struct {
     int32_t time_to_live;
@@ -14,6 +12,9 @@ typedef struct {
     int32_t initial_time_to_live;
     float y_full_transform;
     easing_function_t easing_function;
+
+    font_t* font;
+    int32_t padding;
 
     uint8_t box_pos_from_world_pos : 1;
     float box_world_pos_x;

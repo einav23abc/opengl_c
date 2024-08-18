@@ -11,12 +11,14 @@ texture_t* floor_texture;
 texture_t* global_texture;
 
 font_t letters_font;
+font_t big_letters_font;
 
 shader_t* global_shader;
 shader_t* ui_shader;
 shader_t* font_shader;
 shader_t* cooldown_billboards_shader;
 shader_t* tile_effect_shader;
+shader_t* build_preview_shader;
 
 vec3_t camera_pos;
 camera_t* camera;
@@ -134,7 +136,7 @@ uvec2_t get_str_boxed_size(char* str, float row_height) {
         .y = h
     };
 }
-void draw_str_boxed(char* str, uint32_t left_x, uint32_t bottom_y, uint32_t padding, uint32_t row_height) {
+void draw_str_boxed(char* str, font_t font, uint32_t left_x, uint32_t bottom_y, uint32_t padding, uint32_t row_height) {
     uvec2_t str_size = get_str_boxed_size(str, row_height);
     
     uint32_t top_y = bottom_y + str_size.y;
@@ -167,7 +169,7 @@ void draw_str_boxed(char* str, uint32_t left_x, uint32_t bottom_y, uint32_t padd
         }
 
         x += draw_string(
-            letters_font,
+            font,
             one_char_str,
             (vec3_t){
                 .x = left_x + x,
@@ -261,11 +263,104 @@ int32_t has_enough_resources(int32_t player_id, int32_t tile_type_id) {
     return 1;
 }
 
+void enter_main_menu() {
+    close_all_ui_lists();
+    // set up ui lists
 
+}
+void exit_main_menu() {
+
+}
+void enter_game() {
+    selected_tile.x = -1;
+    selected_tile.y = -1;
+    hovered_tiles[0].x = -1;
+    hovered_tiles[0].y = -1;
+    hovered_tiles[1].x = -1;
+    hovered_tiles[1].y = -1;
+
+    game_struct.player_turn = 0;
+    game_struct.game_ended = 0;
+
+    in_cooldowns_translation = 0;
+
+    player_translations_update();
+    game_struct.players[0].y_lerp_start_translation = game_struct.players[0].y_translation;
+    game_struct.players[0].y_current_translation = game_struct.players[0].y_translation;
+    game_struct.players[1].y_lerp_start_translation = game_struct.players[1].y_translation;
+    game_struct.players[1].y_current_translation = game_struct.players[1].y_translation;
+
+    game_struct.players[0].translation_lerp_time = 0;
+    game_struct.players[1].translation_lerp_time = 0;
+
+    for (uint32_t i = 0; i < _PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_; i++) {
+        game_struct.players[0].tiles[i].type = TILE_TYPE_EMPTY;
+        game_struct.players[0].tiles[i].camoflauged = 0;
+        game_struct.players[0].tiles[i].cooldown_timer = 0;
+        game_struct.players[0].tiles[i].curent_cooldown_timer = 0;
+        game_struct.players[1].tiles[i].type = TILE_TYPE_EMPTY;
+        game_struct.players[1].tiles[i].camoflauged = 0;
+        game_struct.players[1].tiles[i].cooldown_timer = 0;
+        game_struct.players[1].tiles[i].curent_cooldown_timer = 0;
+    }
+    game_struct.players[0].tiles[13].type = TILE_TYPE_HOUSE;
+    game_struct.players[0].tiles[13].cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
+    game_struct.players[0].tiles[13].curent_cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
+    game_struct.players[0].tiles[19].type = TILE_TYPE_MINE;
+    game_struct.players[0].tiles[19].cooldown_timer = tile_type_properties[TILE_TYPE_MINE].give_cooldown;
+    game_struct.players[0].tiles[19].curent_cooldown_timer = tile_type_properties[TILE_TYPE_MINE].give_cooldown;
+    game_struct.players[1].tiles[13].type = TILE_TYPE_HOUSE;
+    game_struct.players[1].tiles[13].cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
+    game_struct.players[1].tiles[13].curent_cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
+    game_struct.players[1].tiles[19].type = TILE_TYPE_MINE;
+    game_struct.players[1].tiles[19].cooldown_timer = tile_type_properties[TILE_TYPE_MINE].give_cooldown;
+    game_struct.players[1].tiles[19].curent_cooldown_timer = tile_type_properties[TILE_TYPE_MINE].give_cooldown;
+
+    game_struct.players[0].wheight = 0;
+    game_struct.players[0].resources.wood = 2;
+    game_struct.players[0].resources.stone = 2;
+    game_struct.players[0].resources.wheat = 2;
+    game_struct.players[0].resources.soldiers = 0;
+    game_struct.players[0].resources.population = 2;
+    game_struct.players[1].wheight = 0;
+    game_struct.players[1].resources.wood = 2;
+    game_struct.players[1].resources.stone = 2;
+    game_struct.players[1].resources.wheat = 2;
+    game_struct.players[1].resources.soldiers = 0;
+    game_struct.players[1].resources.population = 2;
+
+    // next turn - ui list
+    int32_t ui_list_id = new_ui_list_assign_id();
+    ui_lists[ui_list_id] = (ui_list_t){
+        .active = 1,
+        .permenant = 1,
+
+        .font = &letters_font,
+        .padding = 0,
+        .button_padding = 5,
+
+        .box_pos_from_world_pos = 0,
+        .x = 0,
+        .y = _OUTPORT_HEIGHT_,
+
+        .buttons_amount = 1,
+        .button_strings = {"end turn"},
+        .button_info_strings = {""},
+        .button_callbacks = {&switch_turn_button_callback},
+
+        .child_ui_list = -1,
+        .parent_ui_list = -1
+    };
+
+    page = PAGE_IN_GAME;
+}
 void exit_game_button_callback(int32_t ui_list_id, int32_t button_id) {
     
 }
 void switch_turn_button_callback(int32_t ui_list_id, int32_t button_id) {
+    request_switch_turn();
+}
+void request_switch_turn() {
     if (game_struct.game_ended == 1) {
         add_error_alert_at_cursor("The game has ended");
         close_unperm_ui_lists();
@@ -387,4 +482,221 @@ void player_1_ai_turn() {
 
     // end turn after transitions will end
     player1_ai_played = 1;
+}
+
+
+void ui_list_build_specific_button_callback(int32_t ui_list_id, int32_t button_id) {
+    if (game_struct.game_ended == 1) {
+        add_error_alert_at_cursor("The game has ended");
+        close_unperm_ui_lists();
+        // unselect tile
+        selected_tile.x = -1;
+        selected_tile.y = -1;
+        return;
+    }
+
+    int32_t tile_type_id = button_id;
+    tile_type_t* tile_type = &(tile_type_properties[tile_type_id]);
+
+    if (has_enough_resources(0, tile_type_id) == 0) {
+        // not enough resources
+        add_error_alert_at_cursor("Not enough resources");
+        make_ui_list_safe(ui_list_id);
+        return;
+    }
+
+    game_struct.players[0].wheight += 1;
+    game_struct.players[1].wheight -= 1;
+    game_struct.players[0].resources.wood       -= tile_type->cost.wood;
+    game_struct.players[0].resources.stone      -= tile_type->cost.stone;
+    game_struct.players[0].resources.wheat      -= tile_type->cost.wheat;
+    game_struct.players[0].resources.population -= tile_type->cost.population;
+    game_struct.players[0].resources.soldiers   -= tile_type->cost.soldiers;
+    game_struct.players[0].tiles[selected_tile.y*_PLAYER_GRID_WIDTH_ + selected_tile.x].cooldown_timer        = tile_type->give_cooldown;
+    game_struct.players[0].tiles[selected_tile.y*_PLAYER_GRID_WIDTH_ + selected_tile.x].curent_cooldown_timer = tile_type->give_cooldown;
+    game_struct.players[0].tiles[selected_tile.y*_PLAYER_GRID_WIDTH_ + selected_tile.x].type = tile_type_id;
+    close_unperm_ui_lists();
+    // unselect tile
+    selected_tile.x = -1;
+    selected_tile.y = -1;
+}
+void ui_list_build_button_callback(int32_t ui_list_id, int32_t button_id) {
+    if (game_struct.game_ended == 1) {
+        add_error_alert_at_cursor("The game has ended");
+        close_unperm_ui_lists();
+        // unselect tile
+        selected_tile.x = -1;
+        selected_tile.y = -1;
+        return;
+    }
+
+    // close child (if exists)
+    close_ui_list(ui_lists[ui_list_id].child_ui_list);
+
+    // create child
+    int32_t new_ui_list_id = new_ui_list_assign_id();
+    ui_lists[new_ui_list_id] = (ui_list_t){
+        .active = 1,
+        .permenant = 0,
+
+        .font = &letters_font,
+        .padding = 2,
+        .button_padding = 2,
+
+        .box_pos_from_world_pos = 1,
+        .box_world_pos_x = ui_lists[ui_list_id].box_world_pos_x,
+        .box_world_pos_y = ui_lists[ui_list_id].box_world_pos_y,
+        .box_world_pos_z = ui_lists[ui_list_id].box_world_pos_z,
+        .x = get_ui_list_width(ui_list_id) + ui_lists[ui_list_id].padding + 2,
+        .y = 0,
+
+        .buttons_amount = _TILE_TYPES_AMOUNT_,
+        .button_strings = {"house", "barracks", "field", "mine", "forest"},
+        .button_info_strings = {
+            tile_type_properties[0].build_info_string,
+            tile_type_properties[1].build_info_string,
+            tile_type_properties[2].build_info_string,
+            tile_type_properties[3].build_info_string,
+            tile_type_properties[4].build_info_string
+        },
+        .button_callbacks = {
+            &ui_list_build_specific_button_callback,
+            &ui_list_build_specific_button_callback,
+            &ui_list_build_specific_button_callback,
+            &ui_list_build_specific_button_callback,
+            &ui_list_build_specific_button_callback
+        },
+
+        .child_ui_list = -1,
+        .parent_ui_list = ui_list_id
+    };
+    ui_lists[ui_list_id].child_ui_list = new_ui_list_id;
+
+    make_ui_list_safe(new_ui_list_id);
+}
+void ui_list_attack_button_callback(int32_t ui_list_id, int32_t button_id) {
+    if (game_struct.game_ended == 1) {
+        add_error_alert_at_cursor("The game has ended");
+        close_unperm_ui_lists();
+        // unselect tile
+        selected_tile.x = -1;
+        selected_tile.y = -1;
+        return;
+    }
+
+    if (game_struct.players[0].resources.soldiers < 1) {
+        // not enough resources
+        add_error_alert_at_cursor("Not enough resources");
+        make_ui_list_safe(ui_list_id);
+        return;
+    }
+
+    game_struct.players[0].resources.soldiers -= 1;
+    game_struct.players[0].wheight += 1;
+    game_struct.players[1].wheight -= 1;
+
+    game_struct.players[1].tiles[selected_tile.y*_PLAYER_GRID_WIDTH_ + selected_tile.x].type = TILE_TYPE_EMPTY;
+    game_struct.players[1].tiles[selected_tile.y*_PLAYER_GRID_WIDTH_ + selected_tile.x].cooldown_timer        = 0;
+    game_struct.players[1].tiles[selected_tile.y*_PLAYER_GRID_WIDTH_ + selected_tile.x].curent_cooldown_timer = 0;
+    close_unperm_ui_lists();
+    // unselect tile
+    selected_tile.x = -1;
+    selected_tile.y = -1;
+}
+void ui_list_demolish_sure_button_callback(int32_t ui_list_id, int32_t button_id) {
+    if (game_struct.game_ended == 1) {
+        add_error_alert_at_cursor("The game has ended");
+        close_unperm_ui_lists();
+        // unselect tile
+        selected_tile.x = -1;
+        selected_tile.y = -1;
+        return;
+    }
+
+    game_struct.players[0].wheight -= 1;
+    game_struct.players[1].wheight += 1;
+
+    int32_t tile_type_id = game_struct.players[0].tiles[selected_tile.y*_PLAYER_GRID_WIDTH_ + selected_tile.x].type;
+    tile_type_t* tile_type = &(tile_type_properties[tile_type_id]);
+    
+    // add resources
+    game_struct.players[0].resources.wood       += tile_type->give.wood;
+    game_struct.players[0].resources.stone      += tile_type->give.stone;
+    game_struct.players[0].resources.wheat      += tile_type->give.wheat;
+    game_struct.players[0].resources.population += tile_type->give.population;
+    game_struct.players[0].resources.soldiers   += tile_type->give.soldiers;
+    // add alert
+    int32_t new_alert_id = new_alert_assign_id();
+    alerts[new_alert_id] = (alert_t){
+        .time_to_live = 3000,
+
+        .font = &letters_font,
+        .padding = 3,
+
+        .initial_time_to_live = 3000,
+        .y_full_transform = letters_font.letter_height*3,
+        .easing_function = &ease_out_sine,
+
+        .box_pos_from_world_pos = 1,
+        .box_world_pos_x = 0.5*_TILE_SIZE_ + selected_tile.x*_TILE_SIZE_ + game_struct.players[0].x_current_translation,
+        .box_world_pos_y =   1*_TILE_SIZE_ + game_struct.players[0].y_current_translation,
+        .box_world_pos_z = 0.5*_TILE_SIZE_ + selected_tile.y*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_,
+        .x = 0,
+        .y = 0,
+        
+        .string = tile_type->give_alert_string
+    };
+
+    game_struct.players[0].tiles[selected_tile.y*_PLAYER_GRID_WIDTH_ + selected_tile.x].type = TILE_TYPE_EMPTY;
+    game_struct.players[0].tiles[selected_tile.y*_PLAYER_GRID_WIDTH_ + selected_tile.x].cooldown_timer        = 0;
+    game_struct.players[0].tiles[selected_tile.y*_PLAYER_GRID_WIDTH_ + selected_tile.x].curent_cooldown_timer = 0;
+    close_unperm_ui_lists();
+    // unselect tile
+    selected_tile.x = -1;
+    selected_tile.y = -1;
+}
+void ui_list_demolish_button_callback(int32_t ui_list_id, int32_t button_id) {
+    if (game_struct.game_ended == 1) {
+        add_error_alert_at_cursor("The game has ended");
+        close_unperm_ui_lists();
+        // unselect tile
+        selected_tile.x = -1;
+        selected_tile.y = -1;
+        return;
+    }
+
+    // close child (if exists)
+    close_ui_list(ui_lists[ui_list_id].child_ui_list);
+
+    // create child
+    int32_t new_ui_list_id = new_ui_list_assign_id();
+    ui_lists[new_ui_list_id] = (ui_list_t){
+        .active = 1,
+        .permenant = 0,
+
+        .font = &letters_font,
+        .padding = 2,
+        .button_padding = 2,
+
+        .box_pos_from_world_pos = 1,
+        .box_world_pos_x = ui_lists[ui_list_id].box_world_pos_x,
+        .box_world_pos_y = ui_lists[ui_list_id].box_world_pos_y,
+        .box_world_pos_z = ui_lists[ui_list_id].box_world_pos_z,
+        .x = get_ui_list_width(ui_list_id) + ui_lists[ui_list_id].padding + 2,
+        .y = 0,
+
+        .buttons_amount = 2,
+        .button_strings = {"yes", "are you sure?"},
+        .button_info_strings = {"", ""},
+        .button_callbacks = {
+            &ui_list_demolish_sure_button_callback,
+            NULL
+        },
+
+        .child_ui_list = -1,
+        .parent_ui_list = ui_list_id
+    };
+    ui_lists[ui_list_id].child_ui_list = new_ui_list_id;
+
+    make_ui_list_safe(new_ui_list_id);
 }

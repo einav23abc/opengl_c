@@ -27,7 +27,7 @@ void update_game() {
         game_struct.players[1].wheight -= 1;
     }
     if (keys[SDL_SCANCODE_J] == 1) {
-        switch_turn();
+        request_switch_turn();
     }
 
     if (
@@ -51,9 +51,13 @@ void update_game() {
             .active = 1,
             .permenant = 1,
 
+            .font = &big_letters_font,
+            .padding = 3,
+            .button_padding = 4,
+
             .box_pos_from_world_pos = 0,
-            .x = _OUTPORT_WIDTH_*0.5  - get_str_boxed_size(message, _UI_LIST_BUTTON_HEIGHT_).x*0.5,
-            .y = _OUTPORT_HEIGHT_*0.5 + _UI_LIST_BUTTON_HEIGHT_,
+            .x = _OUTPORT_WIDTH_*0.5  - (max(strlen(message), strlen("exit game"))*big_letters_font.letter_width + 4*2)*0.5,
+            .y = _OUTPORT_HEIGHT_*0.5 + big_letters_font.letter_height + 4*2,
 
             .buttons_amount = 2,
             .button_strings = {
@@ -240,8 +244,11 @@ void tile_cooldowns_update() {
                         alerts[new_alert_id] = (alert_t){
                             .time_to_live = 3000,
 
+                            .font = &letters_font,
+                            .padding = 3,
+
                             .initial_time_to_live = 3000,
-                            .y_full_transform = _ALERT_ROW_HEIGHT_*3,
+                            .y_full_transform = letters_font.letter_height*3,
                             .easing_function = &ease_out_sine,
 
                             .box_pos_from_world_pos = 1,

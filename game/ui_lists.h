@@ -4,11 +4,8 @@
 #include "game.h"
 
 
-#define _MAX_UI_LISTS_AMOUNT_ (4)
+#define _MAX_UI_LISTS_AMOUNT_ (12)
 #define _UI_LIST_MAX_BUTTONS_AMOUNT_ (8)
-#define _UI_LIST_PADDING_ (3)
-#define _UI_LIST_BUTTON_HEIGHT_ (12)
-#define _UI_LIST_BUTTON_INFO_ROW_HEIGHT_ (12)
 
 
 /* param 1: the ui_list id
@@ -20,6 +17,10 @@ typedef struct {
     uint8_t active : 1;
     uint8_t safe : 1;
     uint8_t permenant : 1;
+
+    font_t* font;
+    int32_t padding;
+    int32_t button_padding;
 
     uint8_t box_pos_from_world_pos : 1;
     float box_world_pos_x;
@@ -60,7 +61,12 @@ uvec2_t get_ui_list_box_pos_padded(int32_t i);
  * or `-1` in everything if not inside ui_list
  */
 ivec3_t get_ui_list_inside_pos();
-uvec2_t get_ui_button_info_size(char* info_str);
-
+/* x = ui_list_id
+ * y = button_id
+ */
+ivec2_t get_ui_list_hovered_button();
+uvec2_t get_ui_list_button_info_size(int32_t i, char* info_str);
+void draw_ui_list(int32_t i);
+void draw_ui_list_hovered_button_info_string();
 
 #endif
