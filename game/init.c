@@ -161,14 +161,14 @@ uint8_t init() {
 
     // <cameras>
         camera_pos = (vec3_t){
-            .x = -_TILE_SIZE_,
+            .x = -_TILE_SIZE_*0.5,
             .y = _SCALE_AXIS_POINT_Y_,
-            .z = -_TILE_SIZE_*2
+            .z = -_TILE_SIZE_
         };
         camera = create_camera(
             0, 0, 0,
             M_PI*1.8, -M_PI*0.15, 0,
-            340, 260, 1600,
+            380, 260, 1600,
             -32000, 32000,
             0, 60,
             0, 0, _OUTPORT_WIDTH_, _OUTPORT_HEIGHT_
@@ -240,6 +240,13 @@ uint8_t init() {
             "in_vertex_position\0in_vertex_texcoord", 2,
             "u_position\0u_scale\0u_quat_rotation\0u_text_row_length\0u_text_row\0u_font_data\0u_color", 7
         );
+
+        cooldown_billboards_shader = create_shader_from_files(
+            "./game/shaders/cooldown.vert",
+            "./game/shaders/cooldown.frag",
+            "in_vertex_position\0in_vertex_texcoord", 2,
+            "u_position\0u_scale\0u_rads", 3
+        );
         
         sun_shadow_map_shader = create_shader_from_files(
             "./game/shaders/sun_shadow_map.vert",
@@ -259,7 +266,7 @@ uint8_t init() {
                 .population = 0,
                 .soldiers = 0
             },
-            .give_cooldown = 2,
+            .give_cooldown = 3,
             .give = (resources_t){
                 .wood = 0,
                 .stone = 0,
@@ -321,7 +328,7 @@ uint8_t init() {
         };
         tile_type_properties[TILE_TYPE_FOREST] = (tile_type_t){
             .cost = (resources_t){
-                .wood = 1,
+                .wood = 0,
                 .stone = 0,
                 .wheat = 1,
                 .population = 1,
@@ -337,6 +344,7 @@ uint8_t init() {
             }
         };
 
+        // build_info_string
         for (uint32_t i = 0; i < _TILE_TYPES_AMOUNT_; i++) {
             char build_info_string[_TILE_BUILD_INFO_STRING_MAX_LENGTH_];
             uint32_t c = 0;
@@ -464,6 +472,53 @@ uint8_t init() {
 
             strcpy(tile_type_properties[i].build_info_string, build_info_string);
         }
+        
+        // give_alert_string
+        for (uint32_t i = 0; i < _TILE_TYPES_AMOUNT_; i++) {
+            char give_alert_string[_TILE_RESOURCE_GIVE_ALERT_STRING_MAX_LENGTH_];
+            uint32_t c = 0;
+
+            if (tile_type_properties[i].give.population > 0) {
+                give_alert_string[c  ] = '+';
+                give_alert_string[c+1] = '0' + tile_type_properties[i].give.population;
+                give_alert_string[c+2] = '\1';
+                give_alert_string[c+3] = '\n';
+                c += 4;
+            }
+            if (tile_type_properties[i].give.wheat > 0) {
+                give_alert_string[c  ] = '+';
+                give_alert_string[c+1] = '0' + tile_type_properties[i].give.wheat;
+                give_alert_string[c+2] = '\2';
+                give_alert_string[c+3] = '\n';
+                c += 4;
+            }
+            if (tile_type_properties[i].give.wood > 0) {
+                give_alert_string[c  ] = '+';
+                give_alert_string[c+1] = '0' + tile_type_properties[i].give.wood;
+                give_alert_string[c+2] = '\3';
+                give_alert_string[c+3] = '\n';
+                c += 4;
+            }
+            if (tile_type_properties[i].give.stone > 0) {
+                give_alert_string[c  ] = '+';
+                give_alert_string[c+1] = '0' + tile_type_properties[i].give.stone;
+                give_alert_string[c+2] = '\4';
+                give_alert_string[c+3] = '\n';
+                c += 4;
+            }
+            if (tile_type_properties[i].give.soldiers > 0) {
+                give_alert_string[c  ] = '+';
+                give_alert_string[c+1] = '0' + tile_type_properties[i].give.soldiers;
+                give_alert_string[c+2] = '\5';
+                give_alert_string[c+3] = '\n';
+                c += 4;
+            }
+
+            // remove newline and add null terminator
+            give_alert_string[c-1] = '\0';
+
+            strcpy(tile_type_properties[i].give_alert_string, give_alert_string);
+        }
     // </tile_type_properties>
 
 
@@ -498,11 +553,19 @@ void init_game() {
     for (uint32_t i = 0; i < _PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_; i++) {
         game_struct.players[0].tiles[i].type = TILE_TYPE_EMPTY;
         game_struct.players[0].tiles[i].camoflauged = 0;
+        game_struct.players[0].tiles[i].cooldown_timer = 0;
+        game_struct.players[0].tiles[i].curent_cooldown_timer = 0;
         game_struct.players[1].tiles[i].type = TILE_TYPE_EMPTY;
         game_struct.players[1].tiles[i].camoflauged = 0;
+        game_struct.players[1].tiles[i].cooldown_timer = 0;
+        game_struct.players[1].tiles[i].curent_cooldown_timer = 0;
     }
     game_struct.players[0].tiles[14].type = TILE_TYPE_HOUSE;
+    game_struct.players[0].tiles[14].cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
+    game_struct.players[0].tiles[14].curent_cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
     game_struct.players[1].tiles[14].type = TILE_TYPE_HOUSE;
+    game_struct.players[1].tiles[14].cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
+    game_struct.players[1].tiles[14].curent_cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
 
     game_struct.players[0].wheight = 0;
     game_struct.players[0].resources.wood = 2;

@@ -15,6 +15,7 @@ font_t letters_font;
 shader_t* global_shader;
 shader_t* ui_shader;
 shader_t* font_shader;
+shader_t* cooldown_billboards_shader;
 
 vec3_t camera_pos;
 camera_t* camera;
@@ -27,11 +28,8 @@ mesh_t* centered_cube_mesh;
 tile_type_t tile_type_properties[_TILE_TYPES_AMOUNT_];
 
 game_t game_struct;
-ivec2_t selected_tile;
+ivec3_t selected_tile;
 ivec2_t hovered_tiles[2];
-
-ui_list_t ui_lists[_MAX_UI_LISTS_AMOUNT_];
-alert_t alerts[_MAX_ALERTS_AMOUNT_];
 
 float sun_vector_x;
 float sun_vector_y;
@@ -41,98 +39,72 @@ fbo_t* sun_shadow_map_fbo;
 shader_t* sun_shadow_map_shader;
 
 
+float draw_string(font_t font, char* str, vec3_t pos, quat_t rot, float height, float color_r, float color_b, float color_g) {
+    int32_t string_len = min(strlen(str), _MAX_TEXT_ROW_LENGTH);
 
-int32_t new_ui_list_assign_id() {
-    for (int32_t i = 0; i < _MAX_UI_LISTS_AMOUNT_; i++) {
-        if (ui_lists[i].active == 0) return i;
-    }
-}
-void set_ui_lists_to_unsafe() {
-    for (int32_t i = 0; i < _MAX_UI_LISTS_AMOUNT_; i++) ui_lists[i].safe = 0;
-}
-void close_ui_list(int32_t i) {
-    if (i < 0 || i >= _MAX_UI_LISTS_AMOUNT_) return;
-    ui_lists[i].active = 0;
-    if (ui_lists[i].child_ui_list >= 0) close_ui_list(ui_lists[i].child_ui_list);
-}
-void make_ui_list_safe(int32_t i) {
-    if (i < 0 || i >= _MAX_UI_LISTS_AMOUNT_) return;
-    ui_lists[i].safe = 1;
-    if (ui_lists[i].parent_ui_list >= 0) make_ui_list_safe(ui_lists[i].parent_ui_list);
-}
-void close_unsafe_ui_lists() {
-    for (int32_t i = 0; i < _MAX_UI_LISTS_AMOUNT_; i++) {
-        if (ui_lists[i].safe == 0) ui_lists[i].active = 0;
-    }
-}
-void close_all_ui_lists() {
-    for (int32_t i = 0; i < _MAX_UI_LISTS_AMOUNT_; i++) {
-        ui_lists[i].active = 0;
-    }
-}
-uint32_t get_ui_list_width(int32_t i) {
-    uint32_t button_string_max_length = 1;
-    for (uint32_t j = 0; j < ui_lists[i].buttons_amount; j++) {
-        button_string_max_length = max(button_string_max_length, strlen(ui_lists[i].button_strings[j]));
-    }
-    return (button_string_max_length * letters_font.letter_width*(_UI_LIST_BUTTON_HEIGHT_/letters_font.letter_height));
-}
-uint32_t get_ui_list_height(int32_t i) {
-    return (_UI_LIST_BUTTON_HEIGHT_*ui_lists[i].buttons_amount);
-}
-uvec2_t get_ui_list_box_pos(int32_t i) {
-    float x = 0;
-    float y = 0;
-    if (ui_lists[i].box_pos_from_world_pos == 1) {
-        vec2_t screen_cord = outport_space_position_from_world_space(vec3(ui_lists[i].box_world_pos_x, ui_lists[i].box_world_pos_y, ui_lists[i].box_world_pos_z));
-        x = screen_cord.x;
-        y = screen_cord.y;
-    }
+    shader_t* last_shader = shaders_list[current_shader];
+    use_shader(font_shader);
 
-    x += ui_lists[i].x;
-    y += ui_lists[i].y;
-
-    y -= get_ui_list_height(i);
-
-    return (uvec2_t){
-        .x = x,
-        .y = y
-    };
-}
-uvec2_t get_ui_list_box_pos_padded(int32_t i) {
-    uvec2_t box_pos = get_ui_list_box_pos(i);
-    box_pos.x -= _UI_LIST_PADDING_;
-    box_pos.y -= _UI_LIST_PADDING_;
-    return box_pos;
-}
-ivec3_t get_ui_list_inside_pos() {
-    vec2_t outport_space_position = get_mouse_outport_space_position();
-    
-    for (int32_t i = 0; i < _MAX_UI_LISTS_AMOUNT_; i++) {
-        uvec2_t box_pos = get_ui_list_box_pos(i);
-        if (
-            ui_lists[i].active == 1 &&
-            box_pos.x <= outport_space_position.x &&
-            box_pos.y <= outport_space_position.y &&
-            box_pos.x + get_ui_list_width(i)  >= outport_space_position.x &&
-            box_pos.y + get_ui_list_height(i) >= outport_space_position.y
-        ) {
-            return (ivec3_t){
-                .x = outport_space_position.x - box_pos.x,
-                .y = outport_space_position.y - box_pos.y,
-                .z = i
-            };
-        }
+    // u_texture
+    bind_texture(font.font_texture, shaders_list[current_shader]->u_texture_loc, 0);
+    // u_position
+    glUniform3f(
+        shaders_list[current_shader]->uniform_locations[0],
+        pos.x,
+        pos.y,
+        pos.z
+    );
+    // u_scale
+    float size_x = string_len*font.letter_width*(height/font.letter_height);
+    glUniform3f(
+        shaders_list[current_shader]->uniform_locations[1],
+        size_x,
+        height,
+        0
+    );
+    // u_quat_rotation
+    glUniform4f(
+        shaders_list[current_shader]->uniform_locations[2],
+        rot.x,
+        rot.y,
+        rot.z,
+        rot.w
+    );
+    // u_text_row_length
+    glUniform1i(
+        shaders_list[current_shader]->uniform_locations[3],
+        string_len
+    );
+    // u_text_row
+    int32_t text_row[string_len];
+    for (int32_t i = 0; i < string_len; i++) {
+        text_row[i] = str[i];
     }
-    return (ivec3_t){
-        .x = -1,
-        .y = -1,
-        .z = -1
-    };
+    glUniform1iv(
+        shaders_list[current_shader]->uniform_locations[4],
+        string_len,
+        text_row
+    );
+    // u_font_data
+    glUniform2i(
+        shaders_list[current_shader]->uniform_locations[5],
+        font.letters_in_row,
+        font.letters_in_col
+    );
+    // u_color
+    glUniform3f(
+        shaders_list[current_shader]->uniform_locations[6],
+        color_r,
+        color_g,
+        color_b
+    );
+    draw_mesh(rect_plane_mesh);
+
+    use_shader(last_shader);
+
+    return size_x;
 }
-
-
-uvec2_t get_str_size(char* str, float row_height) {
+uvec2_t get_str_boxed_size(char* str, float row_height) {
     uint32_t w = 0;
     uint32_t h = row_height;
     uint32_t x = 0;
@@ -158,7 +130,7 @@ uvec2_t get_str_size(char* str, float row_height) {
     };
 }
 void draw_str_boxed(char* str, uint32_t left_x, uint32_t bottom_y, uint32_t padding, uint32_t row_height) {
-    uvec2_t str_size = get_str_size(str, row_height);
+    uvec2_t str_size = get_str_boxed_size(str, row_height);
     
     uint32_t top_y = bottom_y + str_size.y;
 
@@ -202,85 +174,6 @@ void draw_str_boxed(char* str, uint32_t left_x, uint32_t bottom_y, uint32_t padd
             1, 1, 1
         );
     }
-}
-
-uvec2_t get_ui_button_info_size(char* info_str) {
-    return get_str_size(info_str, _UI_LIST_BUTTON_INFO_ROW_HEIGHT_);
-}
-
-
-int32_t new_alert_assign_id() {
-    for (int32_t i = 0; i < _MAX_ALERTS_AMOUNT_; i++) {
-        if (alerts[i].time_to_live <= 0) return i;
-    }
-    // get shortest time to live alert
-    int32_t min_time_to_live = alerts[0].time_to_live;
-    int32_t min_time_to_live_i = 0;
-    for (int32_t i = 1; i < _MAX_ALERTS_AMOUNT_; i++) {
-        if (alerts[i].time_to_live < min_time_to_live) {
-            min_time_to_live = alerts[i].time_to_live;
-            min_time_to_live_i = i;
-        }
-    }
-    return min_time_to_live_i;
-}
-uvec2_t get_alert_box_size(int32_t i) {
-    return get_str_size(alerts[i].string, _ALERT_ROW_HEIGHT_);
-}
-uvec2_t get_alert_box_pos(int32_t i) {
-    float x = 0;
-    float y = 0;
-    if (alerts[i].box_pos_from_world_pos == 1) {
-        vec2_t screen_cord = outport_space_position_from_world_space(vec3(alerts[i].box_world_pos_x, alerts[i].box_world_pos_y, alerts[i].box_world_pos_z));
-        x = screen_cord.x;
-        y = screen_cord.y;
-    }
-
-    x += alerts[i].x;
-    y += alerts[i].y;
-
-    if (&(alerts[i].easing_function) != NULL) {
-        float t = 1-(((float)alerts[i].time_to_live) / (alerts[i].initial_time_to_live));
-        y += alerts[i].easing_function(t) * alerts[i].y_full_transform;
-    }
-
-    if (x < _ALERT_PADDING_) x = _ALERT_PADDING_;
-    if (y < _ALERT_PADDING_) y = _ALERT_PADDING_;
-
-    return (uvec2_t){
-        .x = x,
-        .y = y
-    };
-}
-uvec2_t get_alert_box_pos_padded(int32_t i) {
-    uvec2_t box_pos = get_alert_box_pos(i);
-    box_pos.x -= _ALERT_PADDING_;
-    box_pos.y -= _ALERT_PADDING_;
-    return box_pos;
-}
-void add_alert_at_cursor(char* string) {
-    vec2_t mouse_outport_space_position = get_mouse_outport_space_position();
-
-    int32_t new_alert_id = new_alert_assign_id();
-
-    uvec2_t string_size = get_str_size(string, _ALERT_ROW_HEIGHT_);
-    
-    alerts[new_alert_id] = (alert_t){
-        .time_to_live = 3000,
-
-        .initial_time_to_live = 3000,
-        .y_full_transform = string_size.y*3,
-        .easing_function = &ease_out_sine,
-
-        .box_pos_from_world_pos = 0,
-        .x = mouse_outport_space_position.x - string_size.x*0.5,
-        .y = mouse_outport_space_position.y - string_size.y*0.5,
-
-        .string = string
-    };
-}
-void close_all_alerts() {
-    for (int32_t i = 0; i < _MAX_ALERTS_AMOUNT_; i++) alerts[i].time_to_live = 0;
 }
 
 
@@ -353,6 +246,21 @@ void switch_turn() {
     selected_tile.x = -1;
     selected_tile.y = -1;
     close_all_ui_lists();
+
+    // update cooldown timers
+    for (uint32_t x = 0; x < _PLAYER_GRID_WIDTH_; x++) {
+        for (uint32_t z = 0; z < _PLAYER_GRID_DEPTH_; z++) {
+            tile_t* tile = &(game_struct.players[game_struct.player_turn].tiles[z*_PLAYER_GRID_DEPTH_ + x]);
+            
+            if (tile->type == TILE_TYPE_EMPTY) continue;
+
+            tile->cooldown_timer -= 1;
+
+            if (tile->cooldown_timer <= 0) {
+                tile->cooldown_timer = tile_type_properties[tile->type].give_cooldown;
+            }
+        }
+    }
 }
 void player_1_turn() {
     player_1_ai_turn();

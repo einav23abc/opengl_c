@@ -35,6 +35,7 @@ void update_game() {
     }
 
     player_translations_update();
+    tile_cooldowns_update();
     camera_update();
     sun_shadow_map_update();
     update_hovered_tile();
@@ -150,6 +151,58 @@ void player_translations_update() {
             game_struct.players[i].x_current_translation = game_struct.players[i].hinge_x_position - _TILE_SIZE_ - _TILE_SIZE_*_PLAYER_GRID_WIDTH_;
         }else {
             game_struct.players[i].x_current_translation = game_struct.players[i].hinge_x_position + _TILE_SIZE_;
+        }
+    }
+}
+
+void tile_cooldowns_update() {
+    for (uint8_t i = 0; i < 2; i++) {
+        for (uint32_t x = 0; x < _PLAYER_GRID_WIDTH_; x++) {
+            for (uint32_t z = 0; z < _PLAYER_GRID_DEPTH_; z++) {
+                tile_t* tile = &(game_struct.players[i].tiles[z*_PLAYER_GRID_DEPTH_ + x]);
+                
+                if (tile->type == TILE_TYPE_EMPTY) continue;
+                if (tile->curent_cooldown_timer == tile->cooldown_timer) continue;
+
+                if (tile->cooldown_timer > tile->curent_cooldown_timer) {
+                    // go to 0 and jump up
+                    tile->curent_cooldown_timer -= ((float)delta_time) / _PLAYER_COOLDOWN_TRANSLATION_LERP_DURATION_;
+                    if (tile->curent_cooldown_timer <= 0) {
+                        tile->curent_cooldown_timer = tile->cooldown_timer;
+                        // add resources
+                        tile_type_t* tile_type = &(tile_type_properties[tile->type]);
+                        game_struct.players[i].resources.population += tile_type->give.population;
+                        game_struct.players[i].resources.wheat      += tile_type->give.wheat;
+                        game_struct.players[i].resources.wood       += tile_type->give.wood;
+                        game_struct.players[i].resources.stone      += tile_type->give.stone;
+                        game_struct.players[i].resources.soldiers   += tile_type->give.soldiers;
+                        // add alert
+                        int32_t new_alert_id = new_alert_assign_id();
+                        alerts[new_alert_id] = (alert_t){
+                            .time_to_live = 3000,
+
+                            .initial_time_to_live = 3000,
+                            .y_full_transform = _ALERT_ROW_HEIGHT_*3,
+                            .easing_function = &ease_out_sine,
+
+                            .box_pos_from_world_pos = 1,
+                            .box_world_pos_x = 0.5*_TILE_SIZE_ + x*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
+                            .box_world_pos_y =   1*_TILE_SIZE_ + game_struct.players[i].y_current_translation,
+                            .box_world_pos_z = 0.5*_TILE_SIZE_ + z*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_,
+                            .x = 0,
+                            .y = 0,
+                            
+                            .string = tile_type->give_alert_string
+                        };
+                    }
+                }else {
+                    // go down
+                    tile->curent_cooldown_timer -= ((float)delta_time) / _PLAYER_COOLDOWN_TRANSLATION_LERP_DURATION_;
+                    if (tile->curent_cooldown_timer <= tile->cooldown_timer) {
+                        tile->curent_cooldown_timer = tile->cooldown_timer;
+                    }
+                }
+            }
         }
     }
 }

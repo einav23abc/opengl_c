@@ -52,10 +52,14 @@ void render_game() {
     // draw outport frame buffer to screen
     use_default_fbo();
 
-    // float pixel_scale = fmin(((float)window_drawable_width)/_OUTPORT_WIDTH_, ((float)window_drawable_height)/_OUTPORT_HEIGHT_);
     uint32_t pixel_scale = uintmin(window_drawable_width/_OUTPORT_WIDTH_, window_drawable_height/_OUTPORT_HEIGHT_);
     uint32_t w = _OUTPORT_WIDTH_*pixel_scale;
     uint32_t h = _OUTPORT_HEIGHT_*pixel_scale;
+    if (pixel_scale < 1) {
+        float fpixel_scale = fmin(((float)window_drawable_width)/_OUTPORT_WIDTH_, ((float)window_drawable_height)/_OUTPORT_HEIGHT_);
+        w = _OUTPORT_WIDTH_*fpixel_scale;
+        h = _OUTPORT_HEIGHT_*fpixel_scale;
+    }
     glViewport((window_drawable_width-w)*0.5,(window_drawable_height-h)*0.5,w,h);
     
     simple_draw_module_draw_fbo_color_texture(outport_fbo);
@@ -183,7 +187,7 @@ void render_game_world() {
         for (uint32_t x = 0; x < _PLAYER_GRID_WIDTH_; x++) {
             for (uint32_t z = 0; z < _PLAYER_GRID_DEPTH_; z++) {
                 uint8_t hovered = (hovered_tiles[i].x == x && hovered_tiles[i].y == z);
-                uint8_t selected = (selected_tile.x == x && selected_tile.y == z && i == 0);
+                uint8_t selected = (selected_tile.x == x && selected_tile.y == z && selected_tile.z == i);
                 int32_t tile_type = game_struct.players[i].tiles[z*_PLAYER_GRID_DEPTH_ + x].type;
                 
                 if (tile_type != TILE_TYPE_EMPTY) {
@@ -246,7 +250,44 @@ void render_game_ui() {
     glClear(GL_DEPTH_BUFFER_BIT);
     glDisable(GL_DEPTH_TEST);
 
+
+    // <cooldown billboards>
+        quat_t quat_rotation;
+        billboard_t billboard;
+        use_shader(cooldown_billboards_shader);
+        for (int8_t i = 0; i < 2; i ++) {
+            for (uint32_t x = 0; x < _PLAYER_GRID_WIDTH_; x++) {
+                for (uint32_t z = 0; z < _PLAYER_GRID_DEPTH_; z++) {
+                    tile_t* tile = &(game_struct.players[i].tiles[z*_PLAYER_GRID_DEPTH_ + x]);
+                    int32_t tile_type_cooldown = tile_type_properties[tile->type].give_cooldown;
+                    
+                    if (tile->type == TILE_TYPE_EMPTY) continue;
+                    if (tile->curent_cooldown_timer <= 0 || tile->curent_cooldown_timer >= tile_type_cooldown) continue;
+
+                    billboard = (billboard_t){
+                        .box_pos_from_world_pos = 1,
+                        .box_world_pos_x = 0.5*_TILE_SIZE_ + x*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
+                        .box_world_pos_y = 0.5*_TILE_SIZE_ + game_struct.players[i].y_current_translation,
+                        .box_world_pos_z = 0.5*_TILE_SIZE_ + z*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_,
+                        .x = -10,
+                        .y = 10,
+                        .box_width = 20,
+                        .box_height = 20
+                    };
+                    glUniform1f(
+                        cooldown_billboards_shader->uniform_locations[2],
+                        M_PI*2*(tile->curent_cooldown_timer / ((float)tile_type_cooldown))
+                    );
+                    draw_billboard_shaded(billboard);
+                }
+            }
+        }
+        use_shader(ui_shader);
+    // </cooldown billboards>
+
+
     // draw ui lists
+    int32_t ui_list_to_draw_info_string = -1;
     ivec3_t cursor_inside_box_pos = get_ui_list_inside_pos();
     for (int32_t i = 0; i < _MAX_UI_LISTS_AMOUNT_; i++) {
         if (ui_lists[i].active == 1) {
@@ -266,10 +307,12 @@ void render_game_ui() {
             
             // buttons
             for (int32_t j = 0; j < ui_lists[i].buttons_amount; j++) {
-                if (cursor_inside_button == j) {
+                // hovering indication
+                if (cursor_inside_button == j && ui_lists[i].button_callbacks[j] != NULL) {
                     sdm_set_color(0.5,0.5,0,1);
                     sdm_draw_rect(box_pos.x, box_pos.y + j*_UI_LIST_BUTTON_HEIGHT_, box_width, _UI_LIST_BUTTON_HEIGHT_);
                 }
+
                 draw_string(
                     letters_font,
                     ui_lists[i].button_strings[j],
@@ -287,14 +330,20 @@ void render_game_ui() {
             // button info string
             if (cursor_inside_box_pos.z == i) {
                 if (cursor_inside_button < 0 || cursor_inside_button >= ui_lists[i].buttons_amount) continue;
-
                 if (ui_lists[i].button_info_strings[cursor_inside_button][0] == '\0') continue;
-
-                uint32_t left_x = box_pos.x + cursor_inside_box_pos.x + _UI_LIST_PADDING_;
-                uint32_t bottom_y = box_pos.y + _UI_LIST_BUTTON_HEIGHT_ + cursor_inside_button*_UI_LIST_BUTTON_INFO_ROW_HEIGHT_ + _UI_LIST_PADDING_;
-                draw_str_boxed(ui_lists[i].button_info_strings[cursor_inside_button], left_x, bottom_y, _UI_LIST_PADDING_, _UI_LIST_BUTTON_INFO_ROW_HEIGHT_);
+                ui_list_to_draw_info_string = i;
             }
         }
+    }
+
+    // ui list button info string
+    if (ui_list_to_draw_info_string != -1) {
+        uvec2_t box_pos = get_ui_list_box_pos(ui_list_to_draw_info_string);
+        int32_t cursor_inside_button = floor(((float)cursor_inside_box_pos.y)/_UI_LIST_BUTTON_HEIGHT_);
+
+        uint32_t left_x = box_pos.x + cursor_inside_box_pos.x + _UI_LIST_PADDING_;
+        uint32_t bottom_y = box_pos.y + _UI_LIST_BUTTON_HEIGHT_ + cursor_inside_button*_UI_LIST_BUTTON_INFO_ROW_HEIGHT_ + _UI_LIST_PADDING_;
+        draw_str_boxed(ui_lists[ui_list_to_draw_info_string].button_info_strings[cursor_inside_button], left_x, bottom_y, _UI_LIST_PADDING_, _UI_LIST_BUTTON_INFO_ROW_HEIGHT_);
     }
 
     // draw alerts
@@ -307,70 +356,4 @@ void render_game_ui() {
     }
 
     glEnable(GL_DEPTH_TEST);
-}
-
-float draw_string(font_t font, char* str, vec3_t pos, quat_t rot, float height, float color_r, float color_b, float color_g) {
-    int32_t string_len = min(strlen(str), _MAX_TEXT_ROW_LENGTH);
-
-    shader_t* last_shader = shaders_list[current_shader];
-    use_shader(font_shader);
-
-    // u_texture
-    bind_texture(font.font_texture, shaders_list[current_shader]->u_texture_loc, 0);
-    // u_position
-    glUniform3f(
-        shaders_list[current_shader]->uniform_locations[0],
-        pos.x,
-        pos.y,
-        pos.z
-    );
-    // u_scale
-    float size_x = string_len*font.letter_width*(height/font.letter_height);
-    glUniform3f(
-        shaders_list[current_shader]->uniform_locations[1],
-        size_x,
-        height,
-        0
-    );
-    // u_quat_rotation
-    glUniform4f(
-        shaders_list[current_shader]->uniform_locations[2],
-        rot.x,
-        rot.y,
-        rot.z,
-        rot.w
-    );
-    // u_text_row_length
-    glUniform1i(
-        shaders_list[current_shader]->uniform_locations[3],
-        string_len
-    );
-    // u_text_row
-    int32_t text_row[string_len];
-    for (int32_t i = 0; i < string_len; i++) {
-        text_row[i] = str[i];
-    }
-    glUniform1iv(
-        shaders_list[current_shader]->uniform_locations[4],
-        string_len,
-        text_row
-    );
-    // u_font_data
-    glUniform2i(
-        shaders_list[current_shader]->uniform_locations[5],
-        font.letters_in_row,
-        font.letters_in_col
-    );
-    // u_color
-    glUniform3f(
-        shaders_list[current_shader]->uniform_locations[6],
-        color_r,
-        color_g,
-        color_b
-    );
-    draw_mesh(rect_plane_mesh);
-
-    use_shader(last_shader);
-
-    return size_x;
 }
