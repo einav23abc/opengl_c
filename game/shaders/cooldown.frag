@@ -26,11 +26,11 @@ void main(){
     const vec3 color_edge = vec3(28, 22, 24)/255.0;
     const vec3 color_button = vec3(28, 22, 24)/255.0;
     const vec3 color_line = vec3(28, 22, 24)/255.0;
-    const float line_size = 0.1;
+    const float line_size = 0.15;
 
-    if (dist_from_center <= 0.2) {
+    if (dist_from_center <= 0.15) {
         color.rgb = color_button;
-    }else if (dist_from_center <= 0.9) {
+    }else if (dist_from_center <= 0.85) {
         color.rgb = color_full;
         if (
             ang + M_PI*0.2*line_size/dist_from_center > u_rads &&

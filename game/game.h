@@ -10,9 +10,9 @@
 #define _OUTPORT_WIDTH_ (380*2)
 #define _OUTPORT_HEIGHT_ (260*2)
 
-#define _OUTPORT_BACKGROUND_COLOR_R_ (0.2)
-#define _OUTPORT_BACKGROUND_COLOR_G_ (0.2)
-#define _OUTPORT_BACKGROUND_COLOR_B_ (0.3)
+#define _OUTPORT_BACKGROUND_COLOR_R_ (71.0/255)
+#define _OUTPORT_BACKGROUND_COLOR_G_ (65.0/255)
+#define _OUTPORT_BACKGROUND_COLOR_B_ (107.0/255)
 
 
 #define _PLAYER_GRID_WIDTH_ (5)
@@ -181,15 +181,15 @@ ivec2_t get_hovered_tile_position(uint8_t player_i);
 int32_t has_enough_resources(int32_t player_id, int32_t tile_type_id);
 
 void enter_main_menu();
-void exit_main_menu();
 void enter_game();
-void exit_game_button_callback(int32_t ui_list_id, int32_t button_id);
 void switch_turn_button_callback(int32_t ui_list_id, int32_t button_id);
 void request_switch_turn();
 void switch_turn();
 void player_1_turn();
 void player_1_ai_turn();
 
+void ui_list_exit_game_button_callback(int32_t ui_list_id, int32_t button_id);
+void ui_list_play_button_callback(int32_t ui_list_id, int32_t button_id);
 void ui_list_build_specific_button_callback(int32_t ui_list_id, int32_t button_id);
 void ui_list_build_button_callback(int32_t ui_list_id, int32_t button_id);
 void ui_list_attack_button_callback(int32_t ui_list_id, int32_t button_id);

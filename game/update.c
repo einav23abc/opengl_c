@@ -5,7 +5,14 @@
 
 
 void update() {
-    update_game();
+    switch (page) {
+        case PAGE_IN_GAME:
+            update_game();
+            break;
+        
+        case PAGE_MAIN_MENU:
+            break;
+    }
 
     // update alerts' time to live
     for (int32_t i = 0; i < _MAX_ALERTS_AMOUNT_; i++) {
@@ -66,7 +73,7 @@ void update_game() {
             },
             .button_info_strings = {"",""},
             .button_callbacks = {
-                &exit_game_button_callback,
+                &ui_list_exit_game_button_callback,
                 NULL
             },
 

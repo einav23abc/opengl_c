@@ -37,6 +37,7 @@ uvec2_t get_alert_box_pos(int32_t i);
 uvec2_t get_alert_box_pos_padded(int32_t i);
 void add_error_alert_at_cursor(char* string);
 void close_all_alerts();
+void draw_all_alerts();
 
 
 #endif

@@ -1,6 +1,11 @@
 #include "game.h"
 
 void render() {
+    // clear outport fbo
+    use_fbo(outport_fbo);
+    glClearColor(_OUTPORT_BACKGROUND_COLOR_R_, _OUTPORT_BACKGROUND_COLOR_G_, _OUTPORT_BACKGROUND_COLOR_B_, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
     switch (page) {
         case PAGE_IN_GAME:
             render_game();
@@ -10,15 +15,25 @@ void render() {
             render_main_menu();
             break;
     }
+
+    // draw outport frame buffer to screen
+    use_default_fbo();
+
+    uint32_t pixel_scale = uintmin(window_drawable_width/_OUTPORT_WIDTH_, window_drawable_height/_OUTPORT_HEIGHT_);
+    uint32_t w = _OUTPORT_WIDTH_*pixel_scale;
+    uint32_t h = _OUTPORT_HEIGHT_*pixel_scale;
+    if (pixel_scale < 1) {
+        float fpixel_scale = fmin(((float)window_drawable_width)/_OUTPORT_WIDTH_, ((float)window_drawable_height)/_OUTPORT_HEIGHT_);
+        w = _OUTPORT_WIDTH_*fpixel_scale;
+        h = _OUTPORT_HEIGHT_*fpixel_scale;
+    }
+    glViewport((window_drawable_width-w)*0.5,(window_drawable_height-h)*0.5,w,h);
+    
+    simple_draw_module_draw_fbo_color_texture(outport_fbo);
 }
 
 
 void render_game() {
-    // clear outport fbo
-    use_fbo(outport_fbo);
-    glClearColor(_OUTPORT_BACKGROUND_COLOR_R_, _OUTPORT_BACKGROUND_COLOR_G_, _OUTPORT_BACKGROUND_COLOR_B_, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    
     // <sun shadow map>
         use_fbo(sun_shadow_map_fbo);
         glClear(GL_DEPTH_BUFFER_BIT);
@@ -48,28 +63,8 @@ void render_game() {
     render_game_effects();
 
     // <ui>
-        use_fbo(outport_fbo);
-        use_camera(ui_camera);
-        use_shader(ui_shader);
-
         render_game_ui();
     // <ui>
-    
-
-    // draw outport frame buffer to screen
-    use_default_fbo();
-
-    uint32_t pixel_scale = uintmin(window_drawable_width/_OUTPORT_WIDTH_, window_drawable_height/_OUTPORT_HEIGHT_);
-    uint32_t w = _OUTPORT_WIDTH_*pixel_scale;
-    uint32_t h = _OUTPORT_HEIGHT_*pixel_scale;
-    if (pixel_scale < 1) {
-        float fpixel_scale = fmin(((float)window_drawable_width)/_OUTPORT_WIDTH_, ((float)window_drawable_height)/_OUTPORT_HEIGHT_);
-        w = _OUTPORT_WIDTH_*fpixel_scale;
-        h = _OUTPORT_HEIGHT_*fpixel_scale;
-    }
-    glViewport((window_drawable_width-w)*0.5,(window_drawable_height-h)*0.5,w,h);
-    
-    simple_draw_module_draw_fbo_color_texture(outport_fbo);
 }
 
 void draw_tile(int32_t player_i, int32_t tile_x, int32_t tile_z, int32_t tile_type) {
@@ -426,17 +421,9 @@ void render_game_effects() {
 
 void render_game_ui() {
     glDisable(GL_DEPTH_TEST);
-    
-    // <player 0 resources>
-        char resources_string[] = "X\x11\x12 X\x13\x14 X\x15\x16 X\x17\x18 X\x19\x1a";
-        resources_string[0]  = '0' + game_struct.players[0].resources.population;
-        resources_string[4]  = '0' + game_struct.players[0].resources.wheat;
-        resources_string[8]  = '0' + game_struct.players[0].resources.wood;
-        resources_string[12] = '0' + game_struct.players[0].resources.stone;
-        resources_string[16] = '0' + game_struct.players[0].resources.soldiers;
-        
-        draw_str_boxed(resources_string, letters_font, 3, 3, 3, 12);
-    // </player 0 resources>
+    use_fbo(outport_fbo);
+    use_camera(ui_camera);
+    use_shader(ui_shader);
     
     // <cooldown billboards>
         quat_t quat_rotation;
@@ -456,10 +443,10 @@ void render_game_ui() {
                         .box_world_pos_x = 0.5*_TILE_SIZE_ + x*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
                         .box_world_pos_y = 0.5*_TILE_SIZE_ + game_struct.players[i].y_current_translation,
                         .box_world_pos_z = 0.5*_TILE_SIZE_ + z*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_,
-                        .x = -10,
-                        .y = 10,
-                        .box_width = 20,
-                        .box_height = 20
+                        .x = -8,
+                        .y = 8,
+                        .box_width = 16,
+                        .box_height = 16
                     };
                     glUniform1f(
                         cooldown_billboards_shader->uniform_locations[2],
@@ -471,29 +458,41 @@ void render_game_ui() {
         }
         use_shader(ui_shader);
     // </cooldown billboards>
+
+    // <player 0 resources>
+        char resources_string[] = " X\x11\x12  X\x13\x14  X\x15\x16  X\x17\x18  X\x19\x1a";
+        
+        if (game_struct.players[0].resources.population >= 10) resources_string[0]  = '0' + game_struct.players[0].resources.population/10;
+        resources_string[1]  = '0' + game_struct.players[0].resources.population % 10;
+        if (game_struct.players[0].resources.wheat >= 10)      resources_string[5]  = '0' + game_struct.players[0].resources.wheat/10;
+        resources_string[6]  = '0' + game_struct.players[0].resources.wheat      % 10;
+        if (game_struct.players[0].resources.wood >= 10)       resources_string[10] = '0' + game_struct.players[0].resources.wood/10;
+        resources_string[11] = '0' + game_struct.players[0].resources.wood       % 10;
+        if (game_struct.players[0].resources.stone >= 10)      resources_string[15] = '0' + game_struct.players[0].resources.stone/10;
+        resources_string[16] = '0' + game_struct.players[0].resources.stone      % 10;
+        if (game_struct.players[0].resources.soldiers >= 10)   resources_string[20] = '0' + game_struct.players[0].resources.soldiers/10;
+        resources_string[21] = '0' + game_struct.players[0].resources.soldiers   % 10;
+
+        uvec2_t str_box_width = get_str_boxed_size(resources_string, big_letters_font.letter_height);
+        draw_str_boxed(resources_string, big_letters_font, _OUTPORT_WIDTH_-str_box_width.x-6, 6, 6, big_letters_font.letter_height);
+    // </player 0 resources>
+
+    draw_all_ui_lists();
+    draw_all_alerts();
     
-
-    // draw ui lists
-    for (int32_t i = 0; i < _MAX_UI_LISTS_AMOUNT_; i++) {
-        if (ui_lists[i].active == 0) continue;
-        draw_ui_list(i);
-    }
-    draw_ui_list_hovered_button_info_string();
-
-    // draw alerts
-    for (int32_t i = 0; i < _MAX_ALERTS_AMOUNT_; i++) {
-        if (alerts[i].time_to_live <= 0) continue;
-        uvec2_t box_pos = get_alert_box_pos(i);
-        uint32_t left_x = box_pos.x;
-        uint32_t bottom_y = box_pos.y;
-        draw_str_boxed(alerts[i].string, letters_font, left_x, bottom_y, alerts[i].padding, alerts[i].font->letter_height);
-    }
-
     glEnable(GL_DEPTH_TEST);
 }
 
 
 
 void render_main_menu() {
+    glDisable(GL_DEPTH_TEST);
+    use_fbo(outport_fbo);
+    use_camera(ui_camera);
+    use_shader(ui_shader);
 
+    draw_all_ui_lists();
+    draw_all_alerts();
+
+    glEnable(GL_DEPTH_TEST);
 }

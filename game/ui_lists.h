@@ -68,5 +68,6 @@ ivec2_t get_ui_list_hovered_button();
 uvec2_t get_ui_list_button_info_size(int32_t i, char* info_str);
 void draw_ui_list(int32_t i);
 void draw_ui_list_hovered_button_info_string();
+void draw_all_ui_lists();
 
 #endif

@@ -265,13 +265,37 @@ int32_t has_enough_resources(int32_t player_id, int32_t tile_type_id) {
 
 void enter_main_menu() {
     close_all_ui_lists();
+    close_all_alerts();
+    page = PAGE_MAIN_MENU;
+
     // set up ui lists
+    int32_t ui_list_id = new_ui_list_assign_id();
+    ui_lists[ui_list_id] = (ui_list_t){
+        .active = 1,
+        .permenant = 1,
 
-}
-void exit_main_menu() {
+        .font = &big_letters_font,
+        .padding = 3,
+        .button_padding = 4,
 
+        .box_pos_from_world_pos = 0,
+        .x = _OUTPORT_WIDTH_*0.5  - (strlen("Play!")*big_letters_font.letter_width + 4*2)*0.5,
+        .y = _OUTPORT_HEIGHT_*0.5 + big_letters_font.letter_height*0.5 + 4,
+
+        .buttons_amount = 1,
+        .button_strings = {"Play!"},
+        .button_info_strings = {""},
+        .button_callbacks = {&ui_list_play_button_callback},
+
+        .child_ui_list = -1,
+        .parent_ui_list = -1
+    };
 }
 void enter_game() {
+    close_all_ui_lists();
+    close_all_alerts();
+    page = PAGE_IN_GAME;
+
     selected_tile.x = -1;
     selected_tile.y = -1;
     hovered_tiles[0].x = -1;
@@ -353,9 +377,6 @@ void enter_game() {
     };
 
     page = PAGE_IN_GAME;
-}
-void exit_game_button_callback(int32_t ui_list_id, int32_t button_id) {
-    
 }
 void switch_turn_button_callback(int32_t ui_list_id, int32_t button_id) {
     request_switch_turn();
@@ -485,6 +506,12 @@ void player_1_ai_turn() {
 }
 
 
+void ui_list_exit_game_button_callback(int32_t ui_list_id, int32_t button_id) {
+    enter_main_menu();
+}
+void ui_list_play_button_callback(int32_t ui_list_id, int32_t button_id) {
+    enter_game();
+}
 void ui_list_build_specific_button_callback(int32_t ui_list_id, int32_t button_id) {
     if (game_struct.game_ended == 1) {
         add_error_alert_at_cursor("The game has ended");

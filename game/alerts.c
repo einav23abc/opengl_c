@@ -92,4 +92,13 @@ void add_error_alert_at_cursor(char* string) {
 void close_all_alerts() {
     for (int32_t i = 0; i < _MAX_ALERTS_AMOUNT_; i++) alerts[i].time_to_live = 0;
 }
+void draw_all_alerts() {
+    for (int32_t i = 0; i < _MAX_ALERTS_AMOUNT_; i++) {
+        if (alerts[i].time_to_live <= 0) continue;
+        uvec2_t box_pos = get_alert_box_pos(i);
+        uint32_t left_x = box_pos.x;
+        uint32_t bottom_y = box_pos.y;
+        draw_str_boxed(alerts[i].string, letters_font, left_x, bottom_y, alerts[i].padding, alerts[i].font->letter_height);
+    }
+}
 

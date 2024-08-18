@@ -196,3 +196,10 @@ void draw_ui_list_hovered_button_info_string() {
         }
     }
 }
+void draw_all_ui_lists() {
+    for (int32_t i = 0; i < _MAX_UI_LISTS_AMOUNT_; i++) {
+        if (ui_lists[i].active == 0) continue;
+        draw_ui_list(i);
+    }
+    draw_ui_list_hovered_button_info_string();
+}
