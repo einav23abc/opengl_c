@@ -749,6 +749,7 @@ void init_game() {
     hovered_tiles[1].y = -1;
 
     game_struct.player_turn = 0;
+    game_struct.game_ended = 0;
 
     in_cooldowns_translation = 0;
 
@@ -784,28 +785,28 @@ void init_game() {
     game_struct.players[1].tiles[19].cooldown_timer = tile_type_properties[TILE_TYPE_MINE].give_cooldown;
     game_struct.players[1].tiles[19].curent_cooldown_timer = tile_type_properties[TILE_TYPE_MINE].give_cooldown;
 
-    game_struct.players[0].wheight = 0;
+    game_struct.players[0].wheight = -6;
     game_struct.players[0].resources.wood = 2;
     game_struct.players[0].resources.stone = 2;
     game_struct.players[0].resources.wheat = 2;
     game_struct.players[0].resources.soldiers = 0;
     game_struct.players[0].resources.population = 2;
-    game_struct.players[1].wheight = 0;
+    game_struct.players[1].wheight = 6;
     game_struct.players[1].resources.wood = 2;
     game_struct.players[1].resources.stone = 2;
     game_struct.players[1].resources.wheat = 2;
     game_struct.players[1].resources.soldiers = 0;
     game_struct.players[1].resources.population = 2;
 
-    // next turn ui list
+    // next turn - ui list
     int32_t ui_list_id = new_ui_list_assign_id();
     ui_lists[ui_list_id] = (ui_list_t){
         .active = 1,
         .permenant = 1,
 
         .box_pos_from_world_pos = 0,
-        .x = _OUTPORT_WIDTH_ - _UI_LIST_PADDING_ - get_str_boxed_size("end_turn", _UI_LIST_BUTTON_HEIGHT_).x,
-        .y = _UI_LIST_BUTTON_HEIGHT_ + _UI_LIST_PADDING_,
+        .x = _UI_LIST_PADDING_,
+        .y = _OUTPORT_HEIGHT_ - _UI_LIST_PADDING_,
 
         .buttons_amount = 1,
         .button_strings = {"end turn"},

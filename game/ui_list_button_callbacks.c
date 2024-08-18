@@ -2,6 +2,15 @@
 #include "game.h"
 
 void ui_list_build_specific_button_callback(int32_t ui_list_id, int32_t button_id) {
+    if (game_struct.game_ended == 1) {
+        add_error_alert_at_cursor("The game has ended");
+        close_unperm_ui_lists();
+        // unselect tile
+        selected_tile.x = -1;
+        selected_tile.y = -1;
+        return;
+    }
+
     int32_t tile_type_id = button_id;
     tile_type_t* tile_type = &(tile_type_properties[tile_type_id]);
 
@@ -29,6 +38,15 @@ void ui_list_build_specific_button_callback(int32_t ui_list_id, int32_t button_i
 }
 
 void ui_list_build_button_callback(int32_t ui_list_id, int32_t button_id) {
+    if (game_struct.game_ended == 1) {
+        add_error_alert_at_cursor("The game has ended");
+        close_unperm_ui_lists();
+        // unselect tile
+        selected_tile.x = -1;
+        selected_tile.y = -1;
+        return;
+    }
+
     // close child (if exists)
     close_ui_list(ui_lists[ui_list_id].child_ui_list);
 
@@ -71,6 +89,15 @@ void ui_list_build_button_callback(int32_t ui_list_id, int32_t button_id) {
 }
 
 void ui_list_attack_button_callback(int32_t ui_list_id, int32_t button_id) {
+    if (game_struct.game_ended == 1) {
+        add_error_alert_at_cursor("The game has ended");
+        close_unperm_ui_lists();
+        // unselect tile
+        selected_tile.x = -1;
+        selected_tile.y = -1;
+        return;
+    }
+
     if (game_struct.players[0].resources.soldiers < 1) {
         // not enough resources
         add_error_alert_at_cursor("Not enough resources");
@@ -92,6 +119,15 @@ void ui_list_attack_button_callback(int32_t ui_list_id, int32_t button_id) {
 }
 
 void ui_list_demolish_sure_button_callback(int32_t ui_list_id, int32_t button_id) {
+    if (game_struct.game_ended == 1) {
+        add_error_alert_at_cursor("The game has ended");
+        close_unperm_ui_lists();
+        // unselect tile
+        selected_tile.x = -1;
+        selected_tile.y = -1;
+        return;
+    }
+
     game_struct.players[0].wheight -= 1;
     game_struct.players[1].wheight += 1;
 
@@ -133,6 +169,15 @@ void ui_list_demolish_sure_button_callback(int32_t ui_list_id, int32_t button_id
 }
 
 void ui_list_demolish_button_callback(int32_t ui_list_id, int32_t button_id) {
+    if (game_struct.game_ended == 1) {
+        add_error_alert_at_cursor("The game has ended");
+        close_unperm_ui_lists();
+        // unselect tile
+        selected_tile.x = -1;
+        selected_tile.y = -1;
+        return;
+    }
+    
     // close child (if exists)
     close_ui_list(ui_lists[ui_list_id].child_ui_list);
 

@@ -89,6 +89,7 @@ typedef struct {
 typedef struct {
     player_t players[2];
     uint8_t player_turn;
+    uint8_t game_ended;
 } game_t;
 
 
@@ -179,6 +180,7 @@ ivec2_t get_hovered_tile_position(uint8_t player_i);
 
 int32_t has_enough_resources(int32_t player_id, int32_t tile_type_id);
 
+void exit_game_button_callback(int32_t ui_list_id, int32_t button_id);
 void switch_turn_button_callback(int32_t ui_list_id, int32_t button_id);
 void switch_turn();
 void player_1_turn();

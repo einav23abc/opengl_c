@@ -41,6 +41,11 @@ void handle_event() {
 #include "ui_list_button_callbacks.c"
 
 void mouse_press_in_game() {
+    if (game_struct.game_ended == 1) {
+        add_error_alert_at_cursor("The game has ended");
+        return;
+    }
+    
     if (game_struct.player_turn == 1) {
         add_error_alert_at_cursor("It is not your turn");
         return;

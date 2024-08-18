@@ -380,10 +380,8 @@ void render_game_world() {
 
 
 void render_game_ui() {
-    glClear(GL_DEPTH_BUFFER_BIT);
     glDisable(GL_DEPTH_TEST);
-
-
+    
     // <cooldown billboards>
         quat_t quat_rotation;
         billboard_t billboard;
@@ -417,7 +415,7 @@ void render_game_ui() {
         }
         use_shader(ui_shader);
     // </cooldown billboards>
-
+    
 
     // draw ui lists
     int32_t ui_list_to_draw_info_string = -1;

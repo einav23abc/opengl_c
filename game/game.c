@@ -261,7 +261,20 @@ int32_t has_enough_resources(int32_t player_id, int32_t tile_type_id) {
     return 1;
 }
 
+
+void exit_game_button_callback(int32_t ui_list_id, int32_t button_id) {
+    
+}
 void switch_turn_button_callback(int32_t ui_list_id, int32_t button_id) {
+    if (game_struct.game_ended == 1) {
+        add_error_alert_at_cursor("The game has ended");
+        close_unperm_ui_lists();
+        // unselect tile
+        selected_tile.x = -1;
+        selected_tile.y = -1;
+        return;
+    }
+
     if (game_struct.player_turn == 1) {
         add_error_alert_at_cursor("It is not your turn");
         return;
@@ -269,6 +282,8 @@ void switch_turn_button_callback(int32_t ui_list_id, int32_t button_id) {
     switch_turn();
 }
 void switch_turn() {
+    if (game_struct.game_ended == 1) return;
+
     game_struct.player_turn = !game_struct.player_turn;
     selected_tile.x = -1;
     selected_tile.y = -1;

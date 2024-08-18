@@ -187,6 +187,7 @@ void simple_draw_module_set_color(float r, float g, float b, float a) {
 void simple_draw_module_draw_rect(float x, float y, float w, float h) {
     int64_t last_shader = current_shader;
 
+    uint32_t cull_face_was_enabled = glIsEnabled(GL_CULL_FACE);
     glDisable(GL_CULL_FACE);
 
     use_shader((shader_t*)simple_draw_module_cube_shader);
@@ -200,7 +201,7 @@ void simple_draw_module_draw_rect(float x, float y, float w, float h) {
     );
     draw_mesh((mesh_t*)simple_draw_module_rectangle_mesh);
 
-    glEnable(GL_CULL_FACE);
+    if (cull_face_was_enabled) glEnable(GL_CULL_FACE);
 
     use_shader(shaders_list[last_shader]);
     return;
@@ -208,6 +209,7 @@ void simple_draw_module_draw_rect(float x, float y, float w, float h) {
 void simple_draw_module_draw_cube(float x, float y, float z, float w, float h, float d) {
     int64_t last_shader = current_shader;
 
+    uint32_t cull_face_was_enabled = glIsEnabled(GL_CULL_FACE);
     glDisable(GL_CULL_FACE);
 
     use_shader((shader_t*)simple_draw_module_cube_shader);
@@ -221,7 +223,7 @@ void simple_draw_module_draw_cube(float x, float y, float z, float w, float h, f
     );
     draw_mesh((mesh_t*)simple_draw_module_cube_mesh);
 
-    glEnable(GL_CULL_FACE);
+    if (cull_face_was_enabled) glEnable(GL_CULL_FACE);
 
     use_shader(shaders_list[last_shader]);
     return;
@@ -229,6 +231,7 @@ void simple_draw_module_draw_cube(float x, float y, float z, float w, float h, f
 void simple_draw_module_draw_ball(float x, float y, float z, float r) {
     int64_t last_shader = current_shader;
 
+    uint32_t cull_face_was_enabled = glIsEnabled(GL_CULL_FACE);
     glDisable(GL_CULL_FACE);
 
     use_shader((shader_t*)simple_draw_module_cube_shader);
@@ -242,32 +245,35 @@ void simple_draw_module_draw_ball(float x, float y, float z, float r) {
     );
     draw_mesh((mesh_t*)simple_draw_module_ball_mesh);
 
-    glEnable(GL_CULL_FACE);
+    if (cull_face_was_enabled) glEnable(GL_CULL_FACE);
 
     use_shader(shaders_list[last_shader]);
     return;
 }
 
 void simple_draw_module_draw_texture(texture_t* texture) {
+    uint32_t depth_test_was_enabled = glIsEnabled(GL_DEPTH_TEST);
     glDisable(GL_DEPTH_TEST);
     use_shader((shader_t*)simple_draw_module_screen_quad_mesh_shader);
     bind_texture(texture, simple_draw_module_screen_quad_mesh_shader->u_texture_loc, 0);
     draw_mesh((mesh_t*)simple_draw_module_screen_quad_mesh);
-    glEnable(GL_DEPTH_TEST);
+    if(depth_test_was_enabled) glEnable(GL_DEPTH_TEST);
 }
 
 void simple_draw_module_draw_fbo_color_texture(fbo_t* fbo) {
+    uint32_t depth_test_was_enabled = glIsEnabled(GL_DEPTH_TEST);
     glDisable(GL_DEPTH_TEST);
     use_shader((shader_t*)simple_draw_module_screen_quad_mesh_shader);
     bind_fbo_color_texture(fbo, simple_draw_module_screen_quad_mesh_shader->u_texture_loc, 0);
     draw_mesh((mesh_t*)simple_draw_module_screen_quad_mesh);
-    glEnable(GL_DEPTH_TEST);
+    if(depth_test_was_enabled) glEnable(GL_DEPTH_TEST);
 }
 
 void simple_draw_module_draw_fbo_depth_stencil_texture(fbo_t* fbo) {
+    uint32_t depth_test_was_enabled = glIsEnabled(GL_DEPTH_TEST);
     glDisable(GL_DEPTH_TEST);
     use_shader((shader_t*)simple_draw_module_screen_quad_mesh_shader);
     bind_fbo_depth_stencil_texture(fbo, simple_draw_module_screen_quad_mesh_shader->u_texture_loc, 0);
     draw_mesh((mesh_t*)simple_draw_module_screen_quad_mesh);
-    glEnable(GL_DEPTH_TEST);
+    if(depth_test_was_enabled) glEnable(GL_DEPTH_TEST);
 }

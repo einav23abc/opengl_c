@@ -30,10 +30,51 @@ void update_game() {
         switch_turn();
     }
 
+    if (
+        game_struct.game_ended == 0 &&
+        (
+            game_struct.players[0].wheight >= _WIN_WHEIGHT_ ||
+            game_struct.players[1].wheight >= _WIN_WHEIGHT_
+        )
+    ) {
+        game_struct.game_ended = 1;
+        
+        // game ended - ui list
+        char* message;
+        if (game_struct.players[0].wheight >= _WIN_WHEIGHT_) {
+            message = "You won!";
+        }else {
+            message = "You lost";
+        }
+        int32_t ui_list_id = new_ui_list_assign_id();
+        ui_lists[ui_list_id] = (ui_list_t){
+            .active = 1,
+            .permenant = 1,
+
+            .box_pos_from_world_pos = 0,
+            .x = _OUTPORT_WIDTH_*0.5  - get_str_boxed_size(message, _UI_LIST_BUTTON_HEIGHT_).x*0.5,
+            .y = _OUTPORT_HEIGHT_*0.5 + _UI_LIST_BUTTON_HEIGHT_,
+
+            .buttons_amount = 2,
+            .button_strings = {
+                "exit game",
+                message
+            },
+            .button_info_strings = {"",""},
+            .button_callbacks = {
+                &exit_game_button_callback,
+                NULL
+            },
+
+            .child_ui_list = -1,
+            .parent_ui_list = -1
+        };
+    }
+
     player_translations_update();
     tile_cooldowns_update();
     camera_update();
-    sun_shadow_map_update();
+    sun_shadow_map_update(); // a bit redundent
     update_hovered_tile();
     
     if (game_struct.player_turn == 1) {
@@ -119,8 +160,16 @@ void player_translations_update() {
     
     for (uint8_t i = 0; i < 2; i++) {
         // set translation
+        int32_t showed_wheight = game_struct.players[i].wheight;
+        if (showed_wheight > _WIN_WHEIGHT_) {
+            showed_wheight = _WIN_WHEIGHT_;
+        }else if (showed_wheight < -_WIN_WHEIGHT_) {
+            showed_wheight = -_WIN_WHEIGHT_;
+        }
+
         float last_y_translation = game_struct.players[i].y_translation;
-        game_struct.players[i].y_translation = (-game_struct.players[i].wheight*0.5)*_TILE_SIZE_+_SCALE_AXIS_POINT_Y_ + _TILE_SIZE_*0.5;
+
+        game_struct.players[i].y_translation = (-showed_wheight*0.5)*_TILE_SIZE_+_SCALE_AXIS_POINT_Y_ + _TILE_SIZE_*0.5;
         if (last_y_translation != game_struct.players[i].y_translation) {
             in_tiles_translation = 1;
 
