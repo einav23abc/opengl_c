@@ -42,8 +42,7 @@ void handle_event() {
 
 void mouse_press_in_game() {
     if (game_struct.player_turn == 1) {
-        close_all_alerts();
-        add_error_alert_at_cursor("It is not your turn.");
+        add_error_alert_at_cursor("It is not your turn");
         return;
     }
 
@@ -76,14 +75,19 @@ void mouse_press_in_game() {
         selected_tile.z = 0;
     }
 
+
+    // in player 0
     if (selected_tile.z == 0) {
         int32_t tile_type_id = game_struct.players[0].tiles[selected_tile.y*_PLAYER_GRID_WIDTH_ + selected_tile.x].type;
 
         if (tile_type_id == TILE_TYPE_EMPTY) {
+            // build
+
             // create ui list
             int32_t ui_list_id = new_ui_list_assign_id();
             ui_lists[ui_list_id] = (ui_list_t){
                 .active = 1,
+                .permenant = 0,
 
                 .box_pos_from_world_pos = 1,
                 .box_world_pos_x = selected_tile.x*_TILE_SIZE_ + game_struct.players[0].x_current_translation + _TILE_SIZE_*0.5,
@@ -101,10 +105,13 @@ void mouse_press_in_game() {
                 .parent_ui_list = -1
             };
         }else {
+            // destroy
+
             // create ui list
             int32_t ui_list_id = new_ui_list_assign_id();
             ui_lists[ui_list_id] = (ui_list_t){
                 .active = 1,
+                .permenant = 0,
 
                 .box_pos_from_world_pos = 1,
                 .box_world_pos_x = selected_tile.x*_TILE_SIZE_ + game_struct.players[0].x_current_translation + _TILE_SIZE_*0.5,
@@ -115,7 +122,7 @@ void mouse_press_in_game() {
 
                 .buttons_amount = 1,
                 .button_strings = {"demolish"},
-                .button_info_strings = {"Destroy this building"},
+                .button_info_strings = {tile_type_properties[tile_type_id].demolish_info_string},
                 .button_callbacks = {&ui_list_demolish_button_callback},
 
                 .child_ui_list = -1,
@@ -123,7 +130,33 @@ void mouse_press_in_game() {
             };
         }
     }else if (selected_tile.z == 1) {
+        int32_t tile_type_id = game_struct.players[1].tiles[selected_tile.y*_PLAYER_GRID_WIDTH_ + selected_tile.x].type;
 
+        if (tile_type_id != TILE_TYPE_EMPTY) {
+            // attack other player
+
+            // create ui list
+            int32_t ui_list_id = new_ui_list_assign_id();
+            ui_lists[ui_list_id] = (ui_list_t){
+                .active = 1,
+                .permenant = 0,
+
+                .box_pos_from_world_pos = 1,
+                .box_world_pos_x = selected_tile.x*_TILE_SIZE_ + game_struct.players[1].x_current_translation + _TILE_SIZE_*0.5,
+                .box_world_pos_y = game_struct.players[1].y_current_translation,
+                .box_world_pos_z = selected_tile.y*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_ + _TILE_SIZE_*0.5,
+                .x = 0,
+                .y = 0,
+
+                .buttons_amount = 1,
+                .button_strings = {"attack"},
+                .button_info_strings = {"destroy this building\n* -1\5"},
+                .button_callbacks = {&ui_list_attack_button_callback},
+
+                .child_ui_list = -1,
+                .parent_ui_list = -1
+            };
+        }
     }
 
 

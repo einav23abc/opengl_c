@@ -19,19 +19,15 @@ void update() {
 
 void update_game() {
     if (keys[SDL_SCANCODE_K] == 1) {
-        game_struct.players[0].wheight += 1;
-        game_struct.players[1].wheight -= 1;
-    }
-    if (keys[SDL_SCANCODE_L] == 1) {
         game_struct.players[0].wheight -= 1;
         game_struct.players[1].wheight += 1;
     }
+    if (keys[SDL_SCANCODE_L] == 1) {
+        game_struct.players[0].wheight += 1;
+        game_struct.players[1].wheight -= 1;
+    }
     if (keys[SDL_SCANCODE_J] == 1) {
         switch_turn();
-    }
-    
-    if (game_struct.player_turn == 1) {
-        player_1_turn();
     }
 
     player_translations_update();
@@ -39,6 +35,10 @@ void update_game() {
     camera_update();
     sun_shadow_map_update();
     update_hovered_tile();
+    
+    if (game_struct.player_turn == 1) {
+        player_1_turn();
+    }
 }
 
 void camera_update() {
@@ -115,17 +115,23 @@ void camera_update() {
 }
 
 void player_translations_update() {
+    in_tiles_translation = 0;
+    
     for (uint8_t i = 0; i < 2; i++) {
         // set translation
         float last_y_translation = game_struct.players[i].y_translation;
-        game_struct.players[i].y_translation = (game_struct.players[i].wheight*0.5)*_TILE_SIZE_+_SCALE_AXIS_POINT_Y_ + _TILE_SIZE_*0.5;
+        game_struct.players[i].y_translation = (-game_struct.players[i].wheight*0.5)*_TILE_SIZE_+_SCALE_AXIS_POINT_Y_ + _TILE_SIZE_*0.5;
         if (last_y_translation != game_struct.players[i].y_translation) {
+            in_tiles_translation = 1;
+
             game_struct.players[i].y_lerp_start_translation = game_struct.players[i].y_current_translation;
             game_struct.players[i].translation_lerp_time = 0;
         }
 
         // animate current translation
         if (game_struct.players[i].y_current_translation != game_struct.players[i].y_translation) {
+            in_tiles_translation = 1;
+
             game_struct.players[i].translation_lerp_time = min(game_struct.players[i].translation_lerp_time + delta_time, _PLAYER_TRANSLATION_LERP_DURATION_);
             float t_linear = ((float)(game_struct.players[i].translation_lerp_time))/_PLAYER_TRANSLATION_LERP_DURATION_;
             float t = ease_out_back(t_linear);
@@ -156,6 +162,8 @@ void player_translations_update() {
 }
 
 void tile_cooldowns_update() {
+    in_cooldowns_translation = 0;
+
     for (uint8_t i = 0; i < 2; i++) {
         for (uint32_t x = 0; x < _PLAYER_GRID_WIDTH_; x++) {
             for (uint32_t z = 0; z < _PLAYER_GRID_DEPTH_; z++) {
@@ -163,6 +171,8 @@ void tile_cooldowns_update() {
                 
                 if (tile->type == TILE_TYPE_EMPTY) continue;
                 if (tile->curent_cooldown_timer == tile->cooldown_timer) continue;
+
+                in_cooldowns_translation = 1;
 
                 if (tile->cooldown_timer > tile->curent_cooldown_timer) {
                     // go to 0 and jump up

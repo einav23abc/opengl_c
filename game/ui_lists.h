@@ -18,6 +18,8 @@ typedef void(*button_callback_t)(int32_t, int32_t);
 
 typedef struct {
     uint8_t active : 1;
+    uint8_t safe : 1;
+    uint8_t permenant : 1;
 
     uint8_t box_pos_from_world_pos : 1;
     float box_world_pos_x;
@@ -33,7 +35,6 @@ typedef struct {
     char* button_info_strings[_UI_LIST_MAX_BUTTONS_AMOUNT_];
     button_callback_t button_callbacks[_UI_LIST_MAX_BUTTONS_AMOUNT_];
 
-    uint8_t safe : 1;
     int32_t parent_ui_list;
     int32_t child_ui_list;
 } ui_list_t;
@@ -47,6 +48,7 @@ void set_ui_lists_to_unsafe();
 void close_ui_list(int32_t i);
 void make_ui_list_safe(int32_t i);
 void close_unsafe_ui_lists();
+void close_unperm_ui_lists();
 void close_all_ui_lists();
 uint32_t get_ui_list_width(int32_t i);
 uint32_t get_ui_list_height(int32_t i);

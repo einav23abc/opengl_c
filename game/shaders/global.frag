@@ -55,7 +55,7 @@ void main(){
     float lighting = clamp(light*shadow,0.0,1.0)*0.9+0.1;
 
     float aerial_mixing = max(0.0,min(1.0,1-0.001*distance(v_position,u_camera_position)));
-    const vec3 aerial_color = vec3(0.2, 0.2, 0.3);
+    const vec3 aerial_color = vec3(71, 65, 107)/255.0;
 
     vec3 color = texture2D(u_texture, v_texcoord).xyz*lighting;
     color = (color*aerial_mixing)+(aerial_color*(1-aerial_mixing));

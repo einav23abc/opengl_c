@@ -23,7 +23,13 @@ void make_ui_list_safe(int32_t i) {
 }
 void close_unsafe_ui_lists() {
     for (int32_t i = 0; i < _MAX_UI_LISTS_AMOUNT_; i++) {
+        if (ui_lists[i].permenant == 1) continue;
         if (ui_lists[i].safe == 0) ui_lists[i].active = 0;
+    }
+}
+void close_unperm_ui_lists() {
+    for (int32_t i = 0; i < _MAX_UI_LISTS_AMOUNT_; i++) {
+        if (ui_lists[i].permenant == 0) ui_lists[i].active = 0;
     }
 }
 void close_all_ui_lists() {

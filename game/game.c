@@ -16,6 +16,7 @@ shader_t* global_shader;
 shader_t* ui_shader;
 shader_t* font_shader;
 shader_t* cooldown_billboards_shader;
+shader_t* tile_effect_shader;
 
 vec3_t camera_pos;
 camera_t* camera;
@@ -24,12 +25,16 @@ camera_t* ui_camera;
 mesh_t* rect_plane_mesh;
 mesh_t* cube_mesh;
 mesh_t* centered_cube_mesh;
+mesh_t* tile_effect_mesh;
 
 tile_type_t tile_type_properties[_TILE_TYPES_AMOUNT_];
 
 game_t game_struct;
 ivec3_t selected_tile;
 ivec2_t hovered_tiles[2];
+int8_t in_cooldowns_translation;
+int8_t in_tiles_translation;
+int8_t player1_ai_played;
 
 float sun_vector_x;
 float sun_vector_y;
@@ -241,11 +246,35 @@ ivec2_t get_hovered_tile_position(uint8_t player_i) {
 }
 
 
+int32_t has_enough_resources(int32_t player_id, int32_t tile_type_id) {
+    tile_type_t* tile_type = &(tile_type_properties[tile_type_id]);
+
+    if (
+        game_struct.players[player_id].resources.wood       < tile_type->cost.wood       ||
+        game_struct.players[player_id].resources.stone      < tile_type->cost.stone      ||
+        game_struct.players[player_id].resources.wheat      < tile_type->cost.wheat      ||
+        game_struct.players[player_id].resources.population < tile_type->cost.population ||
+        game_struct.players[player_id].resources.soldiers   < tile_type->cost.soldiers
+    ) {
+        return 0;
+    }
+    return 1;
+}
+
+void switch_turn_button_callback(int32_t ui_list_id, int32_t button_id) {
+    if (game_struct.player_turn == 1) {
+        add_error_alert_at_cursor("It is not your turn");
+        return;
+    }
+    switch_turn();
+}
 void switch_turn() {
     game_struct.player_turn = !game_struct.player_turn;
     selected_tile.x = -1;
     selected_tile.y = -1;
-    close_all_ui_lists();
+    close_unperm_ui_lists();
+
+    player1_ai_played = 0;
 
     // update cooldown timers
     for (uint32_t x = 0; x < _PLAYER_GRID_WIDTH_; x++) {
@@ -266,5 +295,81 @@ void player_1_turn() {
     player_1_ai_turn();
 }
 void player_1_ai_turn() {
+    // dont resolve turn while transitions (animations) are playing
+    if (in_cooldowns_translation == 1) return;
+    if (in_tiles_translation == 1) return;
 
+    if (player1_ai_played == 1) {
+        switch_turn();
+        return;
+    }
+
+    // count amounts
+    int32_t tile_types_amounts[_TILE_TYPES_AMOUNT_];
+    for (uint32_t i = 0; i < _TILE_TYPES_AMOUNT_; i++) tile_types_amounts[i] = 0;
+    for (uint32_t x = 0; x < _PLAYER_GRID_WIDTH_; x++) {
+        for (uint32_t z = 0; z < _PLAYER_GRID_DEPTH_; z++) {
+            tile_t* tile = &(game_struct.players[game_struct.player_turn].tiles[z*_PLAYER_GRID_DEPTH_ + x]);
+            if (tile->type == TILE_TYPE_EMPTY) continue;
+            tile_types_amounts[tile->type] += 1;
+        }
+    }
+
+    // sort amounts
+    int32_t sorted_tile_type_id[_TILE_TYPES_AMOUNT_];
+    for (uint32_t i = 0; i < _TILE_TYPES_AMOUNT_; i++) sorted_tile_type_id[i] = i;
+    // bubble sort
+    for (uint32_t i = 0; i < _TILE_TYPES_AMOUNT_-1; i++) {
+        for (uint32_t j = 0; j < _TILE_TYPES_AMOUNT_-1-i; j++) {
+            if (
+                (tile_types_amounts[sorted_tile_type_id[j]] > tile_types_amounts[sorted_tile_type_id[j+1]]) ||
+                // put some randomness into equal amount tiles
+                (
+                    tile_types_amounts[sorted_tile_type_id[j]] == tile_types_amounts[sorted_tile_type_id[j+1]] &&
+                    rand()%2 == 1
+                )
+            ) {
+                int32_t tmp = sorted_tile_type_id[j];
+                sorted_tile_type_id[j  ] = sorted_tile_type_id[j+1];
+                sorted_tile_type_id[j+1] = tmp;
+            }
+        }
+    }
+
+    // build whatever i can
+    while(1) {
+        uint8_t built = 0;
+        for (uint32_t i = 0; i < _TILE_TYPES_AMOUNT_-1; i++) {
+            if (has_enough_resources(1, sorted_tile_type_id[i]) == 0) continue;
+
+            // find space to build
+            int32_t new_tile_grid_index = -1;
+            for (uint32_t j = 0; j < _PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_; j++) {
+                if (game_struct.players[1].tiles[j].type == TILE_TYPE_EMPTY) {
+                    new_tile_grid_index = j;
+                    break;
+                }
+            }
+            // handle no space
+            if (new_tile_grid_index == -1) break;
+
+            int32_t tile_type_id = sorted_tile_type_id[i];
+            tile_type_t* tile_type = &(tile_type_properties[tile_type_id]);
+
+            game_struct.players[1].wheight += 1;
+            game_struct.players[0].wheight -= 1;
+            game_struct.players[1].resources.wood       -= tile_type->cost.wood;
+            game_struct.players[1].resources.stone      -= tile_type->cost.stone;
+            game_struct.players[1].resources.wheat      -= tile_type->cost.wheat;
+            game_struct.players[1].resources.population -= tile_type->cost.population;
+            game_struct.players[1].resources.soldiers   -= tile_type->cost.soldiers;
+            game_struct.players[1].tiles[new_tile_grid_index].cooldown_timer        = tile_type->give_cooldown;
+            game_struct.players[1].tiles[new_tile_grid_index].curent_cooldown_timer = tile_type->give_cooldown;
+            game_struct.players[1].tiles[new_tile_grid_index].type = tile_type_id;
+        }
+        if (built == 0) break;
+    }
+
+    // end turn after transitions will end
+    player1_ai_played = 1;
 }

@@ -40,6 +40,81 @@ void render_game() {
         render_game_world();
     // </game world>
 
+    // <hovered and selected tiles>
+        use_shader(tile_effect_shader);
+        glDisable(GL_CULL_FACE);
+
+        // hovered tile
+        for (int8_t i = 0; i < 2; i ++) {
+            if (
+                hovered_tiles[i].x < 0 ||
+                hovered_tiles[i].x >= _PLAYER_GRID_WIDTH_ ||
+                hovered_tiles[i].y < 0 ||
+                hovered_tiles[i].y >= _PLAYER_GRID_DEPTH_
+            ) continue;
+
+            // dont draw on selected tile
+            if (
+                i == selected_tile.z &&
+                hovered_tiles[i].x == selected_tile.x &&
+                hovered_tiles[i].y == selected_tile.y
+            ) continue;
+
+            // u_position
+            glUniform3f(
+                shaders_list[current_shader]->uniform_locations[0],
+                hovered_tiles[i].x*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
+                game_struct.players[i].y_current_translation,
+                hovered_tiles[i].y*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
+            );
+            // u_scale
+            glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_, _TILE_SIZE_*0.5, _TILE_SIZE_);
+            // u_quat_rotation
+            quat_t quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
+            glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
+            // u_color
+            glUniform3f(shaders_list[current_shader]->uniform_locations[3], ((float)108)/255, ((float)140)/255, ((float)80)/255);
+            // u_speed
+            glUniform1f(shaders_list[current_shader]->uniform_locations[4], 0.0005);
+            // u_freq
+            glUniform1f(shaders_list[current_shader]->uniform_locations[5], 5);
+            // u_time
+            glUniform1f(shaders_list[current_shader]->uniform_locations[6], (float)time);
+            draw_mesh(tile_effect_mesh);
+        }
+
+        // selected tile
+        if (
+            selected_tile.x >= 0 &&
+            selected_tile.x < _PLAYER_GRID_WIDTH_ &&
+            selected_tile.y >= 0 &&
+            selected_tile.y < _PLAYER_GRID_DEPTH_
+        ) {
+            // u_position
+            glUniform3f(
+                shaders_list[current_shader]->uniform_locations[0],
+                selected_tile.x*_TILE_SIZE_ + game_struct.players[selected_tile.z].x_current_translation,
+                game_struct.players[selected_tile.z].y_current_translation,
+                selected_tile.y*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
+            );
+            // u_scale
+            glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_, _TILE_SIZE_*0.5, _TILE_SIZE_);
+            // u_quat_rotation
+            quat_t quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
+            glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
+            // u_color
+            glUniform3f(shaders_list[current_shader]->uniform_locations[3], ((float)227)/255, ((float)210)/255, ((float)69)/255);
+            // u_speed
+            glUniform1f(shaders_list[current_shader]->uniform_locations[4], 0.0005);
+            // u_freq
+            glUniform1f(shaders_list[current_shader]->uniform_locations[5], 5);
+            // u_time
+            glUniform1f(shaders_list[current_shader]->uniform_locations[6], (float)time);
+            draw_mesh(tile_effect_mesh);
+        }
+        glEnable(GL_CULL_FACE);
+    // </hovered and selected tiles>
+
     // <ui>
         use_fbo(outport_fbo);
         use_camera(ui_camera);
@@ -186,63 +261,121 @@ void render_game_world() {
     for (int8_t i = 0; i < 2; i ++) {
         for (uint32_t x = 0; x < _PLAYER_GRID_WIDTH_; x++) {
             for (uint32_t z = 0; z < _PLAYER_GRID_DEPTH_; z++) {
-                uint8_t hovered = (hovered_tiles[i].x == x && hovered_tiles[i].y == z);
-                uint8_t selected = (selected_tile.x == x && selected_tile.y == z && selected_tile.z == i);
                 int32_t tile_type = game_struct.players[i].tiles[z*_PLAYER_GRID_DEPTH_ + x].type;
                 
-                if (tile_type != TILE_TYPE_EMPTY) {
-                    // u_position
-                    glUniform3f(
-                        shaders_list[current_shader]->uniform_locations[0],
-                        (((float)x)+0.25)*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
-                        game_struct.players[i].y_current_translation,
-                        (((float)z)+0.25)*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
-                    );
-                    // u_scale
-                    glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_*0.5, _TILE_SIZE_*0.75, _TILE_SIZE_*0.5);
-                    // u_quat_rotation
-                    quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
-                    glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
-                    draw_mesh(cube_mesh);
-                }
+                switch (tile_type) {
+                    case TILE_TYPE_HOUSE:
+                        // u_position
+                        glUniform3f(
+                            shaders_list[current_shader]->uniform_locations[0],
+                            (((float)x)+0.25)*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
+                            game_struct.players[i].y_current_translation,
+                            (((float)z)+0.25)*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
+                        );
+                        // u_scale
+                        glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_*0.5, _TILE_SIZE_*0.75, _TILE_SIZE_*0.5);
+                        // u_quat_rotation
+                        quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
+                        glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
+                        draw_mesh(cube_mesh);
+                        break;
 
-                
-                if (selected) {
-                    // u_position
-                    glUniform3f(
-                        shaders_list[current_shader]->uniform_locations[0],
-                        (((float)x)+0.125)*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
-                        game_struct.players[i].y_current_translation,
-                        (((float)z)+0.125)*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
-                    );
-                    // u_scale
-                    glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_*0.75, _TILE_SIZE_*0.25, _TILE_SIZE_*0.75);
-                    // u_quat_rotation
-                    quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
-                    glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
-                    draw_mesh(cube_mesh);
-                }
+                    case TILE_TYPE_BARRACKS:
+                        // u_position
+                        glUniform3f(
+                            shaders_list[current_shader]->uniform_locations[0],
+                            (((float)x)+0.125)*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
+                            game_struct.players[i].y_current_translation,
+                            (((float)z)+0.375)*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
+                        );
+                        // u_scale
+                        glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_*0.75, _TILE_SIZE_*0.5, _TILE_SIZE_*0.25);
+                        // u_quat_rotation
+                        quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
+                        glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
+                        draw_mesh(cube_mesh);
+                        
+                        // u_position
+                        glUniform3f(
+                            shaders_list[current_shader]->uniform_locations[0],
+                            (((float)x)+0.375)*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
+                            game_struct.players[i].y_current_translation,
+                            (((float)z)+0.125)*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
+                        );
+                        // u_scale
+                        glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_*0.25, _TILE_SIZE_*0.5, _TILE_SIZE_*0.75);
+                        // u_quat_rotation
+                        quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
+                        glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
+                        draw_mesh(cube_mesh);
+                        break;
 
-                if (hovered) {
-                    // u_position
-                    glUniform3f(
-                        shaders_list[current_shader]->uniform_locations[0],
-                        (((float)x)+0.25)*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
-                        game_struct.players[i].y_current_translation,
-                        (((float)z)+0.25)*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
-                    );
-                    // u_scale
-                    glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_*0.5, _TILE_SIZE_*1.25, _TILE_SIZE_*0.5);
-                    // u_quat_rotation
-                    quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
-                    glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
-                    draw_mesh(cube_mesh);
+                    case TILE_TYPE_FIELD:
+                        // u_position
+                        glUniform3f(
+                            shaders_list[current_shader]->uniform_locations[0],
+                            (((float)x)+0.125)*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
+                            game_struct.players[i].y_current_translation,
+                            (((float)z)+0.125)*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
+                        );
+                        // u_scale
+                        glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_*0.75, _TILE_SIZE_*0.25, _TILE_SIZE_*0.75);
+                        // u_quat_rotation
+                        quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
+                        glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
+                        draw_mesh(cube_mesh);
+                        break;
+
+                    case TILE_TYPE_MINE:
+                        // u_position
+                        glUniform3f(
+                            shaders_list[current_shader]->uniform_locations[0],
+                            (((float)x)+0.125)*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
+                            game_struct.players[i].y_current_translation,
+                            (((float)z)+0.25)*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
+                        );
+                        // u_scale
+                        glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_*0.75, _TILE_SIZE_*0.5, _TILE_SIZE_*0.5);
+                        // u_quat_rotation
+                        quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
+                        glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
+                        draw_mesh(cube_mesh);
+                        break;
+
+                    case TILE_TYPE_FOREST:
+                        // u_position
+                        glUniform3f(
+                            shaders_list[current_shader]->uniform_locations[0],
+                            (((float)x)+0.125)*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
+                            game_struct.players[i].y_current_translation,
+                            (((float)z)+0.125)*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
+                        );
+                        // u_scale
+                        glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_*0.25, _TILE_SIZE_*1, _TILE_SIZE_*0.25);
+                        // u_quat_rotation
+                        quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
+                        glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
+                        draw_mesh(cube_mesh);
+                        
+                        // u_position
+                        glUniform3f(
+                            shaders_list[current_shader]->uniform_locations[0],
+                            (((float)x)+0.625)*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
+                            game_struct.players[i].y_current_translation,
+                            (((float)z)+0.625)*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
+                        );
+                        // u_scale
+                        glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_*0.25, _TILE_SIZE_*1, _TILE_SIZE_*0.25);
+                        // u_quat_rotation
+                        quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
+                        glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
+                        draw_mesh(cube_mesh);
+                        break;
                 }
             }
         }
     }
     // </player tiles>
-
 }
 
 
@@ -341,8 +474,24 @@ void render_game_ui() {
         uvec2_t box_pos = get_ui_list_box_pos(ui_list_to_draw_info_string);
         int32_t cursor_inside_button = floor(((float)cursor_inside_box_pos.y)/_UI_LIST_BUTTON_HEIGHT_);
 
+        uvec2_t box_size = get_str_boxed_size(ui_lists[ui_list_to_draw_info_string].button_info_strings[cursor_inside_button], _UI_LIST_BUTTON_HEIGHT_);
+
         uint32_t left_x = box_pos.x + cursor_inside_box_pos.x + _UI_LIST_PADDING_;
         uint32_t bottom_y = box_pos.y + _UI_LIST_BUTTON_HEIGHT_ + cursor_inside_button*_UI_LIST_BUTTON_INFO_ROW_HEIGHT_ + _UI_LIST_PADDING_;
+
+        if (left_x - _UI_LIST_PADDING_ <= 0) {
+            left_x = _UI_LIST_PADDING_;
+        }
+        if (left_x + box_size.x + _UI_LIST_PADDING_ >= _OUTPORT_WIDTH_) {
+            left_x = _OUTPORT_WIDTH_ - _UI_LIST_PADDING_ - box_size.x;
+        }
+        if (bottom_y - _UI_LIST_PADDING_ <= 0) {
+            bottom_y = _UI_LIST_PADDING_;
+        }
+        if (bottom_y + box_size.y + _UI_LIST_PADDING_ >= _OUTPORT_HEIGHT_) {
+            bottom_y = _OUTPORT_HEIGHT_ - _UI_LIST_PADDING_ - box_size.y;
+        }
+
         draw_str_boxed(ui_lists[ui_list_to_draw_info_string].button_info_strings[cursor_inside_button], left_x, bottom_y, _UI_LIST_PADDING_, _UI_LIST_BUTTON_INFO_ROW_HEIGHT_);
     }
 

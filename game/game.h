@@ -44,12 +44,14 @@ typedef struct {
 
 #define _TILE_BUILD_INFO_STRING_MAX_LENGTH_ (64)
 #define _TILE_RESOURCE_GIVE_ALERT_STRING_MAX_LENGTH_ (64)
+#define _TILE_DEMOLISH_INFO_STRING_MAX_LENGTH_ (64)
 typedef struct {
     resources_t cost;
     int32_t give_cooldown;
     resources_t give;
     char build_info_string[_TILE_BUILD_INFO_STRING_MAX_LENGTH_];
     char give_alert_string[_TILE_RESOURCE_GIVE_ALERT_STRING_MAX_LENGTH_];
+    char demolish_info_string[_TILE_DEMOLISH_INFO_STRING_MAX_LENGTH_];
 } tile_type_t;
 
 enum TILE_TYPES {
@@ -118,6 +120,7 @@ extern shader_t* global_shader;
 extern shader_t* ui_shader;
 extern shader_t* font_shader;
 extern shader_t* cooldown_billboards_shader;
+extern shader_t* tile_effect_shader;
 
 extern vec3_t camera_pos;
 extern camera_t* camera;
@@ -126,12 +129,16 @@ extern camera_t* ui_camera;
 extern mesh_t* rect_plane_mesh;
 extern mesh_t* cube_mesh;
 extern mesh_t* centered_cube_mesh;
+extern mesh_t* tile_effect_mesh;
 
 extern tile_type_t tile_type_properties[_TILE_TYPES_AMOUNT_];
 
 extern game_t game_struct;
 extern ivec3_t selected_tile;
 extern ivec2_t hovered_tiles[2];
+extern int8_t in_cooldowns_translation;
+extern int8_t in_tiles_translation;
+extern int8_t player1_ai_played;
 
 extern float sun_vector_x;
 extern float sun_vector_y;
@@ -170,6 +177,9 @@ vec2_t get_mouse_camera_space_position();
 vec3_t get_mouse_world_space_position_at_y(float at_y);
 ivec2_t get_hovered_tile_position(uint8_t player_i);
 
+int32_t has_enough_resources(int32_t player_id, int32_t tile_type_id);
+
+void switch_turn_button_callback(int32_t ui_list_id, int32_t button_id);
 void switch_turn();
 void player_1_turn();
 void player_1_ai_turn();

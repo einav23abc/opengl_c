@@ -54,8 +54,23 @@ uvec2_t get_alert_box_pos_padded(int32_t i) {
 }
 void add_error_alert_at_cursor(char* string) {
     vec2_t mouse_outport_space_position = get_mouse_outport_space_position();
-    
+
     uvec2_t string_size = get_str_boxed_size(string, _ALERT_ROW_HEIGHT_);
+
+    float x = mouse_outport_space_position.x - string_size.x*0.5;
+    float y = mouse_outport_space_position.y - string_size.y*0.5;
+    if (x + string_size.x + _ALERT_PADDING_ >= _OUTPORT_WIDTH_) {
+        x = _OUTPORT_WIDTH_ - string_size.x - _ALERT_PADDING_;
+    }
+    if (x - _ALERT_PADDING_ <= 0) {
+        x = _ALERT_PADDING_;
+    }
+    if (y + string_size.y + _ALERT_PADDING_ >= _OUTPORT_HEIGHT_) {
+        y = _OUTPORT_HEIGHT_ - string_size.y - _ALERT_PADDING_;
+    }
+    if (y - _ALERT_PADDING_ <= 0) {
+        y = _ALERT_PADDING_;
+    }
     
     alerts[0] = (alert_t){
         .time_to_live = 3000,
@@ -65,8 +80,8 @@ void add_error_alert_at_cursor(char* string) {
         .easing_function = &ease_out_sine,
 
         .box_pos_from_world_pos = 0,
-        .x = mouse_outport_space_position.x - string_size.x*0.5,
-        .y = mouse_outport_space_position.y - string_size.y*0.5,
+        .x = x,
+        .y = y,
 
         .string = string
     };
