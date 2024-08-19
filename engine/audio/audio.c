@@ -61,7 +61,7 @@ sound_t* audio_sound_load(const char* path) {
     
     sound->sound = Mix_LoadWAV(path);
     if (sound->sound == NULL) {
-        printf("Failed to load WAV: %s\n", Mix_GetError());
+        printf("Failed to load WAV \"%s\", with error: %s\n", path, Mix_GetError());
         free(sound);
         return NULL;
     }

@@ -611,6 +611,21 @@ uint8_t init() {
         );
     // </shaders>
 
+    // <sounds>
+        build_tile_sound = audio_sound_load("./game/sounds/place_tile.wav");        // \x   // X
+        attack_tile_sound = audio_sound_load("./game/sounds/attack_tile.wav");      // X    // X
+        demolish_tile_sound = audio_sound_load("./game/sounds/demolish_tile.wav");  // X    // X
+        wheight_up_sound = audio_sound_load("./game/sounds/wheight_up.wav");        // X    // X
+        wheight_down_sound = audio_sound_load("./game/sounds/wheight_down.wav");    // X    // X
+        resource_give_sound = audio_sound_load("./game/sounds/resource_give.wav");  // X    // X
+        win_game_sound = audio_sound_load("./game/sounds/win_game.wav");            // /x   // X
+        lose_game_sound = audio_sound_load("./game/sounds/lose_game.wav");          // /x   // X
+        button_press_sound = audio_sound_load("./game/sounds/button_press.wav");    // X    // 
+        error_sound = audio_sound_load("./game/sounds/error.wav");                  // X    // X
+        select_tile_sound = audio_sound_load("./game/sounds/select_tile.wav");      // X    // X
+        talking_mud_music = audio_music_load("./game/sounds/talking_mud.flac");
+        audio_music_play(talking_mud_music);
+    // </sounds>
 
     // <tile_type_properties>
         tile_type_properties[TILE_TYPE_HOUSE] = (tile_type_t){
@@ -632,7 +647,7 @@ uint8_t init() {
         };
         tile_type_properties[TILE_TYPE_BARRACKS] = (tile_type_t){
             .cost = (resources_t){
-                .wood = 0,
+                .wood = 1,
                 .stone = 2,
                 .wheat = 1,
                 .population = 1,

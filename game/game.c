@@ -48,6 +48,19 @@ mesh_t* mine_tile_mesh;
 mesh_t* house_tile_mesh;
 mesh_t* barracks_tile_mesh;
 
+sound_t* build_tile_sound;
+sound_t* attack_tile_sound;
+sound_t* demolish_tile_sound;
+sound_t* wheight_up_sound;
+sound_t* wheight_down_sound;
+sound_t* resource_give_sound;
+sound_t* win_game_sound;
+sound_t* lose_game_sound;
+sound_t* error_sound;
+sound_t* select_tile_sound;
+sound_t* button_press_sound;
+music_t* talking_mud_music;
+
 tile_type_t tile_type_properties[_TILE_TYPES_AMOUNT_];
 
 game_t game_struct;
@@ -55,6 +68,7 @@ ivec3_t selected_tile;
 ivec2_t hovered_tiles[2];
 int8_t in_cooldowns_translation;
 int8_t in_tiles_translation;
+int32_t ai_action_cooldown;
 int8_t player1_ai_played;
 
 float sun_vector_x;
@@ -556,6 +570,8 @@ void enter_game() {
     game_struct.player_turn = 0;
     game_struct.game_ended = 0;
 
+    ai_action_cooldown = 0;
+
     in_cooldowns_translation = 0;
 
     game_struct.players[0].wheight = 0;
@@ -636,6 +652,7 @@ void switch_turn_button_callback(int32_t ui_list_id, int32_t button_id) {
 }
 void request_switch_turn() {
     if (game_struct.game_ended == 1) {
+        audio_sound_play(error_sound);
         add_error_alert_at_cursor("The game has ended");
         close_unperm_ui_lists();
         // unselect tile
@@ -645,6 +662,7 @@ void request_switch_turn() {
     }
 
     if (game_struct.player_turn == 1) {
+        audio_sound_play(error_sound);
         add_error_alert_at_cursor("It is not your turn");
         return;
     }
@@ -678,16 +696,8 @@ void switch_turn() {
 void player_1_turn() {
     player_1_ai_turn();
 }
-void player_1_ai_turn() {
-    // dont resolve turn while transitions (animations) are playing
-    if (in_cooldowns_translation == 1) return;
-    if (in_tiles_translation == 1) return;
-
-    if (player1_ai_played == 1) {
-        switch_turn();
-        return;
-    }
-
+// builds whatever it can (in order of what it has least of)
+int32_t player_ai_build_func1() {
     // count amounts
     int32_t tile_types_amounts[_TILE_TYPES_AMOUNT_];
     for (uint32_t i = 0; i < _TILE_TYPES_AMOUNT_; i++) tile_types_amounts[i] = 0;
@@ -721,41 +731,67 @@ void player_1_ai_turn() {
     }
 
     // build whatever i can
-    while(1) {
-        uint8_t built = 0;
-        for (uint32_t i = 0; i < _TILE_TYPES_AMOUNT_-1; i++) {
-            if (has_enough_resources(1, sorted_tile_type_id[i]) == 0) continue;
+    int32_t built = 0;
+    for (uint32_t i = 0; i < _TILE_TYPES_AMOUNT_-1; i++) {
+        if (has_enough_resources(1, sorted_tile_type_id[i]) == 0) continue;
 
-            // find space to build
-            int32_t new_tile_grid_index = -1;
-            for (uint32_t j = 0; j < _PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_; j++) {
-                if (game_struct.players[1].tiles[j].type == TILE_TYPE_EMPTY) {
-                    new_tile_grid_index = j;
-                    break;
-                }
+        // find space to build
+        int32_t new_tile_grid_index = -1;
+        for (uint32_t j = 0; j < _PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_; j++) {
+            if (game_struct.players[1].tiles[j].type == TILE_TYPE_EMPTY) {
+                new_tile_grid_index = j;
+                break;
             }
-            // handle no space
-            if (new_tile_grid_index == -1) break;
-
-            int32_t tile_type_id = sorted_tile_type_id[i];
-            tile_type_t* tile_type = &(tile_type_properties[tile_type_id]);
-
-            game_struct.players[1].wheight += 1;
-            game_struct.players[0].wheight -= 1;
-            game_struct.players[1].resources.wood       -= tile_type->cost.wood;
-            game_struct.players[1].resources.stone      -= tile_type->cost.stone;
-            game_struct.players[1].resources.wheat      -= tile_type->cost.wheat;
-            game_struct.players[1].resources.population -= tile_type->cost.population;
-            game_struct.players[1].resources.soldiers   -= tile_type->cost.soldiers;
-            game_struct.players[1].tiles[new_tile_grid_index].cooldown_timer        = tile_type->give_cooldown;
-            game_struct.players[1].tiles[new_tile_grid_index].curent_cooldown_timer = tile_type->give_cooldown;
-            game_struct.players[1].tiles[new_tile_grid_index].type = tile_type_id;
         }
-        if (built == 0) break;
+        // handle no space
+        if (new_tile_grid_index == -1) break;
+
+        int32_t tile_type_id = sorted_tile_type_id[i];
+        tile_type_t* tile_type = &(tile_type_properties[tile_type_id]);
+
+        audio_sound_play(build_tile_sound);
+        audio_sound_play(wheight_down_sound);
+
+        game_struct.players[1].wheight += 1;
+        game_struct.players[0].wheight -= 1;
+        game_struct.players[1].resources.wood       -= tile_type->cost.wood;
+        game_struct.players[1].resources.stone      -= tile_type->cost.stone;
+        game_struct.players[1].resources.wheat      -= tile_type->cost.wheat;
+        game_struct.players[1].resources.population -= tile_type->cost.population;
+        game_struct.players[1].resources.soldiers   -= tile_type->cost.soldiers;
+        game_struct.players[1].tiles[new_tile_grid_index].cooldown_timer        = tile_type->give_cooldown;
+        game_struct.players[1].tiles[new_tile_grid_index].curent_cooldown_timer = tile_type->give_cooldown;
+        game_struct.players[1].tiles[new_tile_grid_index].type = tile_type_id;
+
+        // dont build too fast
+        ai_action_cooldown = 500;
+
+        // dont end turn
+        built = 1;
     }
 
-    // end turn after transitions will end
-    player1_ai_played = 1;
+    return built;
+}
+void player_1_ai_turn() {
+    // dont resolve turn while transitions (animations) are playing
+    if (in_cooldowns_translation == 1) return;
+    if (in_tiles_translation == 1) return;
+    if (ai_action_cooldown > 0) {
+        ai_action_cooldown -= delta_time;
+        return;
+    }
+
+    if (player1_ai_played == 1) {
+        switch_turn();
+        return;
+    }
+
+    int32_t built = player_ai_build_func1();
+
+    if (built == 0) {
+        // end turn after transitions will end
+        player1_ai_played = 1;
+    }
 }
 
 
@@ -767,6 +803,7 @@ void ui_list_play_button_callback(int32_t ui_list_id, int32_t button_id) {
 }
 void ui_list_build_specific_button_callback(int32_t ui_list_id, int32_t button_id) {
     if (game_struct.game_ended == 1) {
+        audio_sound_play(error_sound);
         add_error_alert_at_cursor("The game has ended");
         close_unperm_ui_lists();
         // unselect tile
@@ -780,10 +817,14 @@ void ui_list_build_specific_button_callback(int32_t ui_list_id, int32_t button_i
 
     if (has_enough_resources(0, tile_type_id) == 0) {
         // not enough resources
+        audio_sound_play(error_sound);
         add_error_alert_at_cursor("Not enough resources");
         make_ui_list_safe(ui_list_id);
         return;
     }
+
+    audio_sound_play(build_tile_sound);
+    audio_sound_play(wheight_up_sound);
 
     game_struct.players[0].wheight += 1;
     game_struct.players[1].wheight -= 1;
@@ -802,6 +843,7 @@ void ui_list_build_specific_button_callback(int32_t ui_list_id, int32_t button_i
 }
 void ui_list_build_button_callback(int32_t ui_list_id, int32_t button_id) {
     if (game_struct.game_ended == 1) {
+        audio_sound_play(error_sound);
         add_error_alert_at_cursor("The game has ended");
         close_unperm_ui_lists();
         // unselect tile
@@ -859,6 +901,7 @@ void ui_list_build_button_callback(int32_t ui_list_id, int32_t button_id) {
 }
 void ui_list_attack_button_callback(int32_t ui_list_id, int32_t button_id) {
     if (game_struct.game_ended == 1) {
+        audio_sound_play(error_sound);
         add_error_alert_at_cursor("The game has ended");
         close_unperm_ui_lists();
         // unselect tile
@@ -869,10 +912,14 @@ void ui_list_attack_button_callback(int32_t ui_list_id, int32_t button_id) {
 
     if (game_struct.players[0].resources.soldiers < 1) {
         // not enough resources
+        audio_sound_play(error_sound);
         add_error_alert_at_cursor("Not enough resources");
         make_ui_list_safe(ui_list_id);
         return;
     }
+    
+    audio_sound_play(attack_tile_sound);
+    audio_sound_play(wheight_up_sound);
 
     game_struct.players[0].resources.soldiers -= 1;
     game_struct.players[0].wheight += 1;
@@ -888,6 +935,7 @@ void ui_list_attack_button_callback(int32_t ui_list_id, int32_t button_id) {
 }
 void ui_list_demolish_sure_button_callback(int32_t ui_list_id, int32_t button_id) {
     if (game_struct.game_ended == 1) {
+        audio_sound_play(error_sound);
         add_error_alert_at_cursor("The game has ended");
         close_unperm_ui_lists();
         // unselect tile
@@ -895,6 +943,9 @@ void ui_list_demolish_sure_button_callback(int32_t ui_list_id, int32_t button_id
         selected_tile.y = -1;
         return;
     }
+    
+    audio_sound_play(demolish_tile_sound);
+    audio_sound_play(wheight_down_sound);
 
     game_struct.players[0].wheight -= 1;
     game_struct.players[1].wheight += 1;
@@ -940,6 +991,7 @@ void ui_list_demolish_sure_button_callback(int32_t ui_list_id, int32_t button_id
 }
 void ui_list_demolish_button_callback(int32_t ui_list_id, int32_t button_id) {
     if (game_struct.game_ended == 1) {
+        audio_sound_play(error_sound);
         add_error_alert_at_cursor("The game has ended");
         close_unperm_ui_lists();
         // unselect tile

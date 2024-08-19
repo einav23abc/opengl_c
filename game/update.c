@@ -27,10 +27,12 @@ void update() {
 void update_game() {
     #ifdef DEBUG_SOFT_MODE
     if (keys[SDL_SCANCODE_K] == 1) {
+        audio_sound_play(wheight_down_sound);
         game_struct.players[0].wheight -= 1;
         game_struct.players[1].wheight += 1;
     }
     if (keys[SDL_SCANCODE_L] == 1) {
+        audio_sound_play(wheight_up_sound);
         game_struct.players[0].wheight += 1;
         game_struct.players[1].wheight -= 1;
     }
@@ -52,8 +54,10 @@ void update_game() {
         char* message;
         if (game_struct.players[0].wheight >= _WIN_WHEIGHT_) {
             message = "You won!";
+            audio_sound_play(win_game_sound);
         }else {
             message = "You lost";
+            audio_sound_play(lose_game_sound);
         }
         int32_t ui_list_id = new_ui_list_assign_id();
         ui_lists[ui_list_id] = (ui_list_t){
@@ -251,6 +255,10 @@ void tile_cooldowns_update() {
                     if (tile->curent_cooldown_timer <= 0) {
                         tile->curent_cooldown_timer = tile->cooldown_timer;
                         // add resources
+                        if (i == 0) {
+                            audio_sound_play(resource_give_sound);
+                        }
+                        
                         tile_type_t* tile_type = &(tile_type_properties[tile->type]);
                         game_struct.players[i].resources.population += tile_type->give.population;
                         game_struct.players[i].resources.wheat      += tile_type->give.wheat;

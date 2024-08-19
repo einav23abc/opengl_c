@@ -158,6 +158,19 @@ extern mesh_t* mine_tile_mesh;
 extern mesh_t* house_tile_mesh;
 extern mesh_t* barracks_tile_mesh;
 
+extern sound_t* build_tile_sound;
+extern sound_t* attack_tile_sound;
+extern sound_t* demolish_tile_sound;
+extern sound_t* wheight_up_sound;
+extern sound_t* wheight_down_sound;
+extern sound_t* resource_give_sound;
+extern sound_t* win_game_sound;
+extern sound_t* lose_game_sound;
+extern sound_t* error_sound;
+extern sound_t* select_tile_sound;
+extern sound_t* button_press_sound;
+extern music_t* talking_mud_music; // credit to https://freesound.org/people/klankbeeld/
+
 extern tile_type_t tile_type_properties[_TILE_TYPES_AMOUNT_];
 
 extern game_t game_struct;
@@ -165,6 +178,7 @@ extern ivec3_t selected_tile;
 extern ivec2_t hovered_tiles[2];
 extern int8_t in_cooldowns_translation;
 extern int8_t in_tiles_translation;
+extern int32_t ai_action_cooldown;
 extern int8_t player1_ai_played;
 
 extern float sun_vector_x;

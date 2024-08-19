@@ -15,6 +15,8 @@ void handle_event() {
                     int32_t in_button = floor(((float)in_ui_box.y)/(ui_lists[in_ui_box.z].font->letter_height + ui_lists[in_ui_box.z].button_padding*2));
                     if (in_button < 0 || in_button >= ui_lists[in_ui_box.z].buttons_amount) return;
 
+                    audio_sound_play(button_press_sound);
+
                     button_callback_t button_callback = ui_lists[in_ui_box.z].button_callbacks[in_button];
                     if (button_callback != NULL){
                         button_callback(in_ui_box.z, in_button);
@@ -43,11 +45,13 @@ void handle_event() {
 
 void mouse_press_in_game() {
     if (game_struct.game_ended == 1) {
+        audio_sound_play(error_sound);
         add_error_alert_at_cursor("The game has ended");
         return;
     }
     
     if (game_struct.player_turn == 1) {
+        audio_sound_play(error_sound);
         add_error_alert_at_cursor("It is not your turn");
         return;
     }
@@ -84,6 +88,8 @@ void mouse_press_in_game() {
 
     // in player 0
     if (selected_tile.z == 0) {
+        audio_sound_play(select_tile_sound);
+
         int32_t tile_type_id = game_struct.players[0].tiles[selected_tile.y*_PLAYER_GRID_WIDTH_ + selected_tile.x].type;
 
         if (tile_type_id == TILE_TYPE_EMPTY) {
@@ -152,7 +158,13 @@ void mouse_press_in_game() {
     }else if (selected_tile.z == 1) {
         int32_t tile_type_id = game_struct.players[1].tiles[selected_tile.y*_PLAYER_GRID_WIDTH_ + selected_tile.x].type;
 
-        if (tile_type_id != TILE_TYPE_EMPTY) {
+        if (tile_type_id == TILE_TYPE_EMPTY) {
+            selected_tile.x = -1;
+            selected_tile.y = -1;
+            selected_tile.z = -1;
+        }else {
+            audio_sound_play(select_tile_sound);
+
             // attack other player
 
             // create ui list
