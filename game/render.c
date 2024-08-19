@@ -261,7 +261,7 @@ void render_game_world() {
         // u_position
         glUniform3f(shaders_list[current_shader]->uniform_locations[0], (i*2-1)*(_TILE_SIZE_*(_HINGE_DISTANCE_FROM_SCALE_AT_BOTTOM_+1+_PLAYER_GRID_WIDTH_*0.5)), _TILE_SIZE_*(-1+0.25), 0);
         // u_scale
-        glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_*_PLAYER_GRID_WIDTH_, _TILE_SIZE_*0.5, _TILE_SIZE_*_PLAYER_GRID_DEPTH_);
+        glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_*(_PLAYER_GRID_WIDTH_+1), _TILE_SIZE_*0.5, _TILE_SIZE_*(_PLAYER_GRID_DEPTH_+1));
         // u_quat_rotation
         quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
         glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
@@ -386,16 +386,16 @@ void render_game_effects() {
             // u_position
             glUniform3f(
                 shaders_list[current_shader]->uniform_locations[0],
-                -0.1 -_TILE_SIZE_*_PLAYER_GRID_WIDTH_*0.5 + (i*2-1)*(_TILE_SIZE_*(_HINGE_DISTANCE_FROM_SCALE_AT_BOTTOM_+1+_PLAYER_GRID_WIDTH_*0.5)),
+                -0.1 -_TILE_SIZE_*(_PLAYER_GRID_WIDTH_+1)*0.5 + (i*2-1)*(_TILE_SIZE_*(_HINGE_DISTANCE_FROM_SCALE_AT_BOTTOM_+1+_PLAYER_GRID_WIDTH_*0.5)),
                 -_TILE_SIZE_,
-                -0.1 -_TILE_SIZE_*_PLAYER_GRID_DEPTH_*0.5
+                -0.1 -_TILE_SIZE_*(_PLAYER_GRID_DEPTH_+1)*0.5
             );
             // u_scale
             glUniform3f(
                 shaders_list[current_shader]->uniform_locations[1],
-                0.2 + _TILE_SIZE_*_PLAYER_GRID_WIDTH_,
+                0.2 + _TILE_SIZE_*(_PLAYER_GRID_WIDTH_+1),
                 _TILE_SIZE_*1.5,
-                0.2 + _TILE_SIZE_*_PLAYER_GRID_DEPTH_
+                0.2 + _TILE_SIZE_*(_PLAYER_GRID_DEPTH_+1)
             );
             // u_quat_rotation
             quat_t quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
