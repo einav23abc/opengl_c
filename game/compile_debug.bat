@@ -22,4 +22,6 @@ gcc ^
     -l "SDL2_image" ^
     -l "SDL2_mixer" ^
     -l "libpng16-16" ^
+    -D DEBUG_MODE ^
+    -D DEBUG_SOFT_MODE ^
     -g

@@ -21,6 +21,9 @@ typedef struct {
     font_t* font;
     int32_t padding;
     int32_t button_padding;
+    nine_slice_t* box_nslice;
+    nine_slice_t* button_hover_nslice;
+    nine_slice_t* info_string_nslice;
 
     uint8_t box_pos_from_world_pos : 1;
     float box_world_pos_x;

@@ -98,7 +98,7 @@ void draw_all_alerts() {
         uvec2_t box_pos = get_alert_box_pos(i);
         uint32_t left_x = box_pos.x;
         uint32_t bottom_y = box_pos.y;
-        draw_str_boxed(alerts[i].string, letters_font, left_x, bottom_y, alerts[i].padding, alerts[i].font->letter_height);
+        draw_str_boxed(alerts[i].string, letters_font, nine_slice1, left_x, bottom_y, alerts[i].padding, alerts[i].font->letter_height);
     }
 }
 

@@ -25,6 +25,7 @@ void update() {
 }
 
 void update_game() {
+    #ifdef DEBUG_SOFT_MODE
     if (keys[SDL_SCANCODE_K] == 1) {
         game_struct.players[0].wheight -= 1;
         game_struct.players[1].wheight += 1;
@@ -33,6 +34,7 @@ void update_game() {
         game_struct.players[0].wheight += 1;
         game_struct.players[1].wheight -= 1;
     }
+    #endif
     if (keys[SDL_SCANCODE_J] == 1) {
         request_switch_turn();
     }
@@ -59,8 +61,11 @@ void update_game() {
             .permenant = 1,
 
             .font = &big_letters_font,
-            .padding = 3,
+            .padding = 1,
             .button_padding = 4,
+            .box_nslice = &nine_slice2,
+            .button_hover_nslice = &nine_slice3,
+            .info_string_nslice = &nine_slice1,
 
             .box_pos_from_world_pos = 0,
             .x = _OUTPORT_WIDTH_*0.5  - (max(strlen(message), strlen("exit game"))*big_letters_font.letter_width + 4*2)*0.5,
@@ -94,6 +99,7 @@ void update_game() {
 }
 
 void camera_update() {
+    #ifdef DEBUG_SOFT_MODE
     // move left right
     if (keys[SDL_SCANCODE_A]) {
         camera_pos.x += _CAMERA_MOVE_SPEED_*cos(camera->ry+M_PI);
@@ -121,6 +127,7 @@ void camera_update() {
     if (keys[SDL_SCANCODE_LCTRL]) {
         camera_pos.y -= _CAMERA_MOVE_SPEED_;
     }
+    #endif
 
 
     // X axis rotation
@@ -130,6 +137,17 @@ void camera_update() {
     if (keys[SDL_SCANCODE_KP_8]) {
         camera->rx += 0.05*delta_frames;
     }
+
+    // #ifndef DEBUG_SOFT_MODE
+    while(camera->rx < 0)       camera->rx += M_PI*2;
+    while(camera->rx >= M_PI*2) camera->rx -= M_PI*2;
+    if (camera->rx >= M_PI*1.875) {
+        camera->rx = M_PI*1.875;
+    }
+    if (camera->rx <= M_PI*1.625) {
+        camera->rx = M_PI*1.625;
+    }
+    // #endif
 
     // Z axis rotation
     if (keys[SDL_SCANCODE_KP_7]) {

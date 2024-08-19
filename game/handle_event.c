@@ -96,8 +96,11 @@ void mouse_press_in_game() {
                 .permenant = 0,
 
                 .font = &letters_font,
-                .padding = 2,
+                .padding = 1,
                 .button_padding = 2,
+                .box_nslice = &nine_slice2,
+                .button_hover_nslice = &nine_slice3,
+                .info_string_nslice = &nine_slice1,
 
                 .box_pos_from_world_pos = 1,
                 .box_world_pos_x = selected_tile.x*_TILE_SIZE_ + game_struct.players[0].x_current_translation + _TILE_SIZE_*0.5,
@@ -124,8 +127,11 @@ void mouse_press_in_game() {
                 .permenant = 0,
 
                 .font = &letters_font,
-                .padding = 2,
+                .padding = 1,
                 .button_padding = 2,
+                .box_nslice = &nine_slice2,
+                .button_hover_nslice = &nine_slice3,
+                .info_string_nslice = &nine_slice1,
 
                 .box_pos_from_world_pos = 1,
                 .box_world_pos_x = selected_tile.x*_TILE_SIZE_ + game_struct.players[0].x_current_translation + _TILE_SIZE_*0.5,
@@ -156,8 +162,11 @@ void mouse_press_in_game() {
                 .permenant = 0,
 
                 .font = &letters_font,
-                .padding = 2,
+                .padding = 1,
                 .button_padding = 2,
+                .box_nslice = &nine_slice2,
+                .button_hover_nslice = &nine_slice3,
+                .info_string_nslice = &nine_slice1,
 
                 .box_pos_from_world_pos = 1,
                 .box_world_pos_x = selected_tile.x*_TILE_SIZE_ + game_struct.players[1].x_current_translation + _TILE_SIZE_*0.5,

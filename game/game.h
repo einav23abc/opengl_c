@@ -98,6 +98,13 @@ typedef struct {
     texture_t* font_texture;
 } font_t;
 
+typedef struct {
+    int32_t texture_width;
+    int32_t texture_height;
+    int32_t padding;
+    texture_t* texture;
+} nine_slice_t;
+
 
 
 enum PAGES {
@@ -113,11 +120,16 @@ extern fbo_t* outport_fbo;
 extern texture_t* floor_texture;
 extern texture_t* global_texture;
 
+extern nine_slice_t nine_slice1;
+extern nine_slice_t nine_slice2;
+extern nine_slice_t nine_slice3;
+
 extern font_t letters_font;
 extern font_t big_letters_font;
 
 extern shader_t* global_shader;
 extern shader_t* ui_shader;
+extern shader_t* nine_slice_shader;
 extern shader_t* font_shader;
 extern shader_t* cooldown_billboards_shader;
 extern shader_t* tile_effect_shader;
@@ -166,11 +178,12 @@ void draw_tile(int32_t player_i, int32_t tile_x, int32_t tile_z, int32_t tile_ty
 void render_game_world();
 void render_game_effects();
 void render_game_ui();
+
 // returns the drawn width
 float draw_string(font_t font, char* str, vec3_t pos, quat_t rot, float height, float color_r, float color_b, float color_g);
-
 uvec2_t get_str_boxed_size(char* str, float row_height);
-void draw_str_boxed(char* str, font_t font, uint32_t left_x, uint32_t bottom_y, uint32_t padding, uint32_t row_height);
+void draw_str_boxed(char* str, font_t font, nine_slice_t nslice, uint32_t left_x, uint32_t bottom_y, uint32_t padding, uint32_t row_height);
+void draw_nine_slice(nine_slice_t nine_slice, int32_t x, int32_t y, int32_t width, int32_t height);
 
 vec2_t outport_space_position_from_world_space(vec3_t pos);
 vec2_t get_mouse_outport_space_position();

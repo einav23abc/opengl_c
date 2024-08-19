@@ -304,9 +304,9 @@ uint8_t init() {
 
     // <cameras>
         camera_pos = (vec3_t){
-            .x = -_TILE_SIZE_*0.5,
+            .x = 0,
             .y = _SCALE_AXIS_POINT_Y_,
-            .z = -_TILE_SIZE_
+            .z = 0
         };
         camera = create_camera(
             0, 0, 0,
@@ -370,6 +370,29 @@ uint8_t init() {
                 .letter_height = 24
             };
         // </big_letters_font>
+
+        // <nine_slices>
+            nine_slice1 = (nine_slice_t){
+                .texture_width = 16,
+                .texture_height = 16,
+                .padding = 3,
+                .texture = load_texture("./game/textures/nslice1.png")
+            };
+            
+            nine_slice2 = (nine_slice_t){
+                .texture_width = 16,
+                .texture_height = 16,
+                .padding = 3,
+                .texture = load_texture("./game/textures/nslice2.png")
+            };
+            
+            nine_slice3 = (nine_slice_t){
+                .texture_width = 16,
+                .texture_height = 16,
+                .padding = 3,
+                .texture = load_texture("./game/textures/nslice3.png")
+            };
+        // </nine_slices>
     // </textures>
 
     // <shaders>
@@ -384,7 +407,14 @@ uint8_t init() {
             "./game/shaders/ui.vert",
             "./game/shaders/ui.frag",
             "in_vertex_position\0in_vertex_texcoord", 2,
-            "u_position\0u_scale\0u_quat_rotation", 3
+            "u_position\0u_scale", 2
+        );
+
+        nine_slice_shader = create_shader_from_files(
+            "./game/shaders/nine_slice.vert",
+            "./game/shaders/nine_slice.frag",
+            "in_vertex_position\0in_vertex_texcoord", 2,
+            "u_position\0u_scale\0u_texcoord_change", 3
         );
 
         font_shader = create_shader_from_files(

@@ -10,11 +10,16 @@ fbo_t* outport_fbo;
 texture_t* floor_texture;
 texture_t* global_texture;
 
+nine_slice_t nine_slice1;
+nine_slice_t nine_slice2;
+nine_slice_t nine_slice3;
+
 font_t letters_font;
 font_t big_letters_font;
 
 shader_t* global_shader;
 shader_t* ui_shader;
+shader_t* nine_slice_shader;
 shader_t* font_shader;
 shader_t* cooldown_billboards_shader;
 shader_t* tile_effect_shader;
@@ -136,7 +141,7 @@ uvec2_t get_str_boxed_size(char* str, float row_height) {
         .y = h
     };
 }
-void draw_str_boxed(char* str, font_t font, uint32_t left_x, uint32_t bottom_y, uint32_t padding, uint32_t row_height) {
+void draw_str_boxed(char* str, font_t font, nine_slice_t nslice, uint32_t left_x, uint32_t bottom_y, uint32_t padding, uint32_t row_height) {
     uvec2_t str_size = get_str_boxed_size(str, row_height);
     
     uint32_t top_y = bottom_y + str_size.y;
@@ -144,8 +149,8 @@ void draw_str_boxed(char* str, font_t font, uint32_t left_x, uint32_t bottom_y, 
     uint32_t x = 0;
     uint32_t y = -row_height;
 
-    sdm_set_color(0,0.25,0,1);
-    sdm_draw_rect(
+    draw_nine_slice(
+        nslice,
         left_x - padding,
         top_y - str_size.y - padding,
         2*padding + str_size.x,
@@ -181,6 +186,223 @@ void draw_str_boxed(char* str, font_t font, uint32_t left_x, uint32_t bottom_y, 
             1, 1, 1
         );
     }
+}
+void draw_nine_slice(nine_slice_t nine_slice, int32_t x, int32_t y, int32_t width, int32_t height) {
+    shader_t* last_shader = shaders_list[current_shader];
+    use_shader(nine_slice_shader);
+
+    bind_texture(
+        nine_slice.texture,
+        shaders_list[current_shader]->u_texture_loc,
+        0
+    );
+
+    float padding_x_uv_size = ((float)nine_slice.padding)/nine_slice.texture_width;
+    float padding_y_uv_size = ((float)nine_slice.padding)/nine_slice.texture_height;
+
+    // <corners>
+        // u_scale
+        glUniform2f(
+            shaders_list[current_shader]->uniform_locations[1],
+            nine_slice.padding,
+            nine_slice.padding
+        );
+        // <bottom left>
+            // u_position
+            glUniform2f(
+                shaders_list[current_shader]->uniform_locations[0],
+                x,
+                y
+            );
+            // u_texcoord_change
+            glUniform4f(
+                shaders_list[current_shader]->uniform_locations[2],
+                0,
+                1 - padding_y_uv_size,
+                padding_x_uv_size,
+                padding_y_uv_size
+            );
+            draw_mesh(rect_plane_mesh);
+        // </bottom left>
+        
+        // <bottom right>
+            // u_position
+            glUniform2f(
+                shaders_list[current_shader]->uniform_locations[0],
+                x + width - nine_slice.padding,
+                y
+            );
+            // u_texcoord_change
+            glUniform4f(
+                shaders_list[current_shader]->uniform_locations[2],
+                1 - padding_x_uv_size,
+                1 - padding_y_uv_size,
+                padding_x_uv_size,
+                padding_y_uv_size
+            );
+            draw_mesh(rect_plane_mesh);
+        // </bottom right>
+
+        // <top left>
+            // u_position
+            glUniform2f(
+                shaders_list[current_shader]->uniform_locations[0],
+                x,
+                y + height - nine_slice.padding
+            );
+            // u_texcoord_change
+            glUniform4f(
+                shaders_list[current_shader]->uniform_locations[2],
+                0,
+                0,
+                padding_x_uv_size,
+                padding_y_uv_size
+            );
+            draw_mesh(rect_plane_mesh);
+        // </top left>
+        
+        // <top right>
+            // u_position
+            glUniform2f(
+                shaders_list[current_shader]->uniform_locations[0],
+                x + width - nine_slice.padding,
+                y + height - nine_slice.padding
+            );
+            // u_texcoord_change
+            glUniform4f(
+                shaders_list[current_shader]->uniform_locations[2],
+                1 - padding_x_uv_size,
+                0,
+                padding_x_uv_size,
+                padding_y_uv_size
+            );
+            draw_mesh(rect_plane_mesh);
+        // </top right>
+    // </corners>
+
+    // <edges>
+        // <bottom>
+            // u_position
+            glUniform2f(
+                shaders_list[current_shader]->uniform_locations[0],
+                x + nine_slice.padding,
+                y
+            );
+            // u_scale
+            glUniform2f(
+                shaders_list[current_shader]->uniform_locations[1],
+                width - nine_slice.padding*2,
+                nine_slice.padding
+            );
+            // u_texcoord_change
+            glUniform4f(
+                shaders_list[current_shader]->uniform_locations[2],
+                padding_x_uv_size,
+                1 - padding_y_uv_size,
+                1 - padding_x_uv_size*2,
+                padding_y_uv_size
+            );
+            draw_mesh(rect_plane_mesh);
+        // <bottom>
+        
+        // <top>
+            // u_position
+            glUniform2f(
+                shaders_list[current_shader]->uniform_locations[0],
+                x + nine_slice.padding,
+                y + height - nine_slice.padding
+            );
+            // u_scale
+            glUniform2f(
+                shaders_list[current_shader]->uniform_locations[1],
+                width - nine_slice.padding*2,
+                nine_slice.padding
+            );
+            // u_texcoord_change
+            glUniform4f(
+                shaders_list[current_shader]->uniform_locations[2],
+                padding_x_uv_size,
+                0,
+                1 - padding_x_uv_size*2,
+                padding_y_uv_size
+            );
+            draw_mesh(rect_plane_mesh);
+        // <top>
+        
+        // <left>
+            // u_position
+            glUniform2f(
+                shaders_list[current_shader]->uniform_locations[0],
+                x,
+                y + nine_slice.padding
+            );
+            // u_scale
+            glUniform2f(
+                shaders_list[current_shader]->uniform_locations[1],
+                nine_slice.padding,
+                height - nine_slice.padding*2
+            );
+            // u_texcoord_change
+            glUniform4f(
+                shaders_list[current_shader]->uniform_locations[2],
+                0,
+                padding_y_uv_size,
+                padding_x_uv_size,
+                1 - padding_y_uv_size*2
+            );
+            draw_mesh(rect_plane_mesh);
+        // <left>
+        
+        // <right>
+            // u_position
+            glUniform2f(
+                shaders_list[current_shader]->uniform_locations[0],
+                x + width - nine_slice.padding,
+                y + nine_slice.padding
+            );
+            // u_scale
+            glUniform2f(
+                shaders_list[current_shader]->uniform_locations[1],
+                nine_slice.padding,
+                height - nine_slice.padding*2
+            );
+            // u_texcoord_change
+            glUniform4f(
+                shaders_list[current_shader]->uniform_locations[2],
+                1 - padding_x_uv_size,
+                padding_y_uv_size,
+                padding_x_uv_size,
+                1 - padding_y_uv_size*2
+            );
+            draw_mesh(rect_plane_mesh);
+        // <right>
+    // </edges>
+
+    // <middle>
+        // u_position
+        glUniform2f(
+            shaders_list[current_shader]->uniform_locations[0],
+            x + nine_slice.padding,
+            y + nine_slice.padding
+        );
+        // u_scale
+        glUniform2f(
+            shaders_list[current_shader]->uniform_locations[1],
+            width - nine_slice.padding*2,
+            height - nine_slice.padding*2
+        );
+        // u_texcoord_change
+        glUniform4f(
+            shaders_list[current_shader]->uniform_locations[2],
+            padding_x_uv_size,
+            padding_y_uv_size,
+            1 - padding_x_uv_size*2,
+            1 - padding_y_uv_size*2
+        );
+        draw_mesh(rect_plane_mesh);
+    // </middle>
+
+    use_shader(last_shader);
 }
 
 
@@ -275,8 +497,11 @@ void enter_main_menu() {
         .permenant = 1,
 
         .font = &big_letters_font,
-        .padding = 3,
+        .padding = 1,
         .button_padding = 4,
+        .box_nslice = &nine_slice2,
+        .button_hover_nslice = &nine_slice3,
+        .info_string_nslice = &nine_slice1,
 
         .box_pos_from_world_pos = 0,
         .x = _OUTPORT_WIDTH_*0.5  - (strlen("Play!")*big_letters_font.letter_width + 4*2)*0.5,
@@ -308,6 +533,8 @@ void enter_game() {
 
     in_cooldowns_translation = 0;
 
+    game_struct.players[0].wheight = 0;
+    game_struct.players[1].wheight = 0;
     player_translations_update();
     game_struct.players[0].y_lerp_start_translation = game_struct.players[0].y_translation;
     game_struct.players[0].y_current_translation = game_struct.players[0].y_translation;
@@ -340,13 +567,11 @@ void enter_game() {
     game_struct.players[1].tiles[19].cooldown_timer = tile_type_properties[TILE_TYPE_MINE].give_cooldown;
     game_struct.players[1].tiles[19].curent_cooldown_timer = tile_type_properties[TILE_TYPE_MINE].give_cooldown;
 
-    game_struct.players[0].wheight = 0;
     game_struct.players[0].resources.wood = 2;
     game_struct.players[0].resources.stone = 2;
     game_struct.players[0].resources.wheat = 2;
     game_struct.players[0].resources.soldiers = 0;
     game_struct.players[0].resources.population = 2;
-    game_struct.players[1].wheight = 0;
     game_struct.players[1].resources.wood = 2;
     game_struct.players[1].resources.stone = 2;
     game_struct.players[1].resources.wheat = 2;
@@ -360,12 +585,15 @@ void enter_game() {
         .permenant = 1,
 
         .font = &letters_font,
-        .padding = 0,
+        .padding = 1,
         .button_padding = 5,
+        .box_nslice = &nine_slice2,
+        .button_hover_nslice = &nine_slice3,
+        .info_string_nslice = &nine_slice1,
 
         .box_pos_from_world_pos = 0,
-        .x = 0,
-        .y = _OUTPORT_HEIGHT_,
+        .x = 1,
+        .y = _OUTPORT_HEIGHT_ - 1,
 
         .buttons_amount = 1,
         .button_strings = {"end turn"},
@@ -567,14 +795,17 @@ void ui_list_build_button_callback(int32_t ui_list_id, int32_t button_id) {
         .permenant = 0,
 
         .font = &letters_font,
-        .padding = 2,
+        .padding = 1,
         .button_padding = 2,
+        .box_nslice = &nine_slice2,
+        .button_hover_nslice = &nine_slice3,
+        .info_string_nslice = &nine_slice1,
 
         .box_pos_from_world_pos = 1,
         .box_world_pos_x = ui_lists[ui_list_id].box_world_pos_x,
         .box_world_pos_y = ui_lists[ui_list_id].box_world_pos_y,
         .box_world_pos_z = ui_lists[ui_list_id].box_world_pos_z,
-        .x = get_ui_list_width(ui_list_id) + ui_lists[ui_list_id].padding + 2,
+        .x = get_ui_list_width(ui_list_id) + ui_lists[ui_list_id].padding,
         .y = 0,
 
         .buttons_amount = _TILE_TYPES_AMOUNT_,
@@ -702,14 +933,17 @@ void ui_list_demolish_button_callback(int32_t ui_list_id, int32_t button_id) {
         .permenant = 0,
 
         .font = &letters_font,
-        .padding = 2,
+        .padding = 1,
         .button_padding = 2,
+        .box_nslice = &nine_slice2,
+        .button_hover_nslice = &nine_slice3,
+        .info_string_nslice = &nine_slice1,
 
         .box_pos_from_world_pos = 1,
         .box_world_pos_x = ui_lists[ui_list_id].box_world_pos_x,
         .box_world_pos_y = ui_lists[ui_list_id].box_world_pos_y,
         .box_world_pos_z = ui_lists[ui_list_id].box_world_pos_z,
-        .x = get_ui_list_width(ui_list_id) + ui_lists[ui_list_id].padding + 2,
+        .x = get_ui_list_width(ui_list_id) + ui_lists[ui_list_id].padding,
         .y = 0,
 
         .buttons_amount = 2,

@@ -474,7 +474,7 @@ void render_game_ui() {
         resources_string[21] = '0' + game_struct.players[0].resources.soldiers   % 10;
 
         uvec2_t str_box_width = get_str_boxed_size(resources_string, big_letters_font.letter_height);
-        draw_str_boxed(resources_string, big_letters_font, _OUTPORT_WIDTH_-str_box_width.x-6, 6, 6, big_letters_font.letter_height);
+        draw_str_boxed(resources_string, big_letters_font, nine_slice1, _OUTPORT_WIDTH_-str_box_width.x-6, 6, 6, big_letters_font.letter_height);
     // </player 0 resources>
 
     draw_all_ui_lists();

@@ -136,15 +136,25 @@ void draw_ui_list(int32_t i) {
         cursor_inside_button = floor(((float)cursor_inside_box_pos.y)/(ui_lists[i].font->letter_height + ui_lists[i].button_padding*2));
     }
 
-    sdm_set_color(1,0,0,1);
-    sdm_draw_rect(box_padded_pos.x, box_padded_pos.y, box_width+ui_lists[i].padding*2, box_height+ui_lists[i].padding*2);
+    draw_nine_slice(
+        *(ui_lists[i].box_nslice),
+        box_padded_pos.x,
+        box_padded_pos.y,
+        box_width+ui_lists[i].padding*2,
+        box_height+ui_lists[i].padding*2
+    );
     
     // buttons
     for (int32_t j = 0; j < ui_lists[i].buttons_amount; j++) {
         // hovering indication
         if (cursor_inside_button == j && ui_lists[i].button_callbacks[j] != NULL) {
-            sdm_set_color(0.5,0.5,0,1);
-            sdm_draw_rect(box_pos.x, box_pos.y + j*(ui_lists[i].font->letter_height + ui_lists[i].button_padding*2), box_width, (ui_lists[i].font->letter_height + ui_lists[i].button_padding*2));
+            draw_nine_slice(
+                *(ui_lists[i].button_hover_nslice),
+                box_pos.x,
+                box_pos.y + j*(ui_lists[i].font->letter_height + ui_lists[i].button_padding*2),
+                box_width,
+                (ui_lists[i].font->letter_height + ui_lists[i].button_padding*2)
+            );
         }
 
         draw_string(
@@ -191,7 +201,15 @@ void draw_ui_list_hovered_button_info_string() {
                     bottom_y = _OUTPORT_HEIGHT_ - info_str_box_padding - box_size.y;
                 }
 
-                draw_str_boxed(ui_lists[i].button_info_strings[cursor_inside_button], letters_font, left_x, bottom_y, info_str_box_padding, (ui_lists[i].font->letter_height));
+                draw_str_boxed(
+                    ui_lists[i].button_info_strings[cursor_inside_button],
+                    letters_font,
+                    *(ui_lists[i].info_string_nslice),
+                    left_x,
+                    bottom_y,
+                    info_str_box_padding,
+                    ui_lists[i].font->letter_height
+                );
             }
         }
     }
