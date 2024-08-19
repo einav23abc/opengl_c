@@ -130,6 +130,7 @@ void camera_update() {
     #endif
 
 
+    #ifndef DEBUG_SOFT_MODE
     // X axis rotation
     if (keys[SDL_SCANCODE_KP_2]) {
         camera->rx -= 0.05*delta_frames;
@@ -137,17 +138,6 @@ void camera_update() {
     if (keys[SDL_SCANCODE_KP_8]) {
         camera->rx += 0.05*delta_frames;
     }
-
-    // #ifndef DEBUG_SOFT_MODE
-    while(camera->rx < 0)       camera->rx += M_PI*2;
-    while(camera->rx >= M_PI*2) camera->rx -= M_PI*2;
-    if (camera->rx >= M_PI*1.875) {
-        camera->rx = M_PI*1.875;
-    }
-    if (camera->rx <= M_PI*1.625) {
-        camera->rx = M_PI*1.625;
-    }
-    // #endif
 
     // Z axis rotation
     if (keys[SDL_SCANCODE_KP_7]) {
@@ -165,6 +155,7 @@ void camera_update() {
     if (keys[SDL_SCANCODE_KP_4]) {
         camera->ry += 0.05*delta_frames;
     }
+    #endif
 
 
     // follow camera_pos
@@ -172,6 +163,7 @@ void camera_update() {
     camera->y = camera_pos.y - 60*sin(camera->rx);
     camera->z = camera_pos.z - 60*sin(camera->ry+M_PI*0.5)*cos(camera->rx);
 
+    #ifdef DEBUG_SOFT_MODE
     // perspective <-> orthographic togle
     if (keys[SDL_SCANCODE_P] == 1) {
         if (camera->is_prespective) {
@@ -182,6 +174,7 @@ void camera_update() {
             camera->near = 0.01;
         }
     }
+    #endif
 }
 
 void player_translations_update() {

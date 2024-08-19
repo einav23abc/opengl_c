@@ -1,313 +1,466 @@
 #include "game.h"
 
 uint8_t init() {
-    // <meshes;>
-        if(1){
-        float vertices_position_arr[] = {
-            // front
-            0,0,0,
-            0,1,0,
-            1,1,0,
-            1,0,0,
-            // back
-            0,0,1,
-            0,1,1,
-            1,1,1,
-            1,0,1,
-            // bottom
-            0,0,0,
-            0,0,1,
-            1,0,1,
-            1,0,0,
-            // top
-            0,1,0,
-            0,1,1,
-            1,1,1,
-            1,1,0,
-            // left
-            0,0,0,
-            0,1,0,
-            0,1,1,
-            0,0,1,
-            // right
-            1,0,0,
-            1,1,0,
-            1,1,1,
-            1,0,1,
-        };
-        float vertices_texcoord_arr[] = {
-            // front
-            0,1,
-            0,0,
-            1,0,
-            1,1,
-            // back
-            1,1,
-            1,0,
-            0,0,
-            0,1,
-            // bottom
-            0,1,
-            0,0,
-            1,0,
-            1,1,
-            // top
-            0,1,
-            0,0,
-            1,0,
-            1,1,
-            // left
-            1,1,
-            1,0,
-            0,0,
-            0,1,
-            // right
-            0,1,
-            0,0,
-            1,0,
-            1,1,
-        };
-        float vertices_normal_arr[] = {
-            // front
-            0,0,-1,
-            0,0,-1,
-            0,0,-1,
-            0,0,-1,
-            // back
-            0,0,1,
-            0,0,1,
-            0,0,1,
-            0,0,1,
-            // bottom
-            0,-1,0,
-            0,-1,0,
-            0,-1,0,
-            0,-1,0,
-            // top
-            0,1,0,
-            0,1,0,
-            0,1,0,
-            0,1,0,
-            // left
-            -1,0,0,
-            -1,0,0,
-            -1,0,0,
-            -1,0,0,
-            // right
-            1,0,0,
-            1,0,0,
-            1,0,0,
-            1,0,0,
-        };
-        vbo_data_t vbo_datas_arr[3] = {
-            {
-                .data_arr_size = sizeof(vertices_position_arr),
-                .data_arr = (void*)vertices_position_arr,
-                .size = 3,
-                .type = GL_FLOAT,
-                .stride = 3*sizeof(float),
-                .divisor = 0
-            },
-            {
-                .data_arr_size = sizeof(vertices_texcoord_arr),
-                .data_arr = (void*)vertices_texcoord_arr,
-                .size = 2,
-                .type = GL_FLOAT,
-                .stride = 2*sizeof(float),
-                .divisor = 0
-            },
-            {
-                .data_arr_size = sizeof(vertices_normal_arr),
-                .data_arr = (void*)vertices_normal_arr,
-                .size = 3,
-                .type = GL_FLOAT,
-                .stride = 3*sizeof(float),
-                .divisor = 0
+    // <meshes>
+        // <cube mesh & centered cube mesh>
+            if(1){
+            float vertices_position_arr[] = {
+                // front
+                0,0,0,
+                0,1,0,
+                1,1,0,
+                1,0,0,
+                // back
+                0,0,1,
+                0,1,1,
+                1,1,1,
+                1,0,1,
+                // bottom
+                0,0,0,
+                0,0,1,
+                1,0,1,
+                1,0,0,
+                // top
+                0,1,0,
+                0,1,1,
+                1,1,1,
+                1,1,0,
+                // left
+                0,0,0,
+                0,1,0,
+                0,1,1,
+                0,0,1,
+                // right
+                1,0,0,
+                1,1,0,
+                1,1,1,
+                1,0,1,
+            };
+            float vertices_texcoord_arr[] = {
+                // front
+                0,1,
+                0,0,
+                1,0,
+                1,1,
+                // back
+                1,1,
+                1,0,
+                0,0,
+                0,1,
+                // bottom
+                0,1,
+                0,0,
+                1,0,
+                1,1,
+                // top
+                0,1,
+                0,0,
+                1,0,
+                1,1,
+                // left
+                1,1,
+                1,0,
+                0,0,
+                0,1,
+                // right
+                0,1,
+                0,0,
+                1,0,
+                1,1,
+            };
+            float vertices_normal_arr[] = {
+                // front
+                0,0,-1,
+                0,0,-1,
+                0,0,-1,
+                0,0,-1,
+                // back
+                0,0,1,
+                0,0,1,
+                0,0,1,
+                0,0,1,
+                // bottom
+                0,-1,0,
+                0,-1,0,
+                0,-1,0,
+                0,-1,0,
+                // top
+                0,1,0,
+                0,1,0,
+                0,1,0,
+                0,1,0,
+                // left
+                -1,0,0,
+                -1,0,0,
+                -1,0,0,
+                -1,0,0,
+                // right
+                1,0,0,
+                1,0,0,
+                1,0,0,
+                1,0,0,
+            };
+            vbo_data_t vbo_datas_arr[3] = {
+                {
+                    .data_arr_size = sizeof(vertices_position_arr),
+                    .data_arr = (void*)vertices_position_arr,
+                    .size = 3,
+                    .type = GL_FLOAT,
+                    .stride = 3*sizeof(float),
+                    .divisor = 0
+                },
+                {
+                    .data_arr_size = sizeof(vertices_texcoord_arr),
+                    .data_arr = (void*)vertices_texcoord_arr,
+                    .size = 2,
+                    .type = GL_FLOAT,
+                    .stride = 2*sizeof(float),
+                    .divisor = 0
+                },
+                {
+                    .data_arr_size = sizeof(vertices_normal_arr),
+                    .data_arr = (void*)vertices_normal_arr,
+                    .size = 3,
+                    .type = GL_FLOAT,
+                    .stride = 3*sizeof(float),
+                    .divisor = 0
+                }
+            };
+            
+            uint32_t indices_array[] = {
+                // front
+                1, 0, 2,
+                2, 0, 3,
+                // back
+                4, 5, 6,
+                4, 6, 7,
+                // bottom
+                8, 9,10,
+                8,10,11,
+                // top
+                13,12,14,
+                14,12,15,
+                // left
+                16,17,18,
+                16,18,19,
+                // right
+                21,20,22,
+                22,20,23,
+            };
+
+            cube_mesh = generate_mesh(vbo_datas_arr, 3, indices_array, 36, 0);
+            // bind_mesh(cube_mesh);
+            
+            for (uint32_t i = 0; i <sizeof(vertices_position_arr)/sizeof(float); i++) vertices_position_arr[i] -= 0.5;
+            centered_cube_mesh = generate_mesh(vbo_datas_arr, 3, indices_array, 36, 0);
+            };
+        // </cube mesh & centered cube mesh>
+
+        // <hinge_mesh>
+            hinge_mesh = mesh_from_wavefront_obj_ext(
+                "./game/models/hinge.obj",
+                (quat_vec_vec_t){
+                    .pos = (vec3_t){
+                        .x = 0,
+                        .y = 0,
+                        .z = 0
+                    },
+                    .rot = quat_from_axis_angles_yzx(-0, -0, -0),
+                    .scale = (vec3_t){
+                        .x = 0.5,
+                        .y = 0.5,
+                        .z = 0.5
+                    }
+                },
+                0
+            );
+        // </hinge_mesh>
+
+        // <tile_effect_mesh>
+            if(1){
+            float vertices_position_arr[] = {
+                // front
+                0,0,0,
+                0,1,0,
+                1,1,0,
+                1,0,0,
+                // back
+                0,0,1,
+                0,1,1,
+                1,1,1,
+                1,0,1,
+                // bottom
+                0,0,0,
+                0,0,1,
+                1,0,1,
+                1,0,0,
+                // top
+                0,1,0,
+                0,1,1,
+                1,1,1,
+                1,1,0,
+                // left
+                0,0,0,
+                0,1,0,
+                0,1,1,
+                0,0,1,
+                // right
+                1,0,0,
+                1,1,0,
+                1,1,1,
+                1,0,1,
+            };
+            float vertices_texcoord_arr[] = {
+                // front
+                0,1,
+                0,0,
+                1,0,
+                1,1,
+                // back
+                1,1,
+                1,0,
+                0,0,
+                0,1,
+                // bottom
+                0,1,
+                0,0,
+                1,0,
+                1,1,
+                // top
+                0,1,
+                0,0,
+                1,0,
+                1,1,
+                // left
+                1,1,
+                1,0,
+                0,0,
+                0,1,
+                // right
+                0,1,
+                0,0,
+                1,0,
+                1,1,
+            };
+            float vertices_normal_arr[] = {
+                // front
+                0,0,-1,
+                0,0,-1,
+                0,0,-1,
+                0,0,-1,
+                // back
+                0,0,1,
+                0,0,1,
+                0,0,1,
+                0,0,1,
+                // bottom
+                0,-1,0,
+                0,-1,0,
+                0,-1,0,
+                0,-1,0,
+                // top
+                0,1,0,
+                0,1,0,
+                0,1,0,
+                0,1,0,
+                // left
+                -1,0,0,
+                -1,0,0,
+                -1,0,0,
+                -1,0,0,
+                // right
+                1,0,0,
+                1,0,0,
+                1,0,0,
+                1,0,0,
+            };
+            vbo_data_t vbo_datas_arr[3] = {
+                {
+                    .data_arr_size = sizeof(vertices_position_arr),
+                    .data_arr = (void*)vertices_position_arr,
+                    .size = 3,
+                    .type = GL_FLOAT,
+                    .stride = 3*sizeof(float),
+                    .divisor = 0
+                },
+                {
+                    .data_arr_size = sizeof(vertices_texcoord_arr),
+                    .data_arr = (void*)vertices_texcoord_arr,
+                    .size = 2,
+                    .type = GL_FLOAT,
+                    .stride = 2*sizeof(float),
+                    .divisor = 0
+                },
+                {
+                    .data_arr_size = sizeof(vertices_normal_arr),
+                    .data_arr = (void*)vertices_normal_arr,
+                    .size = 3,
+                    .type = GL_FLOAT,
+                    .stride = 3*sizeof(float),
+                    .divisor = 0
+                }
+            };
+            
+            uint32_t indices_array[] = {
+                // front
+                1, 0, 2,
+                2, 0, 3,
+                // back
+                4, 5, 6,
+                4, 6, 7,
+                // left
+                16,17,18,
+                16,18,19,
+                // right
+                21,20,22,
+                22,20,23,
+            };
+
+            tile_effect_mesh = generate_mesh(vbo_datas_arr, 3, indices_array, 24, 0);
             }
-        };
-        
-        uint32_t indices_array[] = {
-            // front
-            1, 0, 2,
-            2, 0, 3,
-            // back
-            4, 5, 6,
-            4, 6, 7,
-            // bottom
-            8, 9,10,
-            8,10,11,
-            // top
-            13,12,14,
-            14,12,15,
-            // left
-            16,17,18,
-            16,18,19,
-            // right
-            21,20,22,
-            22,20,23,
-        };
+        // <tile_effect_mesh>
 
-        cube_mesh = generate_mesh(vbo_datas_arr, 3, indices_array, 36, 0);
-        // bind_mesh(cube_mesh);
-        
-        for (uint32_t i = 0; i <sizeof(vertices_position_arr)/sizeof(float); i++) vertices_position_arr[i] -= 0.5;
-        centered_cube_mesh = generate_mesh(vbo_datas_arr, 3, indices_array, 36, 0);
-        };
+        // <rect_plane_mesh>
+            rect_plane_mesh = generate_2d_quad_mesh(0, 1, 0, 1, 0, 1, 0, 1);
+        // </rect_plane_mesh>
 
-        // tile_effect_mesh
-        if(1){
-        float vertices_position_arr[] = {
-            // front
-            0,0,0,
-            0,1,0,
-            1,1,0,
-            1,0,0,
-            // back
-            0,0,1,
-            0,1,1,
-            1,1,1,
-            1,0,1,
-            // bottom
-            0,0,0,
-            0,0,1,
-            1,0,1,
-            1,0,0,
-            // top
-            0,1,0,
-            0,1,1,
-            1,1,1,
-            1,1,0,
-            // left
-            0,0,0,
-            0,1,0,
-            0,1,1,
-            0,0,1,
-            // right
-            1,0,0,
-            1,1,0,
-            1,1,1,
-            1,0,1,
-        };
-        float vertices_texcoord_arr[] = {
-            // front
-            0,1,
-            0,0,
-            1,0,
-            1,1,
-            // back
-            1,1,
-            1,0,
-            0,0,
-            0,1,
-            // bottom
-            0,1,
-            0,0,
-            1,0,
-            1,1,
-            // top
-            0,1,
-            0,0,
-            1,0,
-            1,1,
-            // left
-            1,1,
-            1,0,
-            0,0,
-            0,1,
-            // right
-            0,1,
-            0,0,
-            1,0,
-            1,1,
-        };
-        float vertices_normal_arr[] = {
-            // front
-            0,0,-1,
-            0,0,-1,
-            0,0,-1,
-            0,0,-1,
-            // back
-            0,0,1,
-            0,0,1,
-            0,0,1,
-            0,0,1,
-            // bottom
-            0,-1,0,
-            0,-1,0,
-            0,-1,0,
-            0,-1,0,
-            // top
-            0,1,0,
-            0,1,0,
-            0,1,0,
-            0,1,0,
-            // left
-            -1,0,0,
-            -1,0,0,
-            -1,0,0,
-            -1,0,0,
-            // right
-            1,0,0,
-            1,0,0,
-            1,0,0,
-            1,0,0,
-        };
-        vbo_data_t vbo_datas_arr[3] = {
-            {
-                .data_arr_size = sizeof(vertices_position_arr),
-                .data_arr = (void*)vertices_position_arr,
-                .size = 3,
-                .type = GL_FLOAT,
-                .stride = 3*sizeof(float),
-                .divisor = 0
-            },
-            {
-                .data_arr_size = sizeof(vertices_texcoord_arr),
-                .data_arr = (void*)vertices_texcoord_arr,
-                .size = 2,
-                .type = GL_FLOAT,
-                .stride = 2*sizeof(float),
-                .divisor = 0
-            },
-            {
-                .data_arr_size = sizeof(vertices_normal_arr),
-                .data_arr = (void*)vertices_normal_arr,
-                .size = 3,
-                .type = GL_FLOAT,
-                .stride = 3*sizeof(float),
-                .divisor = 0
-            }
-        };
-        
-        uint32_t indices_array[] = {
-            // front
-            1, 0, 2,
-            2, 0, 3,
-            // back
-            4, 5, 6,
-            4, 6, 7,
-            // left
-            16,17,18,
-            16,18,19,
-            // right
-            21,20,22,
-            22,20,23,
-        };
+        // <field tile mesh>
+            field_tile_mesh = mesh_from_wavefront_obj_ext(
+                "./game/models/field.obj",
+                (quat_vec_vec_t){
+                    .pos = (vec3_t){
+                        .x = 0.5,
+                        .y = 0,
+                        .z = 0.5
+                    },
+                    .rot = quat_from_axis_angles_yzx(-0, -0, -0),
+                    .scale = (vec3_t){
+                        .x = 0.167,
+                        .y = 0.167,
+                        .z = 0.167
+                    }
+                },
+                0
+            );
 
-        tile_effect_mesh = generate_mesh(vbo_datas_arr, 3, indices_array, 24, 0);
-        }
+            field_wheat_tile_mesh = mesh_from_wavefront_obj_ext(
+                "./game/models/field_wheat.obj",
+                (quat_vec_vec_t){
+                    .pos = (vec3_t){
+                        .x = 0.5,
+                        .y = 0,
+                        .z = 0.5
+                    },
+                    .rot = quat_from_axis_angles_yzx(-0, -0, -0),
+                    .scale = (vec3_t){
+                        .x = 0.167,
+                        .y = 0.167,
+                        .z = 0.167
+                    }
+                },
+                0
+            );
+        // </field tile mesh>
+
+        // <forest tile mesh>
+            forest_tile_mesh = mesh_from_wavefront_obj_ext(
+                "./game/models/forest.obj",
+                (quat_vec_vec_t){
+                    .pos = (vec3_t){
+                        .x = 0.5,
+                        .y = 0,
+                        .z = 0.5
+                    },
+                    .rot = quat_from_axis_angles_yzx(-0, -0, -0),
+                    .scale = (vec3_t){
+                        .x = 0.167,
+                        .y = 0.167,
+                        .z = 0.167
+                    }
+                },
+                0
+            );
+            forest_tree_tile_mesh = mesh_from_wavefront_obj_ext(
+                "./game/models/tree.obj",
+                (quat_vec_vec_t){
+                    .pos = (vec3_t){
+                        .x = 0.5,
+                        .y = 0,
+                        .z = 0.5
+                    },
+                    .rot = quat_from_axis_angles_yzx(-0, -0, -0),
+                    .scale = (vec3_t){
+                        .x = 0.167,
+                        .y = 0.167,
+                        .z = 0.167
+                    }
+                },
+                0
+            );
+        // </forest tile mesh>
+
+        // <mine_tile_mesh>
+            mine_tile_mesh = mesh_from_wavefront_obj_ext(
+                "./game/models/mine.obj",
+                (quat_vec_vec_t){
+                    .pos = (vec3_t){
+                        .x = 0.5,
+                        .y = 0,
+                        .z = 0.5
+                    },
+                    .rot = quat_from_axis_angles_yzx(-0, -0, -0),
+                    .scale = (vec3_t){
+                        .x = 0.167,
+                        .y = 0.167,
+                        .z = 0.167
+                    }
+                },
+                0
+            );
+        // </mine_tile_mesh>
+        
+        // <house_tile_mesh>
+            house_tile_mesh = mesh_from_wavefront_obj_ext(
+                "./game/models/house.obj",
+                (quat_vec_vec_t){
+                    .pos = (vec3_t){
+                        .x = 0.4,
+                        .y = 0,
+                        .z = 0.35
+                    },
+                    .rot = quat_from_axis_angles_yzx(-0, -M_PI*1.6, -0),
+                    .scale = (vec3_t){
+                        .x = 0.167,
+                        .y = 0.167,
+                        .z = 0.167
+                    }
+                },
+                0
+            );
+        // </house_tile_mesh>
+        
+        // <barracks_tile_mesh>
+            barracks_tile_mesh = mesh_from_wavefront_obj_ext(
+                "./game/models/barracks.obj",
+                (quat_vec_vec_t){
+                    .pos = (vec3_t){
+                        .x = 0.55,
+                        .y = 0,
+                        .z = 0.55
+                    },
+                    .rot = quat_from_axis_angles_yzx(-0, -M_PI*0.05, -0),
+                    .scale = (vec3_t){
+                        .x = 0.167,
+                        .y = 0.167,
+                        .z = 0.167
+                    }
+                },
+                0
+            );
+        // </barracks_tile_mesh>
     // </meshes>
 
-    // <rect_plane_mesh>
-        rect_plane_mesh = generate_2d_quad_mesh(0, 1, 0, 1, 0, 1, 0, 1);
-    // </rect_plane_mesh>
-
     // <cameras>
-        camera_pos = (vec3_t){
-            .x = 0,
-            .y = _SCALE_AXIS_POINT_Y_,
-            .z = 0
-        };
         camera = create_camera(
             0, 0, 0,
             M_PI*1.8, -M_PI*0.15, 0,
@@ -339,7 +492,6 @@ uint8_t init() {
         );
     // </sun shadow map>
 
-
     // <fbos>
         outport_fbo = create_fbo(_OUTPORT_WIDTH_, _OUTPORT_HEIGHT_, 1, GL_RGB, 4);
 
@@ -350,6 +502,12 @@ uint8_t init() {
         floor_texture = load_texture("./game/textures/floor.png");
         global_texture = load_texture("./game/textures/global_texture.png");
         // save_surface_to_c_file("./game/textures/global_texture.png", "global_texture_surface", "./game/textures/global_texture_surface.c");
+        tile_texture = load_texture("./game/textures/tile_texture.png");
+        field_tile_texture = load_texture("./game/textures/field_tile_texture.png");
+        forest_tile_texture = load_texture("./game/textures/forest_tile_texture.png");
+        mine_tile_texture = load_texture("./game/textures/mine_tile_texture.png");
+        house_tile_texture = load_texture("./game/textures/house_tile_texture.png");
+        barracks_tile_texture = load_texture("./game/textures/barracks_tile_texture.png");
         
         // <letters_font>
             letters_font = (font_t){
@@ -458,8 +616,8 @@ uint8_t init() {
         tile_type_properties[TILE_TYPE_HOUSE] = (tile_type_t){
             .cost = (resources_t){
                 .wood = 1,
-                .stone = 1,
-                .wheat = 2,
+                .stone = 2,
+                .wheat = 1,
                 .population = 0,
                 .soldiers = 0
             },
@@ -546,61 +704,7 @@ uint8_t init() {
             char build_info_string[_TILE_BUILD_INFO_STRING_MAX_LENGTH_];
             uint32_t c = 0;
 
-            strcpy(&(build_info_string[c]), "costs:\n");
-            c += strlen("costs:\n");
             
-            if (tile_type_properties[i].cost.population > 0) {
-                build_info_string[c  ] = '*';
-                build_info_string[c+1] = ' ';
-                build_info_string[c+2] = '-';
-                build_info_string[c+3] = '0' + tile_type_properties[i].cost.population;
-                build_info_string[c+4] = '\x11';
-                build_info_string[c+5] = '\x12';
-                build_info_string[c+6] = '\n';
-                c += 7;
-            }
-            if (tile_type_properties[i].cost.wheat > 0) {
-                build_info_string[c  ] = '*';
-                build_info_string[c+1] = ' ';
-                build_info_string[c+2] = '-';
-                build_info_string[c+3] = '0' + tile_type_properties[i].cost.wheat;
-                build_info_string[c+4] = '\x13';
-                build_info_string[c+5] = '\x14';
-                build_info_string[c+6] = '\n';
-                c += 7;
-            }
-            if (tile_type_properties[i].cost.wood > 0) {
-                build_info_string[c  ] = '*';
-                build_info_string[c+1] = ' ';
-                build_info_string[c+2] = '-';
-                build_info_string[c+3] = '0' + tile_type_properties[i].cost.wood;
-                build_info_string[c+4] = '\x15';
-                build_info_string[c+5] = '\x16';
-                build_info_string[c+6] = '\n';
-                c += 7;
-            }
-            if (tile_type_properties[i].cost.stone > 0) {
-                build_info_string[c  ] = '*';
-                build_info_string[c+1] = ' ';
-                build_info_string[c+2] = '-';
-                build_info_string[c+3] = '0' + tile_type_properties[i].cost.stone;
-                build_info_string[c+4] = '\x17';
-                build_info_string[c+5] = '\x18';
-                build_info_string[c+6] = '\n';
-                c += 7;
-            }
-            if (tile_type_properties[i].cost.soldiers > 0) {
-                build_info_string[c  ] = '*';
-                build_info_string[c+1] = ' ';
-                build_info_string[c+2] = '-';
-                build_info_string[c+3] = '0' + tile_type_properties[i].cost.soldiers;
-                build_info_string[c+4] = '\x19';
-                build_info_string[c+5] = '\x1a';
-                build_info_string[c+6] = '\n';
-                c += 7;
-            }
-            
-
             if (tile_type_properties[i].give_cooldown == 1) {
                 strcpy(&(build_info_string[c]), "Every turn:\n");
                 c += strlen("Every turn:\n");
@@ -668,6 +772,63 @@ uint8_t init() {
                 build_info_string[c+1] = ' ';
                 build_info_string[c+2] = '+';
                 build_info_string[c+3] = '0' + tile_type_properties[i].give.soldiers;
+                build_info_string[c+4] = '\x19';
+                build_info_string[c+5] = '\x1a';
+                build_info_string[c+6] = '\n';
+                c += 7;
+            }
+
+            build_info_string[c] = '\n';
+            c += 1;
+
+            strcpy(&(build_info_string[c]), "costs:\n");
+            c += strlen("costs:\n");
+            
+            if (tile_type_properties[i].cost.population > 0) {
+                build_info_string[c  ] = '*';
+                build_info_string[c+1] = ' ';
+                build_info_string[c+2] = '-';
+                build_info_string[c+3] = '0' + tile_type_properties[i].cost.population;
+                build_info_string[c+4] = '\x11';
+                build_info_string[c+5] = '\x12';
+                build_info_string[c+6] = '\n';
+                c += 7;
+            }
+            if (tile_type_properties[i].cost.wheat > 0) {
+                build_info_string[c  ] = '*';
+                build_info_string[c+1] = ' ';
+                build_info_string[c+2] = '-';
+                build_info_string[c+3] = '0' + tile_type_properties[i].cost.wheat;
+                build_info_string[c+4] = '\x13';
+                build_info_string[c+5] = '\x14';
+                build_info_string[c+6] = '\n';
+                c += 7;
+            }
+            if (tile_type_properties[i].cost.wood > 0) {
+                build_info_string[c  ] = '*';
+                build_info_string[c+1] = ' ';
+                build_info_string[c+2] = '-';
+                build_info_string[c+3] = '0' + tile_type_properties[i].cost.wood;
+                build_info_string[c+4] = '\x15';
+                build_info_string[c+5] = '\x16';
+                build_info_string[c+6] = '\n';
+                c += 7;
+            }
+            if (tile_type_properties[i].cost.stone > 0) {
+                build_info_string[c  ] = '*';
+                build_info_string[c+1] = ' ';
+                build_info_string[c+2] = '-';
+                build_info_string[c+3] = '0' + tile_type_properties[i].cost.stone;
+                build_info_string[c+4] = '\x17';
+                build_info_string[c+5] = '\x18';
+                build_info_string[c+6] = '\n';
+                c += 7;
+            }
+            if (tile_type_properties[i].cost.soldiers > 0) {
+                build_info_string[c  ] = '*';
+                build_info_string[c+1] = ' ';
+                build_info_string[c+2] = '-';
+                build_info_string[c+3] = '0' + tile_type_properties[i].cost.soldiers;
                 build_info_string[c+4] = '\x19';
                 build_info_string[c+5] = '\x1a';
                 build_info_string[c+6] = '\n';

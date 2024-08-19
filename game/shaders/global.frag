@@ -52,15 +52,19 @@ void main(){
         }
     }
     
-    float lighting = (clamp(light*shadow,0.0,1.0)*0.9+0.1);
+    float lighting = (clamp(light*shadow,0.0,1.0)*0.8+0.2);
 
     float aerial_mixing = max(0.0,min(1.0,1-0.001*distance(v_position,u_camera_position)));
     const vec3 aerial_color = vec3(71, 65, 107)/255.0;
 
-    vec3 color = texture2D(u_texture, v_texcoord).xyz*lighting;
-    color = (color*aerial_mixing)+(aerial_color*(1-aerial_mixing));
+    vec4 color = texture2D(u_texture, v_texcoord);
+    if (color.a <= 0.01) {
+        discard;
+    }
+    color.xyz = color.xyz*lighting;
+    color.xyz = (color.xyz*aerial_mixing)+(aerial_color*(1-aerial_mixing));
 
-    gl_FragColor = vec4(color,1.0);
+    gl_FragColor = color;
     
     // gl_FragColor = vec4(v_normal*0.5+0.5,1.0);
 }

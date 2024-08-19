@@ -119,6 +119,12 @@ extern fbo_t* outport_fbo;
 
 extern texture_t* floor_texture;
 extern texture_t* global_texture;
+extern texture_t* tile_texture;
+extern texture_t* field_tile_texture;
+extern texture_t* forest_tile_texture;
+extern texture_t* mine_tile_texture;
+extern texture_t* house_tile_texture;
+extern texture_t* barracks_tile_texture;
 
 extern nine_slice_t nine_slice1;
 extern nine_slice_t nine_slice2;
@@ -142,7 +148,15 @@ extern camera_t* ui_camera;
 extern mesh_t* rect_plane_mesh;
 extern mesh_t* cube_mesh;
 extern mesh_t* centered_cube_mesh;
+extern mesh_t* hinge_mesh;
 extern mesh_t* tile_effect_mesh;
+extern mesh_t* field_tile_mesh;
+extern mesh_t* field_wheat_tile_mesh;
+extern mesh_t* forest_tile_mesh;
+extern mesh_t* forest_tree_tile_mesh;
+extern mesh_t* mine_tile_mesh;
+extern mesh_t* house_tile_mesh;
+extern mesh_t* barracks_tile_mesh;
 
 extern tile_type_t tile_type_properties[_TILE_TYPES_AMOUNT_];
 
@@ -174,7 +188,7 @@ void camera_update();
 void sun_shadow_map_update();
 
 void render_game();
-void draw_tile(int32_t player_i, int32_t tile_x, int32_t tile_z, int32_t tile_type);
+void draw_tile(int32_t player_i, int32_t tile_x, int32_t tile_z, int32_t tile_type, int32_t fixed_shader);
 void render_game_world();
 void render_game_effects();
 void render_game_ui();

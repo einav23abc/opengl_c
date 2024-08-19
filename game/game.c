@@ -9,6 +9,12 @@ fbo_t* outport_fbo;
 
 texture_t* floor_texture;
 texture_t* global_texture;
+texture_t* tile_texture;
+texture_t* field_tile_texture;
+texture_t* forest_tile_texture;
+texture_t* mine_tile_texture;
+texture_t* house_tile_texture;
+texture_t* barracks_tile_texture;
 
 nine_slice_t nine_slice1;
 nine_slice_t nine_slice2;
@@ -32,7 +38,15 @@ camera_t* ui_camera;
 mesh_t* rect_plane_mesh;
 mesh_t* cube_mesh;
 mesh_t* centered_cube_mesh;
+mesh_t* hinge_mesh;
 mesh_t* tile_effect_mesh;
+mesh_t* field_tile_mesh;
+mesh_t* field_wheat_tile_mesh;
+mesh_t* forest_tile_mesh;
+mesh_t* forest_tree_tile_mesh;
+mesh_t* mine_tile_mesh;
+mesh_t* house_tile_mesh;
+mesh_t* barracks_tile_mesh;
 
 tile_type_t tile_type_properties[_TILE_TYPES_AMOUNT_];
 
@@ -521,8 +535,19 @@ void enter_game() {
     close_all_alerts();
     page = PAGE_IN_GAME;
 
+    // camera
+    camera_pos = (vec3_t){
+        .x = 0,
+        .y = _SCALE_AXIS_POINT_Y_,
+        .z = 0
+    };
+    camera->rx = M_PI*1.8;
+    camera->ry = -M_PI*0.15;
+    camera->rz = 0;
+
     selected_tile.x = -1;
     selected_tile.y = -1;
+    selected_tile.z = -1;
     hovered_tiles[0].x = -1;
     hovered_tiles[0].y = -1;
     hovered_tiles[1].x = -1;
@@ -557,15 +582,15 @@ void enter_game() {
     game_struct.players[0].tiles[13].type = TILE_TYPE_HOUSE;
     game_struct.players[0].tiles[13].cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
     game_struct.players[0].tiles[13].curent_cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
-    game_struct.players[0].tiles[19].type = TILE_TYPE_MINE;
-    game_struct.players[0].tiles[19].cooldown_timer = tile_type_properties[TILE_TYPE_MINE].give_cooldown;
-    game_struct.players[0].tiles[19].curent_cooldown_timer = tile_type_properties[TILE_TYPE_MINE].give_cooldown;
+    game_struct.players[0].tiles[19].type = TILE_TYPE_FOREST;
+    game_struct.players[0].tiles[19].cooldown_timer = tile_type_properties[TILE_TYPE_FOREST].give_cooldown;
+    game_struct.players[0].tiles[19].curent_cooldown_timer = tile_type_properties[TILE_TYPE_FOREST].give_cooldown;
     game_struct.players[1].tiles[13].type = TILE_TYPE_HOUSE;
     game_struct.players[1].tiles[13].cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
     game_struct.players[1].tiles[13].curent_cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
-    game_struct.players[1].tiles[19].type = TILE_TYPE_MINE;
-    game_struct.players[1].tiles[19].cooldown_timer = tile_type_properties[TILE_TYPE_MINE].give_cooldown;
-    game_struct.players[1].tiles[19].curent_cooldown_timer = tile_type_properties[TILE_TYPE_MINE].give_cooldown;
+    game_struct.players[1].tiles[19].type = TILE_TYPE_FOREST;
+    game_struct.players[1].tiles[19].cooldown_timer = tile_type_properties[TILE_TYPE_FOREST].give_cooldown;
+    game_struct.players[1].tiles[19].curent_cooldown_timer = tile_type_properties[TILE_TYPE_FOREST].give_cooldown;
 
     game_struct.players[0].resources.wood = 2;
     game_struct.players[0].resources.stone = 2;
@@ -584,9 +609,9 @@ void enter_game() {
         .active = 1,
         .permenant = 1,
 
-        .font = &letters_font,
+        .font = &big_letters_font,
         .padding = 1,
-        .button_padding = 5,
+        .button_padding = 7,
         .box_nslice = &nine_slice2,
         .button_hover_nslice = &nine_slice3,
         .info_string_nslice = &nine_slice1,
