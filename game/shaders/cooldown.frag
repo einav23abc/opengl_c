@@ -1,3 +1,5 @@
+#version 150
+
 varying vec2 v_texcoord;
 
 uniform float u_rads;
@@ -21,11 +23,11 @@ void main(){
 
     
     vec4 color = vec4(1.0);
-    const vec3 color_empty = vec3(138, 143, 196)/255.0;
-    const vec3 color_full = vec3(161, 61, 59)/255.0;
-    const vec3 color_edge = vec3(28, 22, 24)/255.0;
-    const vec3 color_button = vec3(28, 22, 24)/255.0;
-    const vec3 color_line = vec3(28, 22, 24)/255.0;
+    const vec3 color_empty = vec3(138.0, 143.0, 196.0)/255.0;
+    const vec3 color_full = vec3(161.0, 61.0, 59.0)/255.0;
+    const vec3 color_edge = vec3(28.0, 22.0, 24.0)/255.0;
+    const vec3 color_button = vec3(28.0, 22.0, 24.0)/255.0;
+    const vec3 color_line = vec3(28.0, 22.0, 24.0)/255.0;
     const float line_size = 0.15;
 
     if (dist_from_center <= 0.15) {

@@ -794,18 +794,18 @@ uint8_t init() {
 
     // <sounds>
         #ifdef DEBUG_SOFT_MODE
-        build_tile_sound = audio_sound_load("./game/sounds/place_tile.wav");        // \x   // X
-        attack_tile_sound = audio_sound_load("./game/sounds/attack_tile.wav");      // X    // X
-        demolish_tile_sound = audio_sound_load("./game/sounds/demolish_tile.wav");  // X    // X
-        wheight_up_sound = audio_sound_load("./game/sounds/wheight_up.wav");        // X    // X
-        wheight_down_sound = audio_sound_load("./game/sounds/wheight_down.wav");    // X    // X
-        resource_give_sound = audio_sound_load("./game/sounds/resource_give.wav");  // X    // X
-        win_game_sound = audio_sound_load("./game/sounds/win_game.wav");            // /x   // X
-        lose_game_sound = audio_sound_load("./game/sounds/lose_game.wav");          // /x   // X
-        switch_turn_sound = audio_sound_load("./game/sounds/switch_turn.wav");      // X    // X
-        button_press_sound = audio_sound_load("./game/sounds/button_press.wav");    // X    // X
-        error_sound = audio_sound_load("./game/sounds/error.wav");                  // X    // X
-        select_tile_sound = audio_sound_load("./game/sounds/select_tile.wav");      // X    // X
+        // build_tile_sound = audio_sound_load("./game/sounds/place_tile.wav");        // \x   // X
+        // attack_tile_sound = audio_sound_load("./game/sounds/attack_tile.wav");      // X    // X
+        // demolish_tile_sound = audio_sound_load("./game/sounds/demolish_tile.wav");  // X    // X
+        // wheight_up_sound = audio_sound_load("./game/sounds/wheight_up.wav");        // X    // X
+        // wheight_down_sound = audio_sound_load("./game/sounds/wheight_down.wav");    // X    // X
+        // resource_give_sound = audio_sound_load("./game/sounds/resource_give.wav");  // X    // X
+        // win_game_sound = audio_sound_load("./game/sounds/win_game.wav");            // /x   // X
+        // lose_game_sound = audio_sound_load("./game/sounds/lose_game.wav");          // /x   // X
+        // switch_turn_sound = audio_sound_load("./game/sounds/switch_turn.wav");      // X    // X
+        // button_press_sound = audio_sound_load("./game/sounds/button_press.wav");    // X    // X
+        // error_sound = audio_sound_load("./game/sounds/error.wav");                  // X    // X
+        // select_tile_sound = audio_sound_load("./game/sounds/select_tile.wav");      // X    // X
         #endif
 
         // audio_save_sound_to_c_file(build_tile_sound, "build_tile_sound", "./game/sounds/build_tile_sound.c");

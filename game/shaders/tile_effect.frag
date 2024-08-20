@@ -1,3 +1,5 @@
+#version 150
+
 varying vec3 v_position;
 varying vec2 v_texcoord;
 varying vec3 v_normal;
@@ -16,7 +18,7 @@ uniform float u_length;
 void main(){
     float y = 1.0-v_texcoord.y;
     
-    if (u_width > 0 && u_width <= 1 && u_length > 0){
+    if (u_width > 0.0 && u_width <= 1.0 && u_length > 0.0){
         float min_y = u_time/u_length;
         float max_y = u_time/u_length + u_width;
         if (y < min_y || y > max_y) {
@@ -25,7 +27,7 @@ void main(){
     }
 
     float alpha = ceil(sin((y - u_time*u_speed)*M_PI*u_freq)*0.5+0.5 - y);
-    if (alpha <= 0) {
+    if (alpha <= 0.0) {
         discard;
     }
 

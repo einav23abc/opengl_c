@@ -1,3 +1,5 @@
+#version 150
+
 varying vec2 v_texcoord;
 
 uniform sampler2D u_texture;
@@ -20,7 +22,7 @@ void main(){
         float min_dist = min(1.0, float(current_frame)/float(u_frames_amount-1));
         float max_dist = min(1.0, 2.0*float(current_frame)/float(u_frames_amount-1));
         if (dist_from_center >= min_dist && dist_from_center <= max_dist) {
-            color = vec4(28, 22, 24, 255)/255.0;
+            color = vec4(28.0, 22.0, 24.0, 255)/255.0;
         }
     }
 

@@ -1,3 +1,5 @@
+#version 150
+
 varying vec3 v_position;
 varying vec2 v_texcoord;
 varying vec3 v_normal;
@@ -54,8 +56,8 @@ void main(){
     
     float lighting = (clamp(light*shadow,0.0,1.0)*0.8+0.2);
 
-    float aerial_mixing = max(0.0,min(1.0,1-0.001*distance(v_position,u_camera_position)));
-    const vec3 aerial_color = vec3(71, 65, 107)/255.0;
+    float aerial_mixing = max(0.0,min(1.0, 1.0 - 0.001*distance(v_position,u_camera_position)));
+    const vec3 aerial_color = vec3(71.0, 65.0, 107.0)/255.0;
 
     vec4 color = texture2D(u_texture, v_texcoord);
     if (color.a <= 0.01) {

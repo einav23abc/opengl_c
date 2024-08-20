@@ -1,3 +1,5 @@
+#version 150
+
 #define MAX_TEXT_ROW_LENGTH (64)
 
 varying vec2 v_texcoord;

@@ -115,20 +115,20 @@ mesh_t* rect_plane_mesh;
 #include "./models/scale_head_mesh.c"
 
 
-#ifdef DEBUG_SOFT_MODE
-sound_t* build_tile_sound;
-sound_t* attack_tile_sound;
-sound_t* demolish_tile_sound;
-sound_t* wheight_up_sound;
-sound_t* wheight_down_sound;
-sound_t* resource_give_sound;
-sound_t* win_game_sound;
-sound_t* lose_game_sound;
-sound_t* switch_turn_sound;
-sound_t* error_sound;
-sound_t* select_tile_sound;
-sound_t* button_press_sound;
-#else
+// #ifdef DEBUG_SOFT_MODE
+// sound_t* build_tile_sound;
+// sound_t* attack_tile_sound;
+// sound_t* demolish_tile_sound;
+// sound_t* wheight_up_sound;
+// sound_t* wheight_down_sound;
+// sound_t* resource_give_sound;
+// sound_t* win_game_sound;
+// sound_t* lose_game_sound;
+// sound_t* switch_turn_sound;
+// sound_t* error_sound;
+// sound_t* select_tile_sound;
+// sound_t* button_press_sound;
+// #else
 #include "./sounds/build_tile_sound.c"
 #include "./sounds/attack_tile_sound.c"
 #include "./sounds/demolish_tile_sound.c"
@@ -141,7 +141,7 @@ sound_t* button_press_sound;
 #include "./sounds/error_sound.c"
 #include "./sounds/select_tile_sound.c"
 #include "./sounds/button_press_sound.c"
-#endif
+// #endif
 music_t* talking_mud_music;
 
 tile_type_t tile_type_properties[_TILE_TYPES_AMOUNT_];

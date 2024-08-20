@@ -14,7 +14,7 @@ gcc ^
     render.c ^
     handle_event.c ^
     clean.c ^
-    -o ../export/a_scaled_affair.exe ^
+    -o ../export/a_scaled_affair_debug.exe ^
     -L"../engine" -l "engine_debug" ^
     -l "SDL2main" ^
     -l "SDL2" ^
