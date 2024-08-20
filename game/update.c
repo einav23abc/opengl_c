@@ -41,6 +41,8 @@ void update_game() {
         request_switch_turn();
     }
 
+
+    // update losing/winning
     if (
         game_struct.game_ended == 0 &&
         (
@@ -91,7 +93,9 @@ void update_game() {
         };
     }
 
+
     player_translations_update();
+    // and attack effects
     tile_cooldowns_update();
     camera_update();
     sun_shadow_map_update(); // a bit redundent
@@ -236,6 +240,7 @@ void player_translations_update() {
     }
 }
 
+// also updates tiles attack effects
 void tile_cooldowns_update() {
     in_cooldowns_translation = 0;
 
@@ -243,6 +248,9 @@ void tile_cooldowns_update() {
         for (uint32_t x = 0; x < _PLAYER_GRID_WIDTH_; x++) {
             for (uint32_t z = 0; z < _PLAYER_GRID_DEPTH_; z++) {
                 tile_t* tile = &(game_struct.players[i].tiles[z*_PLAYER_GRID_DEPTH_ + x]);
+
+                // update attack effects
+                if (tile->attacked_effect_time_to_live > 0) tile->attacked_effect_time_to_live -= delta_time;
                 
                 if (tile->type == TILE_TYPE_EMPTY) continue;
                 if (tile->curent_cooldown_timer == tile->cooldown_timer) continue;
@@ -258,7 +266,7 @@ void tile_cooldowns_update() {
                         if (i == 0) {
                             audio_sound_play(resource_give_sound);
                         }
-                        
+
                         tile_type_t* tile_type = &(tile_type_properties[tile->type]);
                         game_struct.players[i].resources.population += tile_type->give.population;
                         game_struct.players[i].resources.wheat      += tile_type->give.wheat;

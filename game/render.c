@@ -310,74 +310,76 @@ void render_game_effects() {
 
     // <hovered and selected tiles>
         use_shader(tile_effect_shader);
-        // hovered tile
-        for (int8_t i = 0; i < 2; i ++) {
+        // <hovered tile>
+            for (int8_t i = 0; i < 2; i ++) {
+                if (
+                    hovered_tiles[i].x < 0 ||
+                    hovered_tiles[i].x >= _PLAYER_GRID_WIDTH_ ||
+                    hovered_tiles[i].y < 0 ||
+                    hovered_tiles[i].y >= _PLAYER_GRID_DEPTH_
+                ) continue;
+
+                // dont draw on selected tile
+                if (
+                    i == selected_tile.z &&
+                    hovered_tiles[i].x == selected_tile.x &&
+                    hovered_tiles[i].y == selected_tile.y
+                ) continue;
+
+                // u_position
+                glUniform3f(
+                    shaders_list[current_shader]->uniform_locations[0],
+                    hovered_tiles[i].x*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
+                    game_struct.players[i].y_current_translation,
+                    hovered_tiles[i].y*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
+                );
+                // u_scale
+                glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_, _TILE_SIZE_*0.5, _TILE_SIZE_);
+                // u_quat_rotation
+                quat_t quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
+                glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
+                // u_color
+                glUniform3f(shaders_list[current_shader]->uniform_locations[3], ((float)154)/255, ((float)64)/255, ((float)126)/255);
+                // u_speed
+                glUniform1f(shaders_list[current_shader]->uniform_locations[4], 0.0005);
+                // u_freq
+                glUniform1f(shaders_list[current_shader]->uniform_locations[5], 5);
+                // u_time
+                glUniform1f(shaders_list[current_shader]->uniform_locations[6], (float)time);
+                draw_mesh(tile_effect_mesh);
+            }
+        // </hovered tile>
+
+        // <selected tile>
             if (
-                hovered_tiles[i].x < 0 ||
-                hovered_tiles[i].x >= _PLAYER_GRID_WIDTH_ ||
-                hovered_tiles[i].y < 0 ||
-                hovered_tiles[i].y >= _PLAYER_GRID_DEPTH_
-            ) continue;
-
-            // dont draw on selected tile
-            if (
-                i == selected_tile.z &&
-                hovered_tiles[i].x == selected_tile.x &&
-                hovered_tiles[i].y == selected_tile.y
-            ) continue;
-
-            // u_position
-            glUniform3f(
-                shaders_list[current_shader]->uniform_locations[0],
-                hovered_tiles[i].x*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
-                game_struct.players[i].y_current_translation,
-                hovered_tiles[i].y*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
-            );
-            // u_scale
-            glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_, _TILE_SIZE_*0.5, _TILE_SIZE_);
-            // u_quat_rotation
-            quat_t quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
-            glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
-            // u_color
-            glUniform3f(shaders_list[current_shader]->uniform_locations[3], ((float)108)/255, ((float)140)/255, ((float)80)/255);
-            // u_speed
-            glUniform1f(shaders_list[current_shader]->uniform_locations[4], 0.0005);
-            // u_freq
-            glUniform1f(shaders_list[current_shader]->uniform_locations[5], 5);
-            // u_time
-            glUniform1f(shaders_list[current_shader]->uniform_locations[6], (float)time);
-            draw_mesh(tile_effect_mesh);
-        }
-
-        // selected tile
-        if (
-            selected_tile.x >= 0 &&
-            selected_tile.x < _PLAYER_GRID_WIDTH_ &&
-            selected_tile.y >= 0 &&
-            selected_tile.y < _PLAYER_GRID_DEPTH_
-        ) {
-            // u_position
-            glUniform3f(
-                shaders_list[current_shader]->uniform_locations[0],
-                selected_tile.x*_TILE_SIZE_ + game_struct.players[selected_tile.z].x_current_translation,
-                game_struct.players[selected_tile.z].y_current_translation,
-                selected_tile.y*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
-            );
-            // u_scale
-            glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_, _TILE_SIZE_*0.5, _TILE_SIZE_);
-            // u_quat_rotation
-            quat_t quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
-            glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
-            // u_color
-            glUniform3f(shaders_list[current_shader]->uniform_locations[3], ((float)227)/255, ((float)210)/255, ((float)69)/255);
-            // u_speed
-            glUniform1f(shaders_list[current_shader]->uniform_locations[4], 0.0005);
-            // u_freq
-            glUniform1f(shaders_list[current_shader]->uniform_locations[5], 5);
-            // u_time
-            glUniform1f(shaders_list[current_shader]->uniform_locations[6], (float)time);
-            draw_mesh(tile_effect_mesh);
-        }
+                selected_tile.x >= 0 &&
+                selected_tile.x < _PLAYER_GRID_WIDTH_ &&
+                selected_tile.y >= 0 &&
+                selected_tile.y < _PLAYER_GRID_DEPTH_
+            ) {
+                // u_position
+                glUniform3f(
+                    shaders_list[current_shader]->uniform_locations[0],
+                    selected_tile.x*_TILE_SIZE_ + game_struct.players[selected_tile.z].x_current_translation,
+                    game_struct.players[selected_tile.z].y_current_translation,
+                    selected_tile.y*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
+                );
+                // u_scale
+                glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_, _TILE_SIZE_*0.5, _TILE_SIZE_);
+                // u_quat_rotation
+                quat_t quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
+                glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
+                // u_color
+                glUniform3f(shaders_list[current_shader]->uniform_locations[3], ((float)216)/255, ((float)128)/255, ((float)56)/255);
+                // u_speed
+                glUniform1f(shaders_list[current_shader]->uniform_locations[4], 0.0005);
+                // u_freq
+                glUniform1f(shaders_list[current_shader]->uniform_locations[5], 5);
+                // u_time
+                glUniform1f(shaders_list[current_shader]->uniform_locations[6], (float)time);
+                draw_mesh(tile_effect_mesh);
+            }
+        // </selected tile>
     // </hovered and selected tiles>
 
     // <win bases>
@@ -401,7 +403,11 @@ void render_game_effects() {
             quat_t quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
             glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
             // u_color
-            glUniform3f(shaders_list[current_shader]->uniform_locations[3], ((float)154)/255, ((float)64)/255, ((float)126)/255);
+            if (game_struct.player_turn == i) {
+                glUniform3f(shaders_list[current_shader]->uniform_locations[3], ((float)216)/255, ((float)128)/255, ((float)56)/255);
+            }else {
+                glUniform3f(shaders_list[current_shader]->uniform_locations[3], ((float)154)/255, ((float)64)/255, ((float)126)/255);
+            }
             // u_speed
             glUniform1f(shaders_list[current_shader]->uniform_locations[4], 0.0001);
             // u_freq
@@ -418,7 +424,7 @@ void render_game_effects() {
             if (ui_lists[hovered_button.x].button_callbacks[hovered_button.y] == &ui_list_build_specific_button_callback) {
                 use_shader(build_preview_shader);
                 // u_color
-                glUniform3f(shaders_list[current_shader]->uniform_locations[3], ((float)154)/255, ((float)64)/255, ((float)126)/255);
+                glUniform3f(shaders_list[current_shader]->uniform_locations[3], ((float)108)/255, ((float)140)/255, ((float)80)/255);
                 // u_speed
                 glUniform1f(shaders_list[current_shader]->uniform_locations[4], 0.003);
                 // u_freq
@@ -438,10 +444,10 @@ void render_game_ui() {
     use_fbo(outport_fbo);
     use_camera(ui_camera);
     use_shader(ui_shader);
+
+    billboard_t billboard;
     
     // <cooldown billboards>
-        quat_t quat_rotation;
-        billboard_t billboard;
         use_shader(cooldown_billboards_shader);
         for (int8_t i = 0; i < 2; i ++) {
             for (uint32_t x = 0; x < _PLAYER_GRID_WIDTH_; x++) {
@@ -462,8 +468,9 @@ void render_game_ui() {
                         .box_width = 16,
                         .box_height = 16
                     };
+                    // u_rads
                     glUniform1f(
-                        cooldown_billboards_shader->uniform_locations[2],
+                        shaders_list[current_shader]->uniform_locations[2],
                         M_PI*2*(tile->curent_cooldown_timer / ((float)tile_type_cooldown))
                     );
                     draw_billboard_shaded(billboard);
@@ -472,6 +479,45 @@ void render_game_ui() {
         }
         use_shader(ui_shader);
     // </cooldown billboards>
+    
+    // <attacked billboards>
+        use_shader(attacked_billboards_shader);
+        // u_texture
+        bind_texture(attack_effect_texture, shaders_list[current_shader]->u_texture_loc, 0);
+        for (int8_t i = 0; i < 2; i ++) {
+            for (uint32_t x = 0; x < _PLAYER_GRID_WIDTH_; x++) {
+                for (uint32_t z = 0; z < _PLAYER_GRID_DEPTH_; z++) {
+                    int32_t effect_time_to_live = game_struct.players[i].tiles[z*_PLAYER_GRID_DEPTH_ + x].attacked_effect_time_to_live;
+                    
+                    if (effect_time_to_live <= 0) continue;
+
+                    billboard = (billboard_t){
+                        .box_pos_from_world_pos = 1,
+                        .box_world_pos_x = 0.5*_TILE_SIZE_ + x*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
+                        .box_world_pos_y = 0.25*_TILE_SIZE_ + game_struct.players[i].y_current_translation,
+                        .box_world_pos_z = 0.5*_TILE_SIZE_ + z*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_,
+                        .x = -32,
+                        .y = 32,
+                        .box_width = 64,
+                        .box_height = 64
+                    };
+                    // u_frames_amount
+                    glUniform1i(
+                        shaders_list[current_shader]->uniform_locations[2],
+                        6
+                    );
+                    // u_current_frame
+                    glUniform1i(
+                        shaders_list[current_shader]->uniform_locations[3],
+                        // animate at 20fps
+                        (int32_t)((_TILE_ATTACKED_EFFECT_TIME_ - effect_time_to_live)/(1000.0/20))
+                    );
+                    draw_billboard_shaded(billboard);
+                }
+            }
+        }
+        use_shader(ui_shader);
+    // </attacked billboards>
 
     // <player 0 resources>
         char resources_string[] = " X\x11\x12  X\x13\x14  X\x15\x16  X\x17\x18  X\x19\x1a";

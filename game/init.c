@@ -508,6 +508,7 @@ uint8_t init() {
         mine_tile_texture = load_texture("./game/textures/mine_tile_texture.png");
         house_tile_texture = load_texture("./game/textures/house_tile_texture.png");
         barracks_tile_texture = load_texture("./game/textures/barracks_tile_texture.png");
+        attack_effect_texture = load_texture("./game/textures/attack_effect.png");
         
         // <letters_font>
             letters_font = (font_t){
@@ -589,6 +590,13 @@ uint8_t init() {
             "u_position\0u_scale\0u_rads", 3
         );
 
+        attacked_billboards_shader = create_shader_from_files(
+            "./game/shaders/attacked.vert",
+            "./game/shaders/attacked.frag",
+            "in_vertex_position\0in_vertex_texcoord", 2,
+            "u_position\0u_scale\0u_frames_amount\0u_current_frame", 4
+        );
+
         tile_effect_shader = create_shader_from_files(
             "./game/shaders/tile_effect.vert",
             "./game/shaders/tile_effect.frag",
@@ -620,7 +628,8 @@ uint8_t init() {
         resource_give_sound = audio_sound_load("./game/sounds/resource_give.wav");  // X    // X
         win_game_sound = audio_sound_load("./game/sounds/win_game.wav");            // /x   // X
         lose_game_sound = audio_sound_load("./game/sounds/lose_game.wav");          // /x   // X
-        button_press_sound = audio_sound_load("./game/sounds/button_press.wav");    // X    // 
+        switch_turn_sound = audio_sound_load("./game/sounds/switch_turn.wav");      // X    // X
+        button_press_sound = audio_sound_load("./game/sounds/button_press.wav");    // X    // X
         error_sound = audio_sound_load("./game/sounds/error.wav");                  // X    // X
         select_tile_sound = audio_sound_load("./game/sounds/select_tile.wav");      // X    // X
         talking_mud_music = audio_music_load("./game/sounds/talking_mud.flac");
