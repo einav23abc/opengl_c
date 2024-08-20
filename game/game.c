@@ -7,6 +7,20 @@ int32_t page;
 
 fbo_t* outport_fbo;
 
+#include "./textures/floor_texture_surface.c"
+#include "./textures/global_texture_surface.c"
+#include "./textures/tile_texture_surface.c"
+#include "./textures/field_tile_texture_surface.c"
+#include "./textures/forest_tile_texture_surface.c"
+#include "./textures/mine_tile_texture_surface.c"
+#include "./textures/house_tile_texture_surface.c"
+#include "./textures/barracks_tile_texture_surface.c"
+#include "./textures/attack_effect_texture_surface.c"
+#include "./textures/letters_font_texture_surface.c"
+#include "./textures/big_letters_font_texture_surface.c"
+#include "./textures/nine_slice1_texture_surface.c"
+#include "./textures/nine_slice2_texture_surface.c"
+#include "./textures/nine_slice3_texture_surface.c"
 texture_t* floor_texture;
 texture_t* global_texture;
 texture_t* tile_texture;
@@ -16,6 +30,11 @@ texture_t* mine_tile_texture;
 texture_t* house_tile_texture;
 texture_t* barracks_tile_texture;
 texture_t* attack_effect_texture;
+texture_t* letters_font_texture;
+texture_t* big_letters_font_texture;
+texture_t* nine_slice1_texture;
+texture_t* nine_slice2_texture;
+texture_t* nine_slice3_texture;
 
 nine_slice_t nine_slice1;
 nine_slice_t nine_slice2;
@@ -24,6 +43,33 @@ nine_slice_t nine_slice3;
 font_t letters_font;
 font_t big_letters_font;
 
+#include "./shaders/global_sh.c"
+#include "./shaders/ui_sh.c"
+#include "./shaders/nine_slice_sh.c"
+#include "./shaders/font_sh.c"
+#include "./shaders/cooldown_sh.c"
+#include "./shaders/attacked_sh.c"
+#include "./shaders/tile_effect_sh.c"
+#include "./shaders/build_preview_sh.c"
+#include "./shaders/sun_shadow_map_sh.c"
+char* global_vert_sh_p = global_vert_sh;
+char* global_frag_sh_p = global_frag_sh;
+char* ui_vert_sh_p = ui_vert_sh;
+char* ui_frag_sh_p = ui_frag_sh;
+char* nine_slice_vert_sh_p = nine_slice_vert_sh;
+char* nine_slice_frag_sh_p = nine_slice_frag_sh;
+char* font_vert_sh_p = font_vert_sh;
+char* font_frag_sh_p = font_frag_sh;
+char* cooldown_vert_sh_p = cooldown_vert_sh;
+char* cooldown_frag_sh_p = cooldown_frag_sh;
+char* attacked_vert_sh_p = attacked_vert_sh;
+char* attacked_frag_sh_p = attacked_frag_sh;
+char* tile_effect_vert_sh_p = tile_effect_vert_sh;
+char* tile_effect_frag_sh_p = tile_effect_frag_sh;
+char* build_preview_vert_sh_p = build_preview_vert_sh;
+char* build_preview_frag_sh_p = build_preview_frag_sh;
+char* sun_shadow_map_vert_sh_p = sun_shadow_map_vert_sh;
+char* sun_shadow_map_frag_sh_p = sun_shadow_map_frag_sh;
 shader_t* global_shader;
 shader_t* ui_shader;
 shader_t* nine_slice_shader;
@@ -32,26 +78,42 @@ shader_t* cooldown_billboards_shader;
 shader_t* attacked_billboards_shader;
 shader_t* tile_effect_shader;
 shader_t* build_preview_shader;
+shader_t* sun_shadow_map_shader;
 
 vec3_t camera_pos;
 camera_t* camera;
 camera_t* ui_camera;
 
 mesh_t* rect_plane_mesh;
-mesh_t* cube_mesh;
-mesh_t* centered_cube_mesh;
-mesh_t* hinge_mesh;
-mesh_t* tile_effect_mesh;
-mesh_t* field_tile_mesh;
-mesh_t* field_wheat_tile_mesh;
-mesh_t* forest_tile_mesh;
-mesh_t* forest_tree_tile_mesh;
-mesh_t* mine_tile_mesh;
-mesh_t* house_tile_mesh;
-mesh_t* barracks_tile_mesh;
-mesh_t* scale_base_mesh;
-mesh_t* scale_head_mesh;
+// mesh_t* cube_mesh;
+// mesh_t* centered_cube_mesh;
+// mesh_t* hinge_mesh;
+// mesh_t* tile_effect_mesh;
+// mesh_t* field_tile_mesh;
+// mesh_t* field_wheat_tile_mesh;
+// mesh_t* forest_tile_mesh;
+// mesh_t* forest_tree_tile_mesh;
+// mesh_t* mine_tile_mesh;
+// mesh_t* house_tile_mesh;
+// mesh_t* barracks_tile_mesh;
+// mesh_t* scale_base_mesh;
+// mesh_t* scale_head_mesh;
+#include "./models/cube_mesh.c"
+#include "./models/centered_cube_mesh.c"
+#include "./models/hinge_mesh.c"
+#include "./models/tile_effect_mesh.c"
+#include "./models/field_tile_mesh.c"
+#include "./models/field_wheat_tile_mesh.c"
+#include "./models/forest_tile_mesh.c"
+#include "./models/forest_tree_tile_mesh.c"
+#include "./models/mine_tile_mesh.c"
+#include "./models/house_tile_mesh.c"
+#include "./models/barracks_tile_mesh.c"
+#include "./models/scale_base_mesh.c"
+#include "./models/scale_head_mesh.c"
 
+
+#ifdef DEBUG_SOFT_MODE
 sound_t* build_tile_sound;
 sound_t* attack_tile_sound;
 sound_t* demolish_tile_sound;
@@ -64,6 +126,20 @@ sound_t* switch_turn_sound;
 sound_t* error_sound;
 sound_t* select_tile_sound;
 sound_t* button_press_sound;
+#else
+#include "./sounds/build_tile_sound.c"
+#include "./sounds/attack_tile_sound.c"
+#include "./sounds/demolish_tile_sound.c"
+#include "./sounds/wheight_up_sound.c"
+#include "./sounds/wheight_down_sound.c"
+#include "./sounds/resource_give_sound.c"
+#include "./sounds/win_game_sound.c"
+#include "./sounds/lose_game_sound.c"
+#include "./sounds/switch_turn_sound.c"
+#include "./sounds/error_sound.c"
+#include "./sounds/select_tile_sound.c"
+#include "./sounds/button_press_sound.c"
+#endif
 music_t* talking_mud_music;
 
 tile_type_t tile_type_properties[_TILE_TYPES_AMOUNT_];
@@ -91,7 +167,6 @@ float sun_vector_y;
 float sun_vector_z;
 camera_t* sun_shadow_map_camera;
 fbo_t* sun_shadow_map_fbo;
-shader_t* sun_shadow_map_shader;
 
 
 float draw_string(font_t font, char* str, vec3_t pos, quat_t rot, float height, float color_r, float color_b, float color_g) {
@@ -588,7 +663,10 @@ void enter_main_menu() {
         .active = 1,
         .permenant = 1,
 
+        .hidden = 0,
+
         .font = &big_letters_font,
+        .info_string_font = &letters_font,
         .padding = 1,
         .button_padding = 4,
         .box_nslice = &nine_slice2,
@@ -727,7 +805,10 @@ void enter_game() {
         .active = 1,
         .permenant = 1,
 
+        .hidden = 0,
+
         .font = &big_letters_font,
+        .info_string_font = &letters_font,
         .padding = 1,
         .button_padding = 7,
         .box_nslice = &nine_slice2,
@@ -739,7 +820,7 @@ void enter_game() {
         .y = _OUTPORT_HEIGHT_ - 1,
 
         .buttons_amount = 1,
-        .button_strings = {"end turn"},
+        .button_strings = {"End turn"},
         .button_info_strings = {""},
         .button_callbacks = {&switch_turn_button_callback},
 
@@ -753,7 +834,10 @@ void enter_game() {
         .active = 1,
         .permenant = 1,
 
+        .hidden = 0,
+
         .font = &letters_font,
+        .info_string_font = &letters_font,
         .padding = 1,
         .button_padding = 5,
         .box_nslice = &nine_slice2,
@@ -761,13 +845,152 @@ void enter_game() {
         .info_string_nslice = &nine_slice1,
 
         .box_pos_from_world_pos = 0,
-        .x = _OUTPORT_WIDTH_ - (strlen("exit game")*letters_font.letter_width + 5*2) - 1,
+        .x = _OUTPORT_WIDTH_ - (strlen("Exit game")*letters_font.letter_width + 5*2) - 1,
         .y = _OUTPORT_HEIGHT_ - 1,
 
         .buttons_amount = 1,
-        .button_strings = {"exit game"},
+        .button_strings = {"Exit game"},
         .button_info_strings = {""},
         .button_callbacks = {&ui_list_exit_in_game_callback},
+
+        .child_ui_list = -1,
+        .parent_ui_list = -1
+    };
+
+
+
+    // type infos - ui list hack
+    ui_list_id = new_ui_list_assign_id();
+    ui_lists[ui_list_id] = (ui_list_t){
+        .active = 1,
+        .permenant = 1,
+
+        .hidden = 1,
+
+        .font = &big_letters_font,
+        .info_string_font = &letters_font,
+        .padding = 1,
+        .button_padding = 5,
+        .box_nslice = &nine_slice2,
+        .button_hover_nslice = &nine_slice3,
+        .info_string_nslice = &nine_slice1,
+
+        .box_pos_from_world_pos = 0,
+        .x = _OUTPORT_WIDTH_ - ((2)*big_letters_font.letter_width + 6*2) + 1,
+        .y = (big_letters_font.letter_height + 6*2) - 1,
+
+        .buttons_amount = 1,
+        .button_strings = {"\x19\x1a"},
+        .button_info_strings = {"Soldiers \x19\x1a:\n* Created by the Barracks.\n* Use on enemy tiles to destroy buildings."},
+        .button_callbacks = {NULL},
+
+        .child_ui_list = -1,
+        .parent_ui_list = -1
+    };
+    ui_list_id = new_ui_list_assign_id();
+    ui_lists[ui_list_id] = (ui_list_t){
+        .active = 1,
+        .permenant = 1,
+
+        .hidden = 1,
+
+        .font = &big_letters_font,
+        .info_string_font = &letters_font,
+        .padding = 1,
+        .button_padding = 5,
+        .box_nslice = &nine_slice2,
+        .button_hover_nslice = &nine_slice3,
+        .info_string_nslice = &nine_slice1,
+
+        .box_pos_from_world_pos = 0,
+        .x = _OUTPORT_WIDTH_ - ((2+4)*big_letters_font.letter_width + 6*2) + 1,
+        .y = (big_letters_font.letter_height + 6*2) - 1,
+
+        .buttons_amount = 1,
+        .button_strings = {"\x17\x18"},
+        .button_info_strings = {"Stone \x17\x18:\n* Created by the Mine."},
+        .button_callbacks = {NULL},
+
+        .child_ui_list = -1,
+        .parent_ui_list = -1
+    };
+    ui_list_id = new_ui_list_assign_id();
+    ui_lists[ui_list_id] = (ui_list_t){
+        .active = 1,
+        .permenant = 1,
+
+        .hidden = 1,
+
+        .font = &big_letters_font,
+        .info_string_font = &letters_font,
+        .padding = 1,
+        .button_padding = 5,
+        .box_nslice = &nine_slice2,
+        .button_hover_nslice = &nine_slice3,
+        .info_string_nslice = &nine_slice1,
+
+        .box_pos_from_world_pos = 0,
+        .x = _OUTPORT_WIDTH_ - ((2+8)*big_letters_font.letter_width + 6*2) + 1,
+        .y = (big_letters_font.letter_height + 6*2) - 1,
+
+        .buttons_amount = 1,
+        .button_strings = {"\x15\x16"},
+        .button_info_strings = {"Wood \x15\x16:\n* Created by the Forest."},
+        .button_callbacks = {NULL},
+
+        .child_ui_list = -1,
+        .parent_ui_list = -1
+    };
+    ui_list_id = new_ui_list_assign_id();
+    ui_lists[ui_list_id] = (ui_list_t){
+        .active = 1,
+        .permenant = 1,
+
+        .hidden = 1,
+
+        .font = &big_letters_font,
+        .info_string_font = &letters_font,
+        .padding = 1,
+        .button_padding = 5,
+        .box_nslice = &nine_slice2,
+        .button_hover_nslice = &nine_slice3,
+        .info_string_nslice = &nine_slice1,
+
+        .box_pos_from_world_pos = 0,
+        .x = _OUTPORT_WIDTH_ - ((2+12)*big_letters_font.letter_width + 6*2) + 1,
+        .y = (big_letters_font.letter_height + 6*2) - 1,
+
+        .buttons_amount = 1,
+        .button_strings = {"\x13\x14"},
+        .button_info_strings = {"Wheat \x13\x14:\n* Created by the Field."},
+        .button_callbacks = {NULL},
+
+        .child_ui_list = -1,
+        .parent_ui_list = -1
+    };
+    ui_list_id = new_ui_list_assign_id();
+    ui_lists[ui_list_id] = (ui_list_t){
+        .active = 1,
+        .permenant = 1,
+
+        .hidden = 1,
+
+        .font = &big_letters_font,
+        .info_string_font = &letters_font,
+        .padding = 1,
+        .button_padding = 5,
+        .box_nslice = &nine_slice2,
+        .button_hover_nslice = &nine_slice3,
+        .info_string_nslice = &nine_slice1,
+
+        .box_pos_from_world_pos = 0,
+        .x = _OUTPORT_WIDTH_ - ((2+16)*big_letters_font.letter_width + 6*2) + 1,
+        .y = (big_letters_font.letter_height + 6*2) - 1,
+
+        .buttons_amount = 1,
+        .button_strings = {"\x11\x12"},
+        .button_info_strings = {"People \x11\x12:\n* Created by the House."},
+        .button_callbacks = {NULL},
 
         .child_ui_list = -1,
         .parent_ui_list = -1
@@ -1107,7 +1330,10 @@ void ui_list_exit_in_game_callback(int32_t ui_list_id, int32_t button_id) {
         .active = 1,
         .permenant = 0,
 
+        .hidden = 0,
+
         .font = &letters_font,
+        .info_string_font = &letters_font,
         .padding = 1,
         .button_padding = 2,
         .box_nslice = &nine_slice2,
@@ -1115,11 +1341,11 @@ void ui_list_exit_in_game_callback(int32_t ui_list_id, int32_t button_id) {
         .info_string_nslice = &nine_slice1,
 
         .box_pos_from_world_pos = 0,
-        .x = ui_lists[ui_list_id].x + get_ui_list_width(ui_list_id) + ui_lists[ui_list_id].padding - (strlen("are you sure?")*letters_font.letter_width + 2*2 + 1),
+        .x = ui_lists[ui_list_id].x + get_ui_list_width(ui_list_id) + ui_lists[ui_list_id].padding - (strlen("Are you sure?")*letters_font.letter_width + 2*2 + 1),
         .y = ui_lists[ui_list_id].y - get_ui_list_height(ui_list_id) - ui_lists[ui_list_id].padding,
 
         .buttons_amount = 2,
-        .button_strings = {"yes", "are you sure?"},
+        .button_strings = {"Yes", "Are you sure?"},
         .button_info_strings = {"", ""},
         .button_callbacks = {
             &ui_list_exit_game_button_callback,
@@ -1187,7 +1413,10 @@ void ui_list_build_button_callback(int32_t ui_list_id, int32_t button_id) {
         .active = 1,
         .permenant = 0,
 
+        .hidden = 0,
+
         .font = &letters_font,
+        .info_string_font = &letters_font,
         .padding = 1,
         .button_padding = 2,
         .box_nslice = &nine_slice2,
@@ -1202,7 +1431,7 @@ void ui_list_build_button_callback(int32_t ui_list_id, int32_t button_id) {
         .y = 0,
 
         .buttons_amount = _TILE_TYPES_AMOUNT_,
-        .button_strings = {"house", "barracks", "field", "mine", "forest"},
+        .button_strings = {"House", "Barracks", "Field", "Mine", "Forest"},
         .button_info_strings = {
             tile_type_properties[0].build_info_string,
             tile_type_properties[1].build_info_string,
@@ -1328,7 +1557,10 @@ void ui_list_demolish_button_callback(int32_t ui_list_id, int32_t button_id) {
         .active = 1,
         .permenant = 0,
 
+        .hidden = 0,
+
         .font = &letters_font,
+        .info_string_font = &letters_font,
         .padding = 1,
         .button_padding = 2,
         .box_nslice = &nine_slice2,
@@ -1343,7 +1575,7 @@ void ui_list_demolish_button_callback(int32_t ui_list_id, int32_t button_id) {
         .y = 0,
 
         .buttons_amount = 2,
-        .button_strings = {"yes", "are you sure?"},
+        .button_strings = {"Yes", "Are you sure?"},
         .button_info_strings = {"", ""},
         .button_callbacks = {
             &ui_list_demolish_sure_button_callback,

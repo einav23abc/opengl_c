@@ -121,6 +121,8 @@ uvec2_t get_ui_list_button_info_size(int32_t i, char* info_str) {
     return get_str_boxed_size(info_str, ui_lists[i].font->letter_height);
 }
 void draw_ui_list(int32_t i) {
+    if (ui_lists[i].hidden) return;
+
     uvec2_t box_pos = get_ui_list_box_pos(i);
     uvec2_t box_padded_pos = (uvec2_t){
         box_pos.x - ui_lists[i].padding,
@@ -181,7 +183,7 @@ void draw_ui_list_hovered_button_info_string() {
 
         if (cursor_inside_button >= 0 && cursor_inside_button < ui_lists[i].buttons_amount) {
             if (ui_lists[i].button_info_strings[cursor_inside_button][0] != '\0') {
-                uvec2_t box_size = get_str_boxed_size(ui_lists[i].button_info_strings[cursor_inside_button], (ui_lists[i].font->letter_height));
+                uvec2_t box_size = get_str_boxed_size(ui_lists[i].button_info_strings[cursor_inside_button], (ui_lists[i].info_string_font->letter_height));
 
                 uint32_t info_str_box_padding = ui_lists[i].padding;
 
@@ -203,12 +205,12 @@ void draw_ui_list_hovered_button_info_string() {
 
                 draw_str_boxed(
                     ui_lists[i].button_info_strings[cursor_inside_button],
-                    letters_font,
+                    *(ui_lists[i].info_string_font),
                     *(ui_lists[i].info_string_nslice),
                     left_x,
                     bottom_y,
                     info_str_box_padding,
-                    ui_lists[i].font->letter_height
+                    ui_lists[i].info_string_font->letter_height
                 );
             }
         }

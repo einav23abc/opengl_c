@@ -1,5 +1,3 @@
-#define MAX_JOINTS (20)
-
 in vec3 in_vertex_position;
 in vec2 in_vertex_texcoord;
 

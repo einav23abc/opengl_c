@@ -73,6 +73,46 @@ sound_t* audio_sound_load(const char* path) {
     
     return sound;
 }
+sound_t* audio_sound_load_from_file_buffer(uint8_t* memory) {
+    if (sounds_amount >= SOUNDS_MAX_AMOUNT) return NULL;
+
+    sound_t* sound = malloc(sizeof(sound_t));
+    if (sound == NULL) return NULL;
+    
+    sound->sound = Mix_QuickLoad_WAV(memory);
+    if (sound->sound == NULL) {
+        printf("Failed to load WAV at %p, with error: %s\n", memory, Mix_GetError());
+        free(sound);
+        return NULL;
+    }
+
+    // append to sounds_list
+    *((uint64_t*)&sound->sound_index) = sounds_amount;
+    sounds_list[sounds_amount] = sound;
+    sounds_amount += 1;
+    
+    return sound;
+}
+sound_t* audio_sound_load_from_buffer(uint8_t* memory, uint32_t length) {
+    if (sounds_amount >= SOUNDS_MAX_AMOUNT) return NULL;
+
+    sound_t* sound = malloc(sizeof(sound_t));
+    if (sound == NULL) return NULL;
+    
+    sound->sound = Mix_QuickLoad_RAW(memory, length);
+    if (sound->sound == NULL) {
+        printf("Failed to load WAV at %p, with error: %s\n", memory, Mix_GetError());
+        free(sound);
+        return NULL;
+    }
+
+    // append to sounds_list
+    *((uint64_t*)&sound->sound_index) = sounds_amount;
+    sounds_list[sounds_amount] = sound;
+    sounds_amount += 1;
+    
+    return sound;
+}
 music_t* audio_music_load(const char* path) {
     if (musics_amount >= MUSICS_MAX_AMOUNT) return NULL;
 
@@ -264,4 +304,55 @@ void audio_clean() {
 
     Mix_CloseAudio();
     Mix_Quit();
+}
+
+void audio_save_sound_to_c_file(sound_t* sound, const char* name, char* c_file_path) {
+    FILE* fp;
+    fp = fopen(c_file_path, "w");
+    if (fp == NULL) {
+        #ifdef DEBUG_SOFT_MODE
+        printf("failed to open file \"%s\" to save surface \"%s\" to.\n", c_file_path, name);
+        #endif
+        return;
+    }
+    
+    printf("\nprinting sound for saving\n");
+
+    fprintf(fp,
+        ""      "static uint8_t %s_buf[%u] = {"
+        ,
+        name,
+        sound->sound->alen
+    );
+    for (uint32_t i = 0; i < sound->sound->alen; i++) {
+        if (i != 0) fprintf(fp, ", ");
+        if (i%20 == 0) fprintf(fp, "\n\t");
+        fprintf(fp, "%hhu", sound->sound->abuf[i]);
+    }
+
+    fprintf(fp,
+        ""      "\n};\n"
+        ""      "static Mix_Chunk %s_mix_chunk = (Mix_Chunk){\n"
+        "\t"        ".allocated = 0,\n"
+        "\t"        ".abuf = %s_buf,\n"
+        "\t"        ".alen = %u,\n"
+        "\t"        ".volume = %hhu\n"
+        ""      "};\n"
+        ""      "static sound_t %s_sound = (sound_t){\n"
+        "\t"        ".sound_index = -1,\n"
+        "\t"        ".sound = &%s_mix_chunk\n"
+        ""      "};\n"
+        ""      "sound_t* %s = &%s_sound;"
+        ,
+        name,
+        name,
+        sound->sound->alen,
+        sound->sound->volume,
+        name,
+        name,
+        name,
+        name
+    );
+
+    fclose(fp);
 }

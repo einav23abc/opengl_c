@@ -58,7 +58,7 @@ void update_game() {
             message = "You won!";
             audio_sound_play(win_game_sound);
         }else {
-            message = "You lost";
+            message = "You lost.";
             audio_sound_play(lose_game_sound);
         }
         int32_t ui_list_id = new_ui_list_assign_id();
@@ -66,7 +66,10 @@ void update_game() {
             .active = 1,
             .permenant = 1,
 
+            .hidden = 0,
+
             .font = &big_letters_font,
+            .info_string_font = &letters_font,
             .padding = 1,
             .button_padding = 4,
             .box_nslice = &nine_slice2,
@@ -74,12 +77,12 @@ void update_game() {
             .info_string_nslice = &nine_slice1,
 
             .box_pos_from_world_pos = 0,
-            .x = _OUTPORT_WIDTH_*0.5  - (max(strlen(message), strlen("exit game"))*big_letters_font.letter_width + 4*2)*0.5,
+            .x = _OUTPORT_WIDTH_*0.5  - (max(strlen(message), strlen("Exit game"))*big_letters_font.letter_width + 4*2)*0.5,
             .y = _OUTPORT_HEIGHT_*0.5 + big_letters_font.letter_height + 4*2,
 
             .buttons_amount = 2,
             .button_strings = {
-                "exit game",
+                "Exit game",
                 message
             },
             .button_info_strings = {"",""},
@@ -138,7 +141,7 @@ void camera_update() {
     #endif
 
 
-    #ifndef DEBUG_SOFT_MODE
+    #ifdef DEBUG_SOFT_MODE
     // X axis rotation
     if (keys[SDL_SCANCODE_KP_2]) {
         camera->rx -= 0.05*delta_frames;

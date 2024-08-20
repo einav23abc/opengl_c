@@ -6,6 +6,7 @@
         "billboard_icon.h": "c",
         "alerts.h": "c",
         "engine.h": "c",
-        "billboard.h": "c"
+        "billboard.h": "c",
+        "sdl.h": "c"
     }
 }

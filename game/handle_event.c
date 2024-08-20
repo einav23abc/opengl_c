@@ -101,7 +101,10 @@ void mouse_press_in_game() {
                 .active = 1,
                 .permenant = 0,
 
+                .hidden = 0,
+
                 .font = &letters_font,
+                .info_string_font = &letters_font,
                 .padding = 1,
                 .button_padding = 2,
                 .box_nslice = &nine_slice2,
@@ -116,7 +119,7 @@ void mouse_press_in_game() {
                 .y = 0,
 
                 .buttons_amount = 1,
-                .button_strings = {"build"},
+                .button_strings = {"Build"},
                 .button_info_strings = {""},
                 .button_callbacks = {&ui_list_build_button_callback},
 
@@ -132,7 +135,10 @@ void mouse_press_in_game() {
                 .active = 1,
                 .permenant = 0,
 
+                .hidden = 0,
+
                 .font = &letters_font,
+                .info_string_font = &letters_font,
                 .padding = 1,
                 .button_padding = 2,
                 .box_nslice = &nine_slice2,
@@ -147,7 +153,7 @@ void mouse_press_in_game() {
                 .y = 0,
 
                 .buttons_amount = 1,
-                .button_strings = {"demolish"},
+                .button_strings = {"Demolish"},
                 .button_info_strings = {tile_type_properties[tile_type_id].demolish_info_string},
                 .button_callbacks = {&ui_list_demolish_button_callback},
 
@@ -173,7 +179,10 @@ void mouse_press_in_game() {
                 .active = 1,
                 .permenant = 0,
 
+                .hidden = 0,
+
                 .font = &letters_font,
+                .info_string_font = &letters_font,
                 .padding = 1,
                 .button_padding = 2,
                 .box_nslice = &nine_slice2,
@@ -188,8 +197,8 @@ void mouse_press_in_game() {
                 .y = 0,
 
                 .buttons_amount = 1,
-                .button_strings = {"attack"},
-                .button_info_strings = {"destroy this building\n* -1\x19\x1a"},
+                .button_strings = {"Attack"},
+                .button_info_strings = {"Destroy this building\n* -1\x19\x1a"},
                 .button_callbacks = {&ui_list_attack_button_callback},
 
                 .child_ui_list = -1,

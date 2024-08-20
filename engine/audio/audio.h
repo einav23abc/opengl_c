@@ -50,6 +50,20 @@ void audio_set_channel_finished_callback(void(*callback)(int32_t channel));
 // *
 // * All sounds are freed when calling `audio_clean()` but can be freed using `audio_sound_destroy(sound)`
 sound_t* audio_sound_load(const char* path);
+// * \returns an allocated sound_t or `NULL` on failure
+// *
+// * \param memory A pointer to a buffer containing WAV file data.
+// *
+// * All sounds are freed when calling `audio_clean()` but can be freed using `audio_sound_destroy(sound)`
+sound_t* audio_sound_load_from_file_buffer(uint8_t* memory);
+// * \returns an allocated sound_t or `NULL` on failure
+// *
+// * \param memory A pointer to a buffer containing the data.
+// *
+// * \param length The length of the buffer.
+// *
+// * All sounds are freed when calling `audio_clean()` but can be freed using `audio_sound_destroy(sound)`
+sound_t* audio_sound_load_from_buffer(uint8_t* memory, uint32_t length);
 // * \returns an allocated music_t or `NULL` on failure
 // *
 // * All musics are freed when calling `audio_clean()` but can be freed using `audio_music_destroy(music)`
@@ -120,5 +134,19 @@ void audio_music_destroy(music_t* music);
 // * Destroys all created sounds and musics.
 // * All audio functions will have undefined behavior until `audio_init()` is recalled.
 void audio_clean();
+
+/* \brief Save a sound_t into a .c file.
+ *
+ * Can be used without having to load from a file.
+ * 
+ * Unlike sounds created by the `audio_sound_load` function, This sound does not need to be freed and will not be freed by the engine.
+ * 
+ * \param sound The sound to save.
+ * 
+ * \param name The name that will be given to the sound. This will be `sound_t* name`.
+ * 
+ * \param c_file_path The path to the c file where the sound will be saved.
+ */
+void audio_save_sound_to_c_file(sound_t* sound, const char* name, char* c_file_path);
 
 #endif

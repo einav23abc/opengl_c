@@ -18,7 +18,10 @@ typedef struct {
     uint8_t safe : 1;
     uint8_t permenant : 1;
 
+    uint8_t hidden : 1;
+
     font_t* font;
+    font_t* info_string_font;
     int32_t padding;
     int32_t button_padding;
     nine_slice_t* box_nslice;

@@ -17,7 +17,7 @@
 
 #define _PLAYER_GRID_WIDTH_ (4)
 #define _PLAYER_GRID_DEPTH_ (4)
-#define _TILE_SIZE_ (16)
+#define _TILE_SIZE_ (20)
 #define _PLAYER_CONSTANT_Z_TRANSLATION_ (-_PLAYER_GRID_DEPTH_*_TILE_SIZE_*0.5)
 #define _PLAYER_TRANSLATION_LERP_DURATION_ (500)
 #define _PLAYER_COOLDOWN_TRANSLATION_LERP_DURATION_ (500)
@@ -140,6 +140,20 @@ int32_t page;
 
 extern fbo_t* outport_fbo;
 
+extern SDL_Surface* floor_texture_surface;
+extern SDL_Surface* global_texture_surface;
+extern SDL_Surface* tile_texture_surface;
+extern SDL_Surface* field_tile_texture_surface;
+extern SDL_Surface* forest_tile_texture_surface;
+extern SDL_Surface* mine_tile_texture_surface;
+extern SDL_Surface* house_tile_texture_surface;
+extern SDL_Surface* barracks_tile_texture_surface;
+extern SDL_Surface* attack_effect_texture_surface;
+extern SDL_Surface* letters_font_texture_surface;
+extern SDL_Surface* big_letters_font_texture_surface;
+extern SDL_Surface* nine_slice1_texture_surface;
+extern SDL_Surface* nine_slice2_texture_surface;
+extern SDL_Surface* nine_slice3_texture_surface;
 extern texture_t* floor_texture;
 extern texture_t* global_texture;
 extern texture_t* tile_texture;
@@ -149,6 +163,11 @@ extern texture_t* mine_tile_texture;
 extern texture_t* house_tile_texture;
 extern texture_t* barracks_tile_texture;
 extern texture_t* attack_effect_texture;
+extern texture_t* letters_font_texture;
+extern texture_t* big_letters_font_texture;
+extern texture_t* nine_slice1_texture;
+extern texture_t* nine_slice2_texture;
+extern texture_t* nine_slice3_texture;
 
 extern nine_slice_t nine_slice1;
 extern nine_slice_t nine_slice2;
@@ -157,6 +176,24 @@ extern nine_slice_t nine_slice3;
 extern font_t letters_font;
 extern font_t big_letters_font;
 
+extern char* global_vert_sh_p;
+extern char* global_frag_sh_p;
+extern char* ui_vert_sh_p;
+extern char* ui_frag_sh_p;
+extern char* nine_slice_vert_sh_p;
+extern char* nine_slice_frag_sh_p;
+extern char* font_vert_sh_p;
+extern char* font_frag_sh_p;
+extern char* cooldown_vert_sh_p;
+extern char* cooldown_frag_sh_p;
+extern char* attacked_vert_sh_p;
+extern char* attacked_frag_sh_p;
+extern char* tile_effect_vert_sh_p;
+extern char* tile_effect_frag_sh_p;
+extern char* build_preview_vert_sh_p;
+extern char* build_preview_frag_sh_p;
+extern char* sun_shadow_map_vert_sh_p;
+extern char* sun_shadow_map_frag_sh_p;
 extern shader_t* global_shader;
 extern shader_t* ui_shader;
 extern shader_t* nine_slice_shader;
@@ -165,6 +202,7 @@ extern shader_t* cooldown_billboards_shader;
 extern shader_t* attacked_billboards_shader;
 extern shader_t* tile_effect_shader;
 extern shader_t* build_preview_shader;
+extern shader_t* sun_shadow_map_shader;
 
 extern vec3_t camera_pos;
 extern camera_t* camera;
@@ -218,7 +256,6 @@ extern float sun_vector_y;
 extern float sun_vector_z;
 extern camera_t* sun_shadow_map_camera;
 extern fbo_t* sun_shadow_map_fbo;
-extern shader_t* sun_shadow_map_shader;
 
 
 
