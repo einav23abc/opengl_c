@@ -33,7 +33,7 @@
 #define _TILE_DEMOLISH_INFO_STRING_MAX_LENGTH_ (64)
 // excluding TILE_TYPE_EMPTY
 #define _TILE_TYPES_AMOUNT_ (5)
-#define _TILE_ATTACKED_EFFECT_TIME_ (1000)
+#define _TILE_ATTACKED_EFFECT_TIME_ (1500)
 
 
 typedef struct {
@@ -165,6 +165,8 @@ extern mesh_t* forest_tree_tile_mesh;
 extern mesh_t* mine_tile_mesh;
 extern mesh_t* house_tile_mesh;
 extern mesh_t* barracks_tile_mesh;
+extern mesh_t* scale_base_mesh;
+extern mesh_t* scale_head_mesh;
 
 extern sound_t* build_tile_sound;
 extern sound_t* attack_tile_sound;

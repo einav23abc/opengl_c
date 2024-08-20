@@ -14,5 +14,15 @@ void main(){
     );
     vec4 color = texture2D(u_texture, texcoord);
 
+    if (color.a <= 0.1) {
+        vec2 position = v_texcoord*2.0-1.0;
+        float dist_from_center = sqrt(dot(position,position));
+        float min_dist = min(1.0, float(current_frame)/float(u_frames_amount-1));
+        float max_dist = min(1.0, 2.0*float(current_frame)/float(u_frames_amount-1));
+        if (dist_from_center >= min_dist && dist_from_center <= max_dist) {
+            color = vec4(28, 22, 24, 255)/255.0;
+        }
+    }
+
     gl_FragColor = color;
 }

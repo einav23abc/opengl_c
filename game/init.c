@@ -458,6 +458,46 @@ uint8_t init() {
                 0
             );
         // </barracks_tile_mesh>
+
+        // <scale_base_mesh>
+            scale_base_mesh = mesh_from_wavefront_obj_ext(
+                "./game/models/scale_base.obj",
+                (quat_vec_vec_t){
+                    .pos = (vec3_t){
+                        .x = 0,
+                        .y = 0,
+                        .z = 0
+                    },
+                    .rot = quat_from_axis_angles_yzx(-0, -0, -0),
+                    .scale = (vec3_t){
+                        .x = 0.5,
+                        .y = 0.5,
+                        .z = 0.5
+                    }
+                },
+                0
+            );
+        // </scale_base_mesh>
+
+        // <scale_head_mesh>
+            scale_head_mesh = mesh_from_wavefront_obj_ext(
+                "./game/models/scale_head.obj",
+                (quat_vec_vec_t){
+                    .pos = (vec3_t){
+                        .x = 0,
+                        .y = 0,
+                        .z = 0
+                    },
+                    .rot = quat_from_axis_angles_yzx(-0, -0, -0),
+                    .scale = (vec3_t){
+                        .x = 0.5,
+                        .y = 0.5,
+                        .z = 0.5
+                    }
+                },
+                0
+            );
+        // </scale_head_mesh>
     // </meshes>
 
     // <cameras>

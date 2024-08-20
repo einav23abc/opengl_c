@@ -49,6 +49,8 @@ mesh_t* forest_tree_tile_mesh;
 mesh_t* mine_tile_mesh;
 mesh_t* house_tile_mesh;
 mesh_t* barracks_tile_mesh;
+mesh_t* scale_base_mesh;
+mesh_t* scale_head_mesh;
 
 sound_t* build_tile_sound;
 sound_t* attack_tile_sound;
@@ -152,11 +154,29 @@ uvec2_t get_str_boxed_size(char* str, float row_height) {
     uint32_t h = row_height;
     uint32_t x = 0;
 
-    int32_t str_len = strlen(str);
     char ch;
 
-    for (uint32_t c = 0; c < str_len; c++) {
+    int32_t in_color_swap = 0;
+
+    int32_t c = -1;
+    while (1) {
+        c += 1;
+
         ch = str[c];
+
+        if (in_color_swap > 0) {
+            in_color_swap -= 1;
+            continue;
+        }
+
+        if (ch == '\0') {
+            break;
+        }
+        
+        if (ch == '\x1f') {
+            in_color_swap = 3;
+            continue;
+        }
         if (ch == '\n') {
             x = 0;
             h += row_height;
@@ -174,6 +194,10 @@ uvec2_t get_str_boxed_size(char* str, float row_height) {
 }
 void draw_str_boxed(char* str, font_t font, nine_slice_t nslice, uint32_t left_x, uint32_t bottom_y, uint32_t padding, uint32_t row_height) {
     uvec2_t str_size = get_str_boxed_size(str, row_height);
+
+    uint8_t color_r = 249;
+    uint8_t color_g = 245;
+    uint8_t color_b = 239;
     
     uint32_t top_y = bottom_y + str_size.y;
 
@@ -187,12 +211,39 @@ void draw_str_boxed(char* str, font_t font, nine_slice_t nslice, uint32_t left_x
         2*padding + str_size.x,
         2*padding + str_size.y
     );
+
+    int32_t in_color_swap = 0;
     
     char one_char_str[2] = "X\0";
-    int32_t info_str_len = strlen(str);
 
-    for (uint32_t c = 0; c < info_str_len; c++) {
+    int32_t c = -1;
+    while (1) {
+        c += 1;
+
         one_char_str[0] = str[c];
+
+        if (in_color_swap == 3) {
+            color_r = one_char_str[0];
+            in_color_swap -= 1;
+            continue;
+        }else if (in_color_swap == 2) {
+            color_g = one_char_str[0];
+            in_color_swap -= 1;
+            continue;
+        }else if (in_color_swap == 1) {
+            color_b = one_char_str[0];
+            in_color_swap -= 1;
+            continue;
+        }
+
+        if (one_char_str[0] == '\0') {
+            break;
+        }
+        
+        if (one_char_str[0] == '\x1f') {
+            in_color_swap = 3;
+            continue;
+        }
         if (one_char_str[0] == '\n') {
             x = 0;
             y -= row_height;
@@ -214,7 +265,7 @@ void draw_str_boxed(char* str, font_t font, nine_slice_t nslice, uint32_t left_x
             },
             quat_from_axis_angles_yzx(-0, -0, -0),
             row_height,
-            1, 1, 1
+            ((float)color_r)/255.0, ((float)color_g)/255.0, ((float)color_b)/255.0
         );
     }
 }

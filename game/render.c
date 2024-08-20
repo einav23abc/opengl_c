@@ -215,17 +215,31 @@ void render_game_world() {
     glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
     draw_mesh(cube_mesh);
 
-    // scale body
-    // u_texture
-    bind_texture(global_texture, shaders_list[current_shader]->u_texture_loc, 0);
-    // u_position
-    glUniform3f(shaders_list[current_shader]->uniform_locations[0], -1*_TILE_SIZE_, -1*_TILE_SIZE_, 0);
-    // u_scale
-    glUniform3f(shaders_list[current_shader]->uniform_locations[1], 2*_TILE_SIZE_, _SCALE_AXIS_POINT_Y_ + 2*_TILE_SIZE_, 1*_TILE_SIZE_);
-    // u_quat_rotation
-    quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
-    glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
-    draw_mesh(cube_mesh);
+    // <scale body>
+        // u_quat_rotation
+        quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
+        glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
+        // u_texture
+        bind_texture(global_texture, shaders_list[current_shader]->u_texture_loc, 0);
+
+        // u_position
+        glUniform3f(shaders_list[current_shader]->uniform_locations[0], -1*_TILE_SIZE_, -1*_TILE_SIZE_, 0);
+        // u_scale
+        glUniform3f(shaders_list[current_shader]->uniform_locations[1], 2*_TILE_SIZE_, _SCALE_AXIS_POINT_Y_ + 2*_TILE_SIZE_, 1*_TILE_SIZE_);
+        draw_mesh(cube_mesh);
+
+        // u_position
+        glUniform3f(shaders_list[current_shader]->uniform_locations[0], 0, -1*_TILE_SIZE_, 0.5*_TILE_SIZE_);
+        // u_scale
+        glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_, _TILE_SIZE_, _TILE_SIZE_);
+        draw_mesh(scale_base_mesh);
+        
+        // u_position
+        glUniform3f(shaders_list[current_shader]->uniform_locations[0], 0, _SCALE_AXIS_POINT_Y_ + _TILE_SIZE_, 0.5*_TILE_SIZE_);
+        // u_scale
+        glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_, _TILE_SIZE_, _TILE_SIZE_);
+        draw_mesh(scale_head_mesh);
+    // <scale body>
 
     // scale axis
     // u_texture
@@ -520,21 +534,181 @@ void render_game_ui() {
     // </attacked billboards>
 
     // <player 0 resources>
-        char resources_string[] = " X\x11\x12  X\x13\x14  X\x15\x16  X\x17\x18  X\x19\x1a";
-        
-        if (game_struct.players[0].resources.population >= 10) resources_string[0]  = '0' + game_struct.players[0].resources.population/10;
-        resources_string[1]  = '0' + game_struct.players[0].resources.population % 10;
-        if (game_struct.players[0].resources.wheat >= 10)      resources_string[5]  = '0' + game_struct.players[0].resources.wheat/10;
-        resources_string[6]  = '0' + game_struct.players[0].resources.wheat      % 10;
-        if (game_struct.players[0].resources.wood >= 10)       resources_string[10] = '0' + game_struct.players[0].resources.wood/10;
-        resources_string[11] = '0' + game_struct.players[0].resources.wood       % 10;
-        if (game_struct.players[0].resources.stone >= 10)      resources_string[15] = '0' + game_struct.players[0].resources.stone/10;
-        resources_string[16] = '0' + game_struct.players[0].resources.stone      % 10;
-        if (game_struct.players[0].resources.soldiers >= 10)   resources_string[20] = '0' + game_struct.players[0].resources.soldiers/10;
-        resources_string[21] = '0' + game_struct.players[0].resources.soldiers   % 10;
+        char resources_string[66] = "";
 
-        uvec2_t str_box_width = get_str_boxed_size(resources_string, big_letters_font.letter_height);
-        draw_str_boxed(resources_string, big_letters_font, nine_slice1, _OUTPORT_WIDTH_-str_box_width.x-6, 6, 6, big_letters_font.letter_height);
+        resources_t player_resources = game_struct.players[0].resources;
+        resources_t resources_delta = (resources_t){
+            .population = 0,
+            .soldiers = 0,
+            .stone = 0,
+            .wheat = 0,
+            .wood = 0
+        };
+        ivec2_t hovered_button = get_ui_list_hovered_button();
+        if (hovered_button.x != -1) {
+            if (hovered_button.y >= 0 && hovered_button.y < ui_lists[hovered_button.x].buttons_amount) {
+                if (ui_lists[hovered_button.x].button_callbacks[hovered_button.y] == &ui_list_build_specific_button_callback) {
+                    resources_delta = tile_type_properties[hovered_button.y].cost;
+                }
+            }
+        }
+        player_resources.population -=  resources_delta.population;
+        player_resources.soldiers -=    resources_delta.soldiers;
+        player_resources.stone -=       resources_delta.stone;
+        player_resources.wheat -=       resources_delta.wheat;
+        player_resources.wood -=        resources_delta.wood;
+        
+        int32_t c = 0;
+
+        if (resources_delta.population > 0) {
+            resources_string[c  ] = 0x1f;
+            resources_string[c+1] = 0xa1;
+            resources_string[c+2] = 0x3d;
+            resources_string[c+3] = 0x3b;
+            c += 4;
+        }
+        resources_string[c] = ' ';
+        if (player_resources.population >= 10) {
+            resources_string[c]  = '0' + player_resources.population/10;
+        }else if (player_resources.population < 0) {
+            resources_string[c  ] = 0x1f;
+            resources_string[c+1] = 0x1c;
+            resources_string[c+2] = 0x16;
+            resources_string[c+3] = 0x18;
+            c += 4;
+            resources_string[c]  = '-';
+        }
+        resources_string[c+1]  = '0' + abs(player_resources.population % 10);
+        c += 2;
+            resources_string[c  ] = 0x1f;
+            resources_string[c+1] = 0xf9;
+            resources_string[c+2] = 0xf5;
+            resources_string[c+3] = 0xef;
+            c += 4;
+        resources_string[c  ] = 0x11;
+        resources_string[c+1] = 0x12;
+        c += 2;
+        
+        if (resources_delta.wheat > 0) {
+            resources_string[c  ] = 0x1f;
+            resources_string[c+1] = 0xa1;
+            resources_string[c+2] = 0x3d;
+            resources_string[c+3] = 0x3b;
+            c += 4;
+        }
+        resources_string[c] = ' ';
+        if (player_resources.wheat >= 10) {
+            resources_string[c]  = '0' + player_resources.wheat/10;
+        }else if (player_resources.wheat < 0) {
+            resources_string[c  ] = 0x1f;
+            resources_string[c+1] = 0x1c;
+            resources_string[c+2] = 0x16;
+            resources_string[c+3] = 0x18;
+            c += 4;
+            resources_string[c]  = '-';
+        }
+        resources_string[c+1]  = '0' + abs(player_resources.wheat % 10);
+        c += 2;
+            resources_string[c  ] = 0x1f;
+            resources_string[c+1] = 0xf9;
+            resources_string[c+2] = 0xf5;
+            resources_string[c+3] = 0xef;
+            c += 4;
+        resources_string[c  ] = 0x13;
+        resources_string[c+1] = 0x14;
+        c += 2;
+        
+        if (resources_delta.wood > 0) {
+            resources_string[c  ] = 0x1f;
+            resources_string[c+1] = 0xa1;
+            resources_string[c+2] = 0x3d;
+            resources_string[c+3] = 0x3b;
+            c += 4;
+        }
+        resources_string[c] = ' ';
+        if (player_resources.wood >= 10) {
+            resources_string[c]  = '0' + player_resources.wood/10;
+        }else if (player_resources.wood < 0) {
+            resources_string[c  ] = 0x1f;
+            resources_string[c+1] = 0x1c;
+            resources_string[c+2] = 0x16;
+            resources_string[c+3] = 0x18;
+            c += 4;
+            resources_string[c]  = '-';
+        }
+        resources_string[c+1]  = '0' + abs(player_resources.wood % 10);
+        c += 2;
+            resources_string[c  ] = 0x1f;
+            resources_string[c+1] = 0xf9;
+            resources_string[c+2] = 0xf5;
+            resources_string[c+3] = 0xef;
+            c += 4;
+        resources_string[c  ] = 0x15;
+        resources_string[c+1] = 0x16;
+        c += 2;
+        
+        if (resources_delta.stone > 0) {
+            resources_string[c  ] = 0x1f;
+            resources_string[c+1] = 0xa1;
+            resources_string[c+2] = 0x3d;
+            resources_string[c+3] = 0x3b;
+            c += 4;
+        }
+        resources_string[c] = ' ';
+        if (player_resources.stone >= 10) {
+            resources_string[c]  = '0' + player_resources.stone/10;
+        }else if (player_resources.stone < 0) {
+            resources_string[c  ] = 0x1f;
+            resources_string[c+1] = 0x1c;
+            resources_string[c+2] = 0x16;
+            resources_string[c+3] = 0x18;
+            c += 4;
+            resources_string[c]  = '-';
+        }
+        resources_string[c+1]  = '0' + abs(player_resources.stone % 10);
+        c += 2;
+            resources_string[c  ] = 0x1f;
+            resources_string[c+1] = 0xf9;
+            resources_string[c+2] = 0xf5;
+            resources_string[c+3] = 0xef;
+            c += 4;
+        resources_string[c  ] = 0x17;
+        resources_string[c+1] = 0x18;
+        c += 2;
+        
+        if (resources_delta.soldiers > 0) {
+            resources_string[c  ] = 0x1f;
+            resources_string[c+1] = 0xa1;
+            resources_string[c+2] = 0x3d;
+            resources_string[c+3] = 0x3b;
+            c += 4;
+        }
+        resources_string[c] = ' ';
+        if (player_resources.soldiers >= 10) {
+            resources_string[c]  = '0' + player_resources.soldiers/10;
+        }else if (player_resources.soldiers < 0) {
+            resources_string[c  ] = 0x1f;
+            resources_string[c+1] = 0x1c;
+            resources_string[c+2] = 0x16;
+            resources_string[c+3] = 0x18;
+            c += 4;
+            resources_string[c]  = '-';
+        }
+        resources_string[c+1]  = '0' + abs(player_resources.soldiers % 10);
+        c += 2;
+            resources_string[c  ] = 0x1f;
+            resources_string[c+1] = 0xf9;
+            resources_string[c+2] = 0xf5;
+            resources_string[c+3] = 0xef;
+            c += 4;
+        resources_string[c  ] = 0x19;
+        resources_string[c+1] = 0x1a;
+        c += 2;
+
+        resources_string[c] = '\0';
+
+        uvec2_t str_box_size = get_str_boxed_size(resources_string, big_letters_font.letter_height);
+        draw_str_boxed(resources_string, big_letters_font, nine_slice1, _OUTPORT_WIDTH_-str_box_size.x-6, 6, 6, big_letters_font.letter_height);
     // </player 0 resources>
 
     draw_all_ui_lists();
