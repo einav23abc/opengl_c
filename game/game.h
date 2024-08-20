@@ -132,7 +132,8 @@ typedef struct {
 
 enum PAGES {
     PAGE_IN_GAME,
-    PAGE_MAIN_MENU
+    PAGE_MAIN_MENU,
+    PAGE_HOW_TO_PLAY,
 };
 
 
@@ -264,6 +265,7 @@ extern fbo_t* sun_shadow_map_fbo;
 void mouse_press_in_game();
 
 void render_main_menu();
+void render_how_to_play();
 
 void update_game();
 void player_translations_update();
@@ -293,6 +295,7 @@ ivec2_t get_hovered_tile_position(uint8_t player_i);
 int32_t has_enough_resources(int32_t player_id, int32_t tile_type_id);
 
 void enter_main_menu();
+void enter_how_to_play();
 void enter_game();
 void switch_turn_button_callback(int32_t ui_list_id, int32_t button_id);
 void request_switch_turn();
@@ -308,6 +311,7 @@ int32_t player_ai_build_least_func();
 int32_t player_ai_attack_least_func();
 int32_t player_ai_attack_most_func();
 
+void ui_list_how_to_play_button_callback(int32_t ui_list_id, int32_t button_id);
 void ui_list_exit_in_game_callback(int32_t ui_list_id, int32_t button_id);
 void ui_list_exit_game_button_callback(int32_t ui_list_id, int32_t button_id);
 void ui_list_play_button_callback(int32_t ui_list_id, int32_t button_id);
