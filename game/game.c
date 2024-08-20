@@ -68,7 +68,17 @@ music_t* talking_mud_music;
 
 tile_type_t tile_type_properties[_TILE_TYPES_AMOUNT_];
 
+ai_action_func_t ai_build_functions[_AI_BUILD_FUNCTIONS_AMOUNT_] = {
+    &player_ai_build_first_least_func,
+    &player_ai_build_least_func
+};
+ai_action_func_t ai_attack_functions[_AI_ATTACK_FUNCTIONS_AMOUNT_] = {
+    &player_ai_attack_least_func,
+    &player_ai_attack_most_func
+};
+
 game_t game_struct;
+ai_t current_ai;
 ivec3_t selected_tile;
 ivec2_t hovered_tiles[2];
 int8_t in_cooldowns_translation;
@@ -624,6 +634,35 @@ void enter_game() {
     game_struct.player_turn = 0;
     game_struct.game_ended = 0;
 
+
+    int32_t ai_build_func_i  = rand() % _AI_BUILD_FUNCTIONS_AMOUNT_;
+    int32_t ai_attack_func_i = rand() % _AI_ATTACK_FUNCTIONS_AMOUNT_;
+    current_ai = (ai_t) {
+        .build_func = ai_build_functions[ai_build_func_i],
+        .tile_build_priority  = rand() % _TILE_TYPES_AMOUNT_,
+        .tile_build_priority_strength = rand() % 6,
+        .attack_func = ai_attack_functions[ai_attack_func_i],
+        .tile_attack_priority = rand() % _TILE_TYPES_AMOUNT_
+    };
+    #ifdef DEBUG_SOFT_MODE
+    printf(
+        ""      "playing against ai:\n"
+        "\t"        "build_func: %d\n"
+        "\t"        "build_priority: %d\n"
+        "\t"        "build_priority_strength: %d\n"
+        "\t"        "\n"
+        "\t"        "attack_func: %d\n"
+        "\t"        "attack_priority: %d\n"
+        ""      "}\n"
+        ,
+        ai_build_func_i,
+        current_ai.tile_build_priority,
+        current_ai.tile_build_priority_strength,
+        ai_attack_func_i,
+        current_ai.tile_attack_priority
+    );
+    #endif
+
     ai_action_cooldown = 0;
 
     in_cooldowns_translation = 0;
@@ -642,25 +681,34 @@ void enter_game() {
     for (uint32_t i = 0; i < _PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_; i++) {
         game_struct.players[0].tiles[i].type = TILE_TYPE_EMPTY;
         game_struct.players[0].tiles[i].attacked_effect_time_to_live = 0;
+        game_struct.players[0].tiles[i].destroyed_effect_time_to_live = 0;
+        game_struct.players[0].tiles[i].built_effect_time_to_live = 0;
         game_struct.players[0].tiles[i].cooldown_timer = 0;
         game_struct.players[0].tiles[i].curent_cooldown_timer = 0;
         game_struct.players[1].tiles[i].type = TILE_TYPE_EMPTY;
         game_struct.players[1].tiles[i].attacked_effect_time_to_live = 0;
+        game_struct.players[1].tiles[i].destroyed_effect_time_to_live = 0;
+        game_struct.players[1].tiles[i].built_effect_time_to_live = 0;
         game_struct.players[1].tiles[i].cooldown_timer = 0;
         game_struct.players[1].tiles[i].curent_cooldown_timer = 0;
     }
-    game_struct.players[0].tiles[13].type = TILE_TYPE_HOUSE;
-    game_struct.players[0].tiles[13].cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
-    game_struct.players[0].tiles[13].curent_cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
-    game_struct.players[0].tiles[19].type = TILE_TYPE_FOREST;
-    game_struct.players[0].tiles[19].cooldown_timer = tile_type_properties[TILE_TYPE_FOREST].give_cooldown;
-    game_struct.players[0].tiles[19].curent_cooldown_timer = tile_type_properties[TILE_TYPE_FOREST].give_cooldown;
-    game_struct.players[1].tiles[13].type = TILE_TYPE_HOUSE;
-    game_struct.players[1].tiles[13].cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
-    game_struct.players[1].tiles[13].curent_cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
-    game_struct.players[1].tiles[19].type = TILE_TYPE_FOREST;
-    game_struct.players[1].tiles[19].cooldown_timer = tile_type_properties[TILE_TYPE_FOREST].give_cooldown;
-    game_struct.players[1].tiles[19].curent_cooldown_timer = tile_type_properties[TILE_TYPE_FOREST].give_cooldown;
+    int32_t rand_pos;
+    rand_pos = get_random_empty_tile_position(0);
+    game_struct.players[0].tiles[rand_pos].type = TILE_TYPE_HOUSE;
+    game_struct.players[0].tiles[rand_pos].cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
+    game_struct.players[0].tiles[rand_pos].curent_cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
+    rand_pos = get_random_empty_tile_position(0);
+    game_struct.players[0].tiles[rand_pos].type = TILE_TYPE_FOREST;
+    game_struct.players[0].tiles[rand_pos].cooldown_timer = tile_type_properties[TILE_TYPE_FOREST].give_cooldown;
+    game_struct.players[0].tiles[rand_pos].curent_cooldown_timer = tile_type_properties[TILE_TYPE_FOREST].give_cooldown;
+    rand_pos = get_random_empty_tile_position(1);
+    game_struct.players[1].tiles[rand_pos].type = TILE_TYPE_HOUSE;
+    game_struct.players[1].tiles[rand_pos].cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
+    game_struct.players[1].tiles[rand_pos].curent_cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
+    rand_pos = get_random_empty_tile_position(1);
+    game_struct.players[1].tiles[rand_pos].type = TILE_TYPE_FOREST;
+    game_struct.players[1].tiles[rand_pos].cooldown_timer = tile_type_properties[TILE_TYPE_FOREST].give_cooldown;
+    game_struct.players[1].tiles[rand_pos].curent_cooldown_timer = tile_type_properties[TILE_TYPE_FOREST].give_cooldown;
 
     game_struct.players[0].resources.wood = 2;
     game_struct.players[0].resources.stone = 2;
@@ -758,7 +806,7 @@ void switch_turn() {
     selected_tile.y = -1;
     close_unperm_ui_lists();
 
-    ai_action_cooldown = 500;
+    ai_action_cooldown = 1000;
     player1_ai_played = 0;
 
     // update cooldown timers
@@ -796,6 +844,7 @@ void build_at_tile(int32_t player, int32_t tile_type_id, int32_t at_tile) {
     game_struct.players[player].resources.soldiers   -= tile_type->cost.soldiers;
     game_struct.players[player].tiles[at_tile].cooldown_timer        = tile_type->give_cooldown;
     game_struct.players[player].tiles[at_tile].curent_cooldown_timer = tile_type->give_cooldown;
+    game_struct.players[player].tiles[at_tile].built_effect_time_to_live = _TILE_BUILT_EFFECT_TIME_;
     game_struct.players[player].tiles[at_tile].type = tile_type_id;
 }
 void attack_tile(int32_t player_attacked, int32_t at_tile) {
@@ -814,6 +863,7 @@ void attack_tile(int32_t player_attacked, int32_t at_tile) {
     game_struct.players[player_attacked].tiles[at_tile].cooldown_timer        = 0;
     game_struct.players[player_attacked].tiles[at_tile].curent_cooldown_timer = 0;
     game_struct.players[player_attacked].tiles[at_tile].attacked_effect_time_to_live = _TILE_ATTACKED_EFFECT_TIME_;
+    game_struct.players[player_attacked].tiles[at_tile].destroyed_effect_time_to_live = _TILE_DESTROYED_EFFECT_TIME_;
 }
 tile_types_amount_sorted_t get_tile_types_amounts_sorted(int32_t player) {
     tile_types_amount_sorted_t ttas;
@@ -850,6 +900,22 @@ tile_types_amount_sorted_t get_tile_types_amounts_sorted(int32_t player) {
 
     return ttas;
 }
+int32_t get_random_empty_tile_position(int32_t player) {
+    // check if empty space exists
+    int32_t empty_tile_exists = -1;
+    for (uint32_t j = 0; j < _PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_; j++) {
+        if (game_struct.players[player].tiles[j].type == TILE_TYPE_EMPTY) {
+            empty_tile_exists = 1;
+            break;
+        }
+    }
+    if (empty_tile_exists == 0) return -1;
+
+    while (1) {
+        int32_t tile_pos = rand() % (_PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_);
+        if (game_struct.players[player].tiles[tile_pos].type == TILE_TYPE_EMPTY) return tile_pos;
+    }
+}
 void player_1_turn() {
     player_1_ai_turn();
 }
@@ -867,43 +933,50 @@ void player_1_ai_turn() {
         return;
     }
 
-    int32_t built = player_ai_build_func1();
+    int32_t built = current_ai.build_func();
     if (built) {
         // dont do actions too fast
-        ai_action_cooldown = 500;
+        ai_action_cooldown = 1000;
         return;
     }
 
-    int32_t attacked = player_ai_attack_func1();
+    int32_t attacked = current_ai.attack_func();
     if (attacked) {
         // dont do actions too fast
-        ai_action_cooldown = 500;
+        ai_action_cooldown = 1000;
         return;
     }
 
     // end turn after transitions will end
     player1_ai_played = 1;
 }
-// builds whatever it can (in order of what it has least of)
-int32_t player_ai_build_func1() {
+// builds 'priority' orthe first thing it can (in order of what it has least of)
+int32_t player_ai_build_first_least_func() {
     tile_types_amount_sorted_t ttas = get_tile_types_amounts_sorted(game_struct.player_turn);
 
     // build whatever i can
-    for (uint32_t i = 0; i < _TILE_TYPES_AMOUNT_-1; i++) {
-        if (has_enough_resources(1, ttas.sorted_tile_type_id[i]) == 0) continue;
+    for (int32_t i = -1; i < _TILE_TYPES_AMOUNT_-1; i++) {
+        int32_t tile_type;
+
+        if (i == -1) {
+            // build priority
+            tile_type = current_ai.tile_build_priority;
+            // build sometimes according to strength
+            if (rand() % (current_ai.tile_build_priority_strength+1) != 0) continue;
+        }else {
+            // build sorted
+            tile_type = ttas.sorted_tile_type_id[i];
+        }
+
+        // dont build if not enough resources
+        if (has_enough_resources(1, tile_type) == 0) continue;
 
         // find space to build
-        int32_t new_tile_grid_index = -1;
-        for (uint32_t j = 0; j < _PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_; j++) {
-            if (game_struct.players[game_struct.player_turn].tiles[j].type == TILE_TYPE_EMPTY) {
-                new_tile_grid_index = j;
-                break;
-            }
-        }
+        int32_t new_tile_grid_index = get_random_empty_tile_position(game_struct.player_turn);
         // handle no space
         if (new_tile_grid_index == -1) break;
 
-        build_at_tile(game_struct.player_turn, ttas.sorted_tile_type_id[i], new_tile_grid_index);
+        build_at_tile(game_struct.player_turn, tile_type, new_tile_grid_index);
 
         // built something
         return 1;
@@ -912,21 +985,102 @@ int32_t player_ai_build_func1() {
     // didnt build anything
     return 0;
 }
-// attacks whatever the other player has least of
-int32_t player_ai_attack_func1() {
+// builds 'priority' or what it has least of, and only things with this 'least amount'
+int32_t player_ai_build_least_func() {
+    tile_types_amount_sorted_t ttas = get_tile_types_amounts_sorted(game_struct.player_turn);
+
+    int32_t least_amount = ttas.tile_types_amounts[ttas.sorted_tile_type_id[0]];
+
+    // build only things that have 'least amount'
+    for (int32_t i = -1; i < _TILE_TYPES_AMOUNT_-1; i++) {
+        int32_t tile_type;
+
+        if (i == -1) {
+            // build priority
+            tile_type = current_ai.tile_build_priority;
+            // build sometimes according to strength
+            if (rand() % (current_ai.tile_build_priority_strength+1) != 0) continue;
+        }else {
+            // build sorted
+            tile_type = ttas.sorted_tile_type_id[i];
+            // dont build things that there are plenty of
+            if (ttas.tile_types_amounts[tile_type] > least_amount) break;
+        }
+
+        // dont build if not enough resources
+        if (has_enough_resources(1, tile_type) == 0) continue;
+
+        // find space to build
+        int32_t new_tile_grid_index = get_random_empty_tile_position(game_struct.player_turn);
+        // handle no space
+        if (new_tile_grid_index == -1) break;
+
+        build_at_tile(game_struct.player_turn, tile_type, new_tile_grid_index);
+
+        // built something
+        return 1;
+    }
+
+    // didnt build anything
+    return 0;
+}
+// attacks 'priority' or whatever the other player has least of
+int32_t player_ai_attack_least_func() {
     tile_types_amount_sorted_t ttas = get_tile_types_amounts_sorted(1-game_struct.player_turn);
 
     // cant attack
     if (game_struct.players[game_struct.player_turn].resources.soldiers < 1) return 0;
 
     // attack the building that has the least amount of apperances
-    for (uint32_t i = 0; i < _TILE_TYPES_AMOUNT_-1; i++) {
+    for (int32_t i = -1; i < _TILE_TYPES_AMOUNT_-1; i++) {
+        int32_t tile_type;
+        if (i == -1) {
+            tile_type = current_ai.tile_attack_priority;
+            if (tile_type < 0 || tile_type >= _TILE_TYPES_AMOUNT_ || tile_type == TILE_TYPE_EMPTY) continue;
+        }else {
+            // least amount
+            tile_type = ttas.sorted_tile_type_id[i];
+        }
+
         // no apperances
-        if (ttas.tile_types_amounts[ttas.sorted_tile_type_id[i]] <= 0) continue;
+        if (ttas.tile_types_amounts[tile_type] <= 0) continue;
 
         // find first apperance
         for (uint32_t j = 0; j < _PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_; j++) {
-            if (game_struct.players[1-game_struct.player_turn].tiles[j].type == ttas.sorted_tile_type_id[i]) {
+            if (game_struct.players[1-game_struct.player_turn].tiles[j].type == tile_type) {
+                attack_tile(1-game_struct.player_turn, j);
+                return 1;
+            }
+        }
+    }
+
+    // didnt attack anything - must be empty?
+    return 0;
+}
+// attacks 'priority' or whatever the other player has most of
+int32_t player_ai_attack_most_func() {
+    tile_types_amount_sorted_t ttas = get_tile_types_amounts_sorted(1-game_struct.player_turn);
+
+    // cant attack
+    if (game_struct.players[game_struct.player_turn].resources.soldiers < 1) return 0;
+
+    // attack the building that has the least amount of apperances
+    for (int32_t i = -1; i < _TILE_TYPES_AMOUNT_-1; i++) {
+        int32_t tile_type;
+        if (i == -1) {
+            tile_type = current_ai.tile_attack_priority;
+            if (tile_type < 0 || tile_type >= _TILE_TYPES_AMOUNT_ || tile_type == TILE_TYPE_EMPTY) continue;
+        }else {
+            // most amount
+            tile_type = ttas.sorted_tile_type_id[_TILE_TYPES_AMOUNT_-1-i];
+        }
+
+        // no apperances
+        if (ttas.tile_types_amounts[tile_type] <= 0) continue;
+
+        // find first apperance
+        for (uint32_t j = 0; j < _PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_; j++) {
+            if (game_struct.players[1-game_struct.player_turn].tiles[j].type == tile_type) {
                 attack_tile(1-game_struct.player_turn, j);
                 return 1;
             }
@@ -1148,6 +1302,7 @@ void ui_list_demolish_sure_button_callback(int32_t ui_list_id, int32_t button_id
     game_struct.players[0].tiles[selected_tile.y*_PLAYER_GRID_WIDTH_ + selected_tile.x].type = TILE_TYPE_EMPTY;
     game_struct.players[0].tiles[selected_tile.y*_PLAYER_GRID_WIDTH_ + selected_tile.x].cooldown_timer        = 0;
     game_struct.players[0].tiles[selected_tile.y*_PLAYER_GRID_WIDTH_ + selected_tile.x].curent_cooldown_timer = 0;
+    game_struct.players[0].tiles[selected_tile.y*_PLAYER_GRID_WIDTH_ + selected_tile.x].destroyed_effect_time_to_live = _TILE_DESTROYED_EFFECT_TIME_;
     close_unperm_ui_lists();
     // unselect tile
     selected_tile.x = -1;

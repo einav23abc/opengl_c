@@ -641,7 +641,7 @@ uint8_t init() {
             "./game/shaders/tile_effect.vert",
             "./game/shaders/tile_effect.frag",
             "in_vertex_position\0in_vertex_texcoord", 2,
-            "u_position\0u_scale\0u_quat_rotation\0u_color\0u_speed\0u_freq\0u_time", 7
+            "u_position\0u_scale\0u_quat_rotation\0u_color\0u_speed\0u_freq\0u_time\0u_width\0u_length", 9
         );
 
         build_preview_shader = create_shader_from_files(
@@ -845,7 +845,7 @@ uint8_t init() {
             build_info_string[c] = '\n';
             c += 1;
 
-            strcpy(&(build_info_string[c]), "costs:\n");
+            strcpy(&(build_info_string[c]), "Costs:\n");
             c += strlen("costs:\n");
             
             if (tile_type_properties[i].cost.population > 0) {

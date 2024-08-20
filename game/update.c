@@ -95,7 +95,7 @@ void update_game() {
 
 
     player_translations_update();
-    // and attack effects
+    // and attack/built/destroyed effects
     tile_cooldowns_update();
     camera_update();
     sun_shadow_map_update(); // a bit redundent
@@ -240,7 +240,7 @@ void player_translations_update() {
     }
 }
 
-// also updates tiles attack effects
+// also updates tiles attack/built effects
 void tile_cooldowns_update() {
     in_cooldowns_translation = 0;
 
@@ -251,6 +251,11 @@ void tile_cooldowns_update() {
 
                 // update attack effects
                 if (tile->attacked_effect_time_to_live > 0) tile->attacked_effect_time_to_live -= delta_time;
+                // update destroy effects
+                if (tile->destroyed_effect_time_to_live > 0) tile->destroyed_effect_time_to_live -= delta_time;
+                // update built effect
+                if (tile->built_effect_time_to_live > 0) tile->built_effect_time_to_live -= delta_time;
+                
                 
                 if (tile->type == TILE_TYPE_EMPTY) continue;
                 if (tile->curent_cooldown_timer == tile->cooldown_timer) continue;

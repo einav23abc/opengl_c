@@ -360,6 +360,10 @@ void render_game_effects() {
                 glUniform1f(shaders_list[current_shader]->uniform_locations[5], 5);
                 // u_time
                 glUniform1f(shaders_list[current_shader]->uniform_locations[6], (float)time);
+                // u_width
+                glUniform1f(shaders_list[current_shader]->uniform_locations[7], -1);
+                // u_length
+                glUniform1f(shaders_list[current_shader]->uniform_locations[8], -1);
                 draw_mesh(tile_effect_mesh);
             }
         // </hovered tile>
@@ -428,6 +432,10 @@ void render_game_effects() {
             glUniform1f(shaders_list[current_shader]->uniform_locations[5], 10);
             // u_time
             glUniform1f(shaders_list[current_shader]->uniform_locations[6], (float)time);
+            // u_width
+            glUniform1f(shaders_list[current_shader]->uniform_locations[7], -1);
+            // u_length
+            glUniform1f(shaders_list[current_shader]->uniform_locations[8], -1);
             draw_mesh(tile_effect_mesh);
         }
     // </win bases>
@@ -449,6 +457,86 @@ void render_game_effects() {
             }
         }
     // </preview building>
+
+    // <built effect>
+        use_shader(tile_effect_shader);
+        for (int8_t i = 0; i < 2; i ++) {
+            for (uint32_t x = 0; x < _PLAYER_GRID_WIDTH_; x++) {
+                for (uint32_t z = 0; z < _PLAYER_GRID_DEPTH_; z++) {
+                    int32_t effect_time_to_live = game_struct.players[i].tiles[z*_PLAYER_GRID_DEPTH_ + x].built_effect_time_to_live;
+                    
+                    if (effect_time_to_live <= 0) continue;
+
+                    // u_position
+                    glUniform3f(
+                        shaders_list[current_shader]->uniform_locations[0],
+                        x*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
+                        game_struct.players[i].y_current_translation,
+                        z*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
+                    );
+                    // u_scale
+                    glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_, 0.75*_TILE_SIZE_, _TILE_SIZE_);
+                    // u_quat_rotation
+                    quat_t quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
+                    glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
+                    // u_color
+                    glUniform3f(shaders_list[current_shader]->uniform_locations[3], ((float)108)/255, ((float)140)/255, ((float)80)/255);
+                    // u_speed
+                    glUniform1f(shaders_list[current_shader]->uniform_locations[4], 0.0012);
+                    // u_freq
+                    glUniform1f(shaders_list[current_shader]->uniform_locations[5], 8);
+                    // u_time
+                    glUniform1f(shaders_list[current_shader]->uniform_locations[6], _TILE_BUILT_EFFECT_TIME_-effect_time_to_live);
+                    // u_width
+                    glUniform1f(shaders_list[current_shader]->uniform_locations[7], 0.6);
+                    // u_length
+                    glUniform1f(shaders_list[current_shader]->uniform_locations[8], _TILE_BUILT_EFFECT_TIME_);
+                    draw_mesh(tile_effect_mesh);
+                }
+            }
+        }
+        use_shader(ui_shader);
+    // </built effect>
+    
+    // <destroyed effect>
+        use_shader(tile_effect_shader);
+        for (int8_t i = 0; i < 2; i ++) {
+            for (uint32_t x = 0; x < _PLAYER_GRID_WIDTH_; x++) {
+                for (uint32_t z = 0; z < _PLAYER_GRID_DEPTH_; z++) {
+                    int32_t effect_time_to_live = game_struct.players[i].tiles[z*_PLAYER_GRID_DEPTH_ + x].destroyed_effect_time_to_live;
+                    
+                    if (effect_time_to_live <= 0) continue;
+
+                    // u_position
+                    glUniform3f(
+                        shaders_list[current_shader]->uniform_locations[0],
+                        x*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
+                        game_struct.players[i].y_current_translation,
+                        z*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
+                    );
+                    // u_scale
+                    glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_, 0.75*_TILE_SIZE_, _TILE_SIZE_);
+                    // u_quat_rotation
+                    quat_t quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
+                    glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
+                    // u_color
+                    glUniform3f(shaders_list[current_shader]->uniform_locations[3], ((float)78)/255, ((float)40)/255, ((float)46)/255);
+                    // u_speed
+                    glUniform1f(shaders_list[current_shader]->uniform_locations[4], 0.0012);
+                    // u_freq
+                    glUniform1f(shaders_list[current_shader]->uniform_locations[5], 8);
+                    // u_time
+                    glUniform1f(shaders_list[current_shader]->uniform_locations[6], _TILE_DESTROYED_EFFECT_TIME_-effect_time_to_live);
+                    // u_width
+                    glUniform1f(shaders_list[current_shader]->uniform_locations[7], 0.6);
+                    // u_length
+                    glUniform1f(shaders_list[current_shader]->uniform_locations[8], _TILE_DESTROYED_EFFECT_TIME_);
+                    draw_mesh(tile_effect_mesh);
+                }
+            }
+        }
+        use_shader(ui_shader);
+    // </destroyed effect>
 
     glEnable(GL_CULL_FACE);
 }

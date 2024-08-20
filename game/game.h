@@ -15,13 +15,13 @@
 #define _OUTPORT_BACKGROUND_COLOR_B_ (107.0/255)
 
 
-#define _PLAYER_GRID_WIDTH_ (5)
-#define _PLAYER_GRID_DEPTH_ (5)
+#define _PLAYER_GRID_WIDTH_ (4)
+#define _PLAYER_GRID_DEPTH_ (4)
 #define _TILE_SIZE_ (16)
 #define _PLAYER_CONSTANT_Z_TRANSLATION_ (-_PLAYER_GRID_DEPTH_*_TILE_SIZE_*0.5)
 #define _PLAYER_TRANSLATION_LERP_DURATION_ (500)
 #define _PLAYER_COOLDOWN_TRANSLATION_LERP_DURATION_ (500)
-#define _WIN_WHEIGHT_ (8)
+#define _WIN_WHEIGHT_ (5)
 #define _HINGE_DISTANCE_FROM_SCALE_AT_BOTTOM_ (2)
 #define _SCALE_AXIS_POINT_Y_ (_TILE_SIZE_*(_WIN_WHEIGHT_*0.5))
 #define _SCALE_AXIS_LENGTH_ (sqrt(_SCALE_AXIS_POINT_Y_*_SCALE_AXIS_POINT_Y_ + _HINGE_DISTANCE_FROM_SCALE_AT_BOTTOM_*_HINGE_DISTANCE_FROM_SCALE_AT_BOTTOM_*_TILE_SIZE_*_TILE_SIZE_))
@@ -34,6 +34,11 @@
 // excluding TILE_TYPE_EMPTY
 #define _TILE_TYPES_AMOUNT_ (5)
 #define _TILE_ATTACKED_EFFECT_TIME_ (1500)
+#define _TILE_DESTROYED_EFFECT_TIME_ (1000)
+#define _TILE_BUILT_EFFECT_TIME_ (1000)
+
+#define _AI_BUILD_FUNCTIONS_AMOUNT_ (2)
+#define _AI_ATTACK_FUNCTIONS_AMOUNT_ (2)
 
 
 typedef struct {
@@ -67,6 +72,8 @@ typedef struct {
     float curent_cooldown_timer;
     int32_t cooldown_timer;
     int32_t attacked_effect_time_to_live;
+    int32_t destroyed_effect_time_to_live;
+    int32_t built_effect_time_to_live;
     // uint8_t camoflauged : 1;
 } tile_t;
 
@@ -94,6 +101,16 @@ typedef struct {
     uint8_t player_turn;
     uint8_t game_ended;
 } game_t;
+
+typedef int32_t(*ai_action_func_t)(void);
+
+typedef struct {
+    int32_t tile_build_priority;
+    int32_t tile_build_priority_strength; // 0 = always, 1 = 1/2 the time, 2 = 1/3 of the time
+    ai_action_func_t build_func;
+    int32_t tile_attack_priority;
+    ai_action_func_t attack_func;
+} ai_t;
 
 
 typedef struct {
@@ -184,7 +201,11 @@ extern music_t* talking_mud_music; // credit to https://freesound.org/people/kla
 
 extern tile_type_t tile_type_properties[_TILE_TYPES_AMOUNT_];
 
+extern ai_action_func_t ai_build_functions[_AI_BUILD_FUNCTIONS_AMOUNT_];
+extern ai_action_func_t ai_attack_functions[_AI_ATTACK_FUNCTIONS_AMOUNT_];
+
 extern game_t game_struct;
+extern ai_t current_ai;
 extern ivec3_t selected_tile;
 extern ivec2_t hovered_tiles[2];
 extern int8_t in_cooldowns_translation;
@@ -240,10 +261,13 @@ void switch_turn();
 void build_at_tile(int32_t player, int32_t tile_type_id, int32_t at_tile);
 void attack_tile(int32_t player_attacked, int32_t at_tile);
 tile_types_amount_sorted_t get_tile_types_amounts_sorted(int32_t player);
+int32_t get_random_empty_tile_position(int32_t player);
 void player_1_turn();
 void player_1_ai_turn();
-int32_t player_ai_build_func1();
-int32_t player_ai_attack_func1();
+int32_t player_ai_build_first_least_func();
+int32_t player_ai_build_least_func();
+int32_t player_ai_attack_least_func();
+int32_t player_ai_attack_most_func();
 
 void ui_list_exit_in_game_callback(int32_t ui_list_id, int32_t button_id);
 void ui_list_exit_game_button_callback(int32_t ui_list_id, int32_t button_id);
