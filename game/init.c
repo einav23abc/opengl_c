@@ -580,6 +580,7 @@ uint8_t init() {
         // nine_slice1_texture = load_texture("./game/textures/nslice1.png");;
         // nine_slice2_texture = load_texture("./game/textures/nslice2.png");
         // nine_slice3_texture = load_texture("./game/textures/nslice3.png");
+        // menu_background_scroll_texture = load_texture("./game/textures/menu_background_scroll.png");
 
         // save_surface_to_c_file("./game/textures/floor.png", "floor_texture_surface", "./game/textures/floor_texture_surface.c");
         // save_surface_to_c_file("./game/textures/global_texture.png", "global_texture_surface", "./game/textures/global_texture_surface.c");
@@ -596,6 +597,7 @@ uint8_t init() {
         // save_surface_to_c_file("./game/textures/nslice1.png", "nine_slice1_texture_surface", "./game/textures/nine_slice1_texture_surface.c");
         // save_surface_to_c_file("./game/textures/nslice2.png", "nine_slice2_texture_surface", "./game/textures/nine_slice2_texture_surface.c");
         // save_surface_to_c_file("./game/textures/nslice3.png", "nine_slice3_texture_surface", "./game/textures/nine_slice3_texture_surface.c");
+        // save_surface_to_c_file("./game/textures/menu_background_scroll.png", "menu_background_scroll_texture_surface", "./game/textures/menu_background_scroll_texture_surface.c");
         
 
         floor_texture = load_texture_from_surface(floor_texture_surface);
@@ -613,6 +615,7 @@ uint8_t init() {
         nine_slice1_texture = load_texture_from_surface(nine_slice1_texture_surface);
         nine_slice2_texture = load_texture_from_surface(nine_slice2_texture_surface);
         nine_slice3_texture = load_texture_from_surface(nine_slice3_texture_surface);
+        menu_background_scroll_texture = load_texture_from_surface(menu_background_scroll_texture_surface);
 
 
         // <letters_font>

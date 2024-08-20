@@ -21,6 +21,7 @@ fbo_t* outport_fbo;
 #include "./textures/nine_slice1_texture_surface.c"
 #include "./textures/nine_slice2_texture_surface.c"
 #include "./textures/nine_slice3_texture_surface.c"
+#include "./textures/menu_background_scroll_texture_surface.c"
 texture_t* floor_texture;
 texture_t* global_texture;
 texture_t* tile_texture;
@@ -35,6 +36,7 @@ texture_t* big_letters_font_texture;
 texture_t* nine_slice1_texture;
 texture_t* nine_slice2_texture;
 texture_t* nine_slice3_texture;
+texture_t* menu_background_scroll_texture;
 
 nine_slice_t nine_slice1;
 nine_slice_t nine_slice2;

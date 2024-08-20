@@ -39,7 +39,7 @@ void main(){
     float normal_dot_sun = dot(v_normal,-u_sun_vector);
     float light = max(0.0,normal_dot_sun);
 
-    vec3 sun_shadow_map_position = (vec4(v_position, 1.0)*u_sun_shadow_map_wvp_mat)*0.5+0.5;
+    vec3 sun_shadow_map_position = ((vec4(v_position, 1.0)*u_sun_shadow_map_wvp_mat)*0.5+0.5).xyz;
 
     float sun_current_depth = sun_shadow_map_position.z;
     float bias = max(0.000025, 0.0001 * (1.0 - normal_dot_sun));

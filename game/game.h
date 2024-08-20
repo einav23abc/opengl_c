@@ -154,6 +154,7 @@ extern SDL_Surface* big_letters_font_texture_surface;
 extern SDL_Surface* nine_slice1_texture_surface;
 extern SDL_Surface* nine_slice2_texture_surface;
 extern SDL_Surface* nine_slice3_texture_surface;
+extern SDL_Surface* menu_background_scroll_texture_surface;
 extern texture_t* floor_texture;
 extern texture_t* global_texture;
 extern texture_t* tile_texture;
@@ -168,6 +169,7 @@ extern texture_t* big_letters_font_texture;
 extern texture_t* nine_slice1_texture;
 extern texture_t* nine_slice2_texture;
 extern texture_t* nine_slice3_texture;
+extern texture_t* menu_background_scroll_texture;
 
 extern nine_slice_t nine_slice1;
 extern nine_slice_t nine_slice2;

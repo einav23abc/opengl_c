@@ -1,3 +1,5 @@
+#version 150
+
 #define MAX_JOINTS (20)
 
 in vec3 in_vertex_position;
@@ -31,17 +33,17 @@ vec3 rotate_vector(vec3 vec, vec4 q) {
 }
 
 void main() {
-    vec3 model_position;
+    vec3 model_position = in_vertex_position;
 
-    if (in_vertex_joint_wheight[0] == 0 && in_vertex_joint_wheight[1] == 0 && in_vertex_joint_wheight[2] == 0) {
-        model_position = in_vertex_position;
-    }else {
-        mat4 m;
-        for (uint i = 0; i < 3; i++) {
-            m += in_vertex_joint_wheight[i] * u_joint_matrices[in_vertex_joint_id[i]];
-        }
-        model_position = vec3(vec4(in_vertex_position,1.0) * m);
-    }
+    // if (in_vertex_joint_wheight[0] == 0 && in_vertex_joint_wheight[1] == 0 && in_vertex_joint_wheight[2] == 0) {
+    //     model_position = in_vertex_position;
+    // }else {
+    //     mat4 m;
+    //     for (uint i = 0; i < 3; i++) {
+    //         m += in_vertex_joint_wheight[i] * u_joint_matrices[in_vertex_joint_id[i]];
+    //     }
+    //     model_position = vec3(vec4(in_vertex_position,1.0) * m);
+    // }
 
     vec3 position = rotate_vector(model_position*u_scale, u_quat_rotation) + u_position;
     
