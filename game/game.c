@@ -1192,7 +1192,7 @@ tile_types_amount_sorted_t get_tile_types_amounts_sorted(int32_t player) {
 }
 int32_t get_random_empty_tile_position(int32_t player) {
     // check if empty space exists
-    int32_t empty_tile_exists = -1;
+    int32_t empty_tile_exists = 0;
     for (uint32_t j = 0; j < _PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_; j++) {
         if (game_struct.players[player].tiles[j].type == TILE_TYPE_EMPTY) {
             empty_tile_exists = 1;
