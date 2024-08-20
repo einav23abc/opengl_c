@@ -174,6 +174,46 @@ void camera_update() {
     camera->y = camera_pos.y - 60*sin(camera->rx);
     camera->z = camera_pos.z - 60*sin(camera->ry+M_PI*0.5)*cos(camera->rx);
 
+    // add camera shake from effects
+    // building
+    // destroying
+    // attacking
+    float shake = 0;
+    for (int8_t i = 0; i < 2; i ++) {
+        for (uint32_t x = 0; x < _PLAYER_GRID_WIDTH_; x++) {
+            for (uint32_t z = 0; z < _PLAYER_GRID_DEPTH_; z++) {
+                int32_t attacked_effect_time_to_live  = game_struct.players[i].tiles[z*_PLAYER_GRID_DEPTH_ + x].attacked_effect_time_to_live;
+                int32_t destroyed_effect_time_to_live = game_struct.players[i].tiles[z*_PLAYER_GRID_DEPTH_ + x].destroyed_effect_time_to_live;
+                int32_t built_effect_time_to_live     = game_struct.players[i].tiles[z*_PLAYER_GRID_DEPTH_ + x].built_effect_time_to_live;
+
+                float attacked_effect_t  = max(0, ((float)attacked_effect_time_to_live) /(_TILE_ATTACKED_EFFECT_TIME_)*3-2);
+                float destroyed_effect_t = max(0, ((float)destroyed_effect_time_to_live)/(_TILE_DESTROYED_EFFECT_TIME_)*4-3);
+                float built_effect_t     = max(0, ((float)built_effect_time_to_live)    /(_TILE_BUILT_EFFECT_TIME_)*5-4);
+
+                float attacked_shake_add  = (ease_out_sine(attacked_effect_t))*5;
+                float destroyed_shake_add = (ease_out_sine(destroyed_effect_t))*3;
+                float built_shake_add     = (ease_out_sine(built_effect_t))*1;
+
+                float shake_add = max(max(
+                    attacked_shake_add,
+                    destroyed_shake_add),
+                    built_shake_add
+                );
+
+                shake += shake_add;
+            }
+        }
+    }
+    vec3_t shake_vec = (vec3_t){(float)((rand() % 20) - 10), (float)((rand() % 20) - 10), (float)((rand() % 20) - 10)};
+    float i_shake_vec_mag = 1/sqrt(dot_product(shake_vec, shake_vec));
+    shake_vec.x *= i_shake_vec_mag*shake;
+    shake_vec.y *= i_shake_vec_mag*shake;
+    shake_vec.z *= i_shake_vec_mag*shake;
+    camera->x += shake_vec.x;
+    camera->y += shake_vec.y;
+    camera->z += shake_vec.z;
+
+
     #ifdef DEBUG_SOFT_MODE
     // perspective <-> orthographic togle
     if (keys[SDL_SCANCODE_P] == 1) {

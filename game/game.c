@@ -679,7 +679,7 @@ void enter_main_menu() {
 
         .buttons_amount = 1,
         .button_strings = {"Play!"},
-        .button_info_strings = {""},
+        .button_info_strings = {"Play against varying enemy AIs"},
         .button_callbacks = {&ui_list_play_button_callback},
 
         .child_ui_list = -1,
