@@ -6,11 +6,19 @@ float simple_draw_module_color_g;
 float simple_draw_module_color_b;
 float simple_draw_module_color_a;
 const shader_t* simple_draw_module_cube_shader;
-const mesh_t* simple_draw_module_rectangle_mesh;
-const mesh_t* simple_draw_module_cube_mesh;
-const mesh_t* simple_draw_module_ball_mesh;
 const shader_t* simple_draw_module_screen_quad_mesh_shader;
-const mesh_t* simple_draw_module_screen_quad_mesh;
+#ifdef RESAVE_MESHES
+mesh_t* simple_draw_module_rectangle_mesh;
+mesh_t* simple_draw_module_cube_mesh;
+mesh_t* simple_draw_module_ball_mesh;
+mesh_t* simple_draw_module_screen_quad_mesh;
+#else
+#include "./simple_draw_module_rectangle_mesh.c"
+#include "./simple_draw_module_cube_mesh.c"
+#include "./simple_draw_module_ball_mesh.c"
+#include "./simple_draw_module_screen_quad_mesh.c"
+#endif
+
 
 int32_t simple_draw_module_init() {
     simple_draw_module_set_color(1, 1, 1, 1);
@@ -55,11 +63,15 @@ int32_t simple_draw_module_init() {
             0, 2, 3
         };
 
-        simple_draw_module_rectangle_mesh = generate_mesh(vbo_datas_arr, 1, indices_array, 6, 0);
+        #ifdef RESAVE_MESHES
+        simple_draw_module_rectangle_mesh = generate_mesh(vbo_datas_arr, 1, indices_array, 6, 1);
         if (simple_draw_module_rectangle_mesh == NULL) {
             printf("failed to generate simple_draw_module_rectangle_mesh\n");
             return 1;
         }
+        save_mesh_to_c_file(simple_draw_module_rectangle_mesh, "simple_draw_module_rectangle_mesh", "./engine/simple_draw_module/simple_draw_module_rectangle_mesh.c");
+        #endif
+        bind_mesh(simple_draw_module_rectangle_mesh);
         }
     // </simple_draw_module_rectangle_mesh>
 
@@ -109,20 +121,29 @@ int32_t simple_draw_module_init() {
             4, 5, 7
         };
 
-        simple_draw_module_cube_mesh = generate_mesh(vbo_datas_arr, 1, indices_array, 6*6, 0);
+        #ifdef RESAVE_MESHES
+        simple_draw_module_cube_mesh = generate_mesh(vbo_datas_arr, 1, indices_array, 6*6, 1);
         if (simple_draw_module_cube_mesh == NULL) {
             printf("failed to generate simple_draw_module_cube_mesh\n");
             return 1;
         }
+        save_mesh_to_c_file(simple_draw_module_cube_mesh, "simple_draw_module_cube_mesh", "./engine/simple_draw_module/simple_draw_module_cube_mesh.c");
+        #endif
+        bind_mesh(simple_draw_module_cube_mesh);
         }
     // </simple_draw_module_cube_mesh>
 
-    // simple_draw_module_ball_mesh
-    simple_draw_module_ball_mesh = mesh_generate_ball(4);
-    if (simple_draw_module_ball_mesh == NULL) {
-        printf("failed to generate simple_draw_module_ball_mesh\n");
-        return 1;
-    }
+    // <simple_draw_module_ball_mesh>
+        #ifdef RESAVE_MESHES
+        simple_draw_module_ball_mesh = mesh_generate_ball(4, 1);
+        if (simple_draw_module_ball_mesh == NULL) {
+            printf("failed to generate simple_draw_module_ball_mesh\n");
+            return 1;
+        }
+        save_mesh_to_c_file(simple_draw_module_ball_mesh, "simple_draw_module_ball_mesh", "./engine/simple_draw_module/simple_draw_module_ball_mesh.c");
+        #endif
+        bind_mesh(simple_draw_module_ball_mesh);
+    // </simple_draw_module_ball_mesh>
 
     // <simple_draw_module_screen_quad_mesh_shader>
         #include "screen_quad_mesh_sh.c"
@@ -166,11 +187,15 @@ int32_t simple_draw_module_init() {
             2, 0, 3
         };
 
-        simple_draw_module_screen_quad_mesh = generate_mesh(vbo_datas_arr, 1, indices_array, 6, 0);
+        #ifdef RESAVE_MESHES
+        simple_draw_module_screen_quad_mesh = generate_mesh(vbo_datas_arr, 1, indices_array, 6, 1);
         if (simple_draw_module_screen_quad_mesh == NULL) {
             printf("failed to generate simple_draw_module_screen_quad_mesh\n");
             return 1;
         }
+        save_mesh_to_c_file(simple_draw_module_screen_quad_mesh, "simple_draw_module_screen_quad_mesh", "./engine/simple_draw_module/simple_draw_module_screen_quad_mesh.c");
+        #endif
+        bind_mesh(simple_draw_module_screen_quad_mesh);
         }
     // </simple_draw_module_screen_quad_mesh>
 

@@ -7,6 +7,8 @@
         "alerts.h": "c",
         "engine.h": "c",
         "billboard.h": "c",
-        "sdl.h": "c"
+        "sdl.h": "c",
+        "nine_slices.h": "c",
+        "shaders.h": "c"
     }
 }

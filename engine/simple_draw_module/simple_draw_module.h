@@ -12,11 +12,11 @@ extern float simple_draw_module_color_g;
 extern float simple_draw_module_color_b;
 extern float simple_draw_module_color_a;
 extern const shader_t* simple_draw_module_cube_shader;
-extern const mesh_t* simple_draw_module_rectangle_mesh;
-extern const mesh_t* simple_draw_module_cube_mesh;
-extern const mesh_t* simple_draw_module_ball_mesh;
 extern const shader_t* simple_draw_module_screen_quad_mesh_shader;
-extern const mesh_t* simple_draw_module_screen_quad_mesh;
+extern mesh_t* simple_draw_module_rectangle_mesh;
+extern mesh_t* simple_draw_module_cube_mesh;
+extern mesh_t* simple_draw_module_ball_mesh;
+extern mesh_t* simple_draw_module_screen_quad_mesh;
 
 int32_t simple_draw_module_init();
 

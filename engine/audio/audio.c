@@ -293,17 +293,25 @@ void audio_clean() {
     #ifdef DEBUG_SOFT_MODE
     printf("cleaning %u sounds\n", sounds_amount);
     #endif
+    Mix_HaltChannel(-1);
     for (uint64_t i = 0; i < sounds_amount; i++) audio_sound_clean(sounds_list[i]);
     sounds_amount = 0;
     
     #ifdef DEBUG_SOFT_MODE
     printf("cleaning %u musics\n", musics_amount);
     #endif
+    Mix_HaltMusic();
     for (uint64_t i = 0; i < musics_amount; i++) audio_music_clean(musics_list[i]);
     musics_amount = 0;
+    #ifdef DEBUG_SOFT_MODE
+    printf("cleaned music successfully\n");
+    #endif
 
     Mix_CloseAudio();
     Mix_Quit();
+    #ifdef DEBUG_SOFT_MODE
+    printf("closed audio successfully\n");
+    #endif
 }
 
 void audio_save_sound_to_c_file(sound_t* sound, const char* name, char* c_file_path) {

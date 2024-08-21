@@ -6,6 +6,8 @@ cd /D "%~dp0"
 gcc ^
     engine_config.c ^
     game.c ^
+    nine_slices.c ^
+    fonts.c ^
     ui_lists.c ^
     alerts.c ^
     billboard.c ^

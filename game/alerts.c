@@ -19,7 +19,7 @@ int32_t new_alert_assign_id() {
     return min_time_to_live_i;
 }
 uvec2_t get_alert_box_size(int32_t i) {
-    return get_str_boxed_size(alerts[i].string, alerts[i].font->letter_height);
+    return get_str_boxed_size(alerts[i].font, alerts[i].string, alerts[i].font->letter_height);
 }
 uvec2_t get_alert_box_pos(int32_t i) {
     float x = 0;
@@ -55,7 +55,7 @@ uvec2_t get_alert_box_pos_padded(int32_t i) {
 void add_error_alert_at_cursor(char* string) {
     vec2_t mouse_outport_space_position = get_mouse_outport_space_position();
 
-    uvec2_t string_size = get_str_boxed_size(string, letters_font.letter_height);
+    uvec2_t string_size = get_str_boxed_size(&letters_font, string, letters_font.letter_height);
 
     float x = mouse_outport_space_position.x - string_size.x*0.5;
     float y = mouse_outport_space_position.y - string_size.y*0.5;

@@ -1,6 +1,10 @@
 #ifndef UI_LISTS_H
 #define UI_LISTS_H
 
+
+#include "../engine/engine.h"
+#include "nine_slices.h"
+#include "fonts.h"
 #include "game.h"
 
 

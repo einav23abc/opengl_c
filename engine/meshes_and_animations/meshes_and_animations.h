@@ -95,8 +95,9 @@ mesh_t* generate_mesh(vbo_data_t* vbo_datas_arr, uint32_t vbo_datas_arr_size, ui
 void bind_mesh(mesh_t* mesh);
 
 mesh_t* generate_2d_quad_mesh( float min_x, float max_x, float min_y, float max_y,
-                                float min_u, float max_u, float min_v, float max_v);
-mesh_t* mesh_generate_ball(uint32_t divisions);
+                                float min_u, float max_u, float min_v, float max_v,
+                                uint8_t unbinded);
+mesh_t* mesh_generate_ball(uint32_t divisions, uint8_t unbinded);
 
 mesh_t* mesh_from_wavefront_obj_ext(const char* obj_file_path, quat_vec_vec_t transform_qvv, uint8_t unbinded);
 mesh_t* mesh_from_wavefront_obj(const char* obj_file_path, uint8_t unbinded);

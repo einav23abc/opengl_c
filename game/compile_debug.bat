@@ -6,9 +6,15 @@ cd /D "%~dp0"
 gcc ^
     engine_config.c ^
     game.c ^
+    meshes.c ^
+    shaders.c ^
+    textures.c ^
+    sounds.c ^
+    nine_slices.c ^
+    fonts.c ^
+    billboards.c ^
     ui_lists.c ^
     alerts.c ^
-    billboard.c ^
     init.c ^
     update.c ^
     render.c ^
@@ -25,3 +31,5 @@ gcc ^
     -D DEBUG_MODE ^
     -D DEBUG_SOFT_MODE ^
     -g
+
+    @REM -D RESAVE_MESHES ^

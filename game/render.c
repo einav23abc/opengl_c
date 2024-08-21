@@ -799,7 +799,7 @@ void render_game_ui() {
 
         resources_string[c] = '\0';
 
-        uvec2_t str_box_size = get_str_boxed_size(resources_string, big_letters_font.letter_height);
+        uvec2_t str_box_size = get_str_boxed_size(&big_letters_font, resources_string, big_letters_font.letter_height);
         draw_str_boxed(resources_string, big_letters_font, nine_slice1, _OUTPORT_WIDTH_-str_box_size.x-6, 6, 6, big_letters_font.letter_height);
     // </player 0 resources>
 
@@ -882,7 +882,7 @@ void render_how_to_play() {
         ""      "     Using the 'Soldiers' resource,\n"
         ""      "  you can attack the enemy's buildings."
     ;
-    uvec2_t size = get_str_boxed_size(str, big_letters_font.letter_height);
+    uvec2_t size = get_str_boxed_size(&big_letters_font, str, big_letters_font.letter_height);
     draw_str_boxed(
         str,
         big_letters_font,

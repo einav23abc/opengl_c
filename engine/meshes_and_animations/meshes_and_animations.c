@@ -120,7 +120,8 @@ void bind_mesh(mesh_t* mesh) {
 }
 
 mesh_t* generate_2d_quad_mesh(  float min_x, float max_x, float min_y, float max_y,
-                                float min_u, float max_u, float min_v, float max_v) {
+                                float min_u, float max_u, float min_v, float max_v,
+                                uint8_t unbinded) {
     float vertices_position_arr[] = {
         min_x, min_y, 0,
         min_x, max_y, 0,
@@ -156,9 +157,9 @@ mesh_t* generate_2d_quad_mesh(  float min_x, float max_x, float min_y, float max
         1, 0, 2,
         2, 0, 3
     };
-    return generate_mesh(vbo_datas_arr, 2, indices_array, 6, 0);
+    return generate_mesh(vbo_datas_arr, 2, indices_array, 6, unbinded);
 }
-mesh_t* mesh_generate_ball(uint32_t divisions) {
+mesh_t* mesh_generate_ball(uint32_t divisions, uint8_t unbinded) {
     const float start_vertices_position_arr[] = {
         // Side A
             sqrt(8.0/9.0),  0,             -1.0/3.0,
@@ -330,7 +331,7 @@ mesh_t* mesh_generate_ball(uint32_t divisions) {
         }
     };
 
-    mesh_t* result = generate_mesh(vbo_datas_arr, 1, indices_array, polygons_amount*3, 0);
+    mesh_t* result = generate_mesh(vbo_datas_arr, 1, indices_array, polygons_amount*3, unbinded);
 
     free(vertices_position_arr);
     free(indices_array);

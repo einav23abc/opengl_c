@@ -65,6 +65,8 @@ gcc ^
     -c ^
     -g
 
+    @REM -D RESAVE_MESHES ^
+
 ar -rcs libengine_debug.a ./*.o
 
 

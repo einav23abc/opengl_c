@@ -5,21 +5,16 @@ void handle_event() {
         
         case SDL_MOUSEBUTTONDOWN: {
             // <ui-lists button clicking>
-                vec2_t outport_space_position = get_mouse_outport_space_position();
-        
                 set_ui_lists_to_unsafe();
-                ivec3_t in_ui_box = get_ui_list_inside_pos();
-                if (in_ui_box.z != -1) {
-                    make_ui_list_safe(in_ui_box.z);
-
-                    int32_t in_button = floor(((float)in_ui_box.y)/(ui_lists[in_ui_box.z].font->letter_height + ui_lists[in_ui_box.z].button_padding*2));
-                    if (in_button < 0 || in_button >= ui_lists[in_ui_box.z].buttons_amount) return;
+                ivec2_t hovered_button = get_ui_list_hovered_button();
+                if (hovered_button.x != -1 && hovered_button.y != -1) {
+                    make_ui_list_safe(hovered_button.x);
 
                     audio_sound_play(button_press_sound);
 
-                    button_callback_t button_callback = ui_lists[in_ui_box.z].button_callbacks[in_button];
+                    button_callback_t button_callback = ui_lists[hovered_button.x].button_callbacks[hovered_button.y];
                     if (button_callback != NULL){
-                        button_callback(in_ui_box.z, in_button);
+                        button_callback(hovered_button.x, hovered_button.y);
                     }
 
                     close_unsafe_ui_lists();
