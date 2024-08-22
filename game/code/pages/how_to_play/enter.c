@@ -1,14 +1,17 @@
-#include "enter.h"
+#include "page.h"
 #include "../../ui_lists.h"
 #include "../../alerts.h"
+
+static void main_menu_button_callback();
+
 
 void enter_how_to_play() {
     close_all_ui_lists();
     close_all_alerts();
-    page = PAGE_HOW_TO_PLAY;
+
     int32_t ui_list_id;
 
-    // exit game - ui list
+    // main menu - ui list
     ui_list_id = new_ui_list_assign_id();
     ui_lists[ui_list_id] = (ui_list_t){
         .active = 1,
@@ -38,6 +41,6 @@ void enter_how_to_play() {
     };
 }
 
-void main_menu_button_callback() {
+static void main_menu_button_callback() {
     switch_page(PAGE_MAIN_MENU);
 }

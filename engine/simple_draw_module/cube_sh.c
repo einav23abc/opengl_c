@@ -1,4 +1,5 @@
 static char cube_frag_arr[] =
+"   #version 150\n"
 "	varying vec2 v_texcoord;	\n"
 "		\n"
 "	uniform vec4 u_color;	\n"
@@ -10,6 +11,7 @@ static char cube_frag_arr[] =
 static char* cube_frag = cube_frag_arr;
 
 static char cube_vert_arr[] =
+"   #version 150\n"
 "	in vec3 in_vertex_position;	\n"
 "	in vec2 in_vertex_texcoord;	\n"
 "		\n"

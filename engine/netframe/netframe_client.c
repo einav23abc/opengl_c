@@ -4,13 +4,6 @@
 // #define NETFRAME_DEBUG
 
 
-__attribute__((weak)) void parse_state_packet(server_packet_t packet);
-__attribute__((weak)) void parse_update_packet(server_packet_t packet);
-__attribute__((weak)) void handle_client_connect(int32_t client_id);
-__attribute__((weak)) void handle_client_disconnect(int32_t client_id);
-__attribute__((weak)) void handle_disconnect_as_client();
-
-
 // packets that will go out to the server
 static packet_t packets_stack[_PACKETS_STACK_LENGTH_];
 static int32_t packets_stack_size;

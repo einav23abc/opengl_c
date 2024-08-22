@@ -4,12 +4,6 @@
 // #define NETFRAME_DEBUG
 
 
-__attribute__((weak)) server_packet_t generate_state_packet();
-__attribute__((weak)) void parse_update_packet(server_packet_t packet);
-__attribute__((weak)) void handle_client_connect(int32_t client_id);
-__attribute__((weak)) void handle_client_disconnect(int32_t client_id);
-
-
 typedef struct {
     uint8_t active                   : 1;
     uint8_t client_outsock_connected : 1;
@@ -26,6 +20,8 @@ typedef struct {
 static client_t clients[_CLIENTS_MAX_AMOUNT_];
 static int8_t clients_amount;
 
+static socket_t* server_outsock;
+static socket_t* server_insock;
 
 
 static void broadcast_packet_to_client_stacks(server_packet_t* packet, int8_t skip_client);
@@ -35,7 +31,7 @@ static void out_handler(socket_t* client_insock);
 static void in_handler(socket_t* client_outsock);
 
 
-static int32_t open_server_ext(uint32_t ipaddr) {
+int32_t open_server_ext(uint32_t ipaddr) {
     clients_amount = 0;
     for (uint32_t i = 0; i < _CLIENTS_MAX_AMOUNT_; i++) clients[i].active = 0;
 
@@ -47,8 +43,8 @@ static int32_t open_server_ext(uint32_t ipaddr) {
     }
     
     // create server sockets
-    socket_t* server_outsock = create_socket_ext(ipaddr, _SERVER_OUT_PORT_);
-    socket_t* server_insock = create_socket_ext(ipaddr, _SERVER_IN_PORT_);
+    server_outsock = create_socket_ext(ipaddr, _SERVER_OUT_PORT_);
+    server_insock = create_socket_ext(ipaddr, _SERVER_IN_PORT_);
     if (server_outsock == NULL || server_insock == NULL) {
         // failed to create 1 or more server sockets
         clean_sockets();
@@ -77,6 +73,18 @@ int32_t open_server(const char* ipv4addr) {
     uint32_t ipaddr = inet_addr(ipv4addr);
     if (ipaddr == INADDR_NONE) return 1;
     return open_server_ext(ipaddr);
+}
+
+uint32_t get_server_ip() {
+    uint32_t ip = ((struct sockaddr_in*)&server_insock->addr)->sin_addr.S_un.S_addr;
+    if (ip == INADDR_ANY) {
+        // get 1 of the local ip addresses
+        char host_name_buff[128];
+        gethostname(host_name_buff, 128);
+        HOSTENT* host = gethostbyname(host_name_buff);
+        ip = ((struct sockaddr_in*)host->h_addr_list[0])->sin_addr.S_un.S_addr;
+    }
+    return ntohl(ip);
 }
 
 void close_server() {

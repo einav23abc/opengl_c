@@ -14,13 +14,15 @@
 #define _OUTPORT_BACKGROUND_COLOR_G_ (65.0/255)
 #define _OUTPORT_BACKGROUND_COLOR_B_ (107.0/255)
 
-#define PAGES_AMOUNT (3)
-
+#define PAGES_AMOUNT (6)
 
 enum PAGE_NAMES {
     PAGE_IN_GAME,
     PAGE_MAIN_MENU,
     PAGE_HOW_TO_PLAY,
+    PAGE_PLAY,
+    PAGE_OPEN_LAN,
+    PAGE_JOIN_LAN
 };
 typedef struct {
     void(*init)(void);
@@ -29,6 +31,7 @@ typedef struct {
     void(*update)(void);
     void(*render)(void);
     void(*mouse_press)(void);
+    void(*key_press)(void);
 } page_t;
 
 extern int32_t page;

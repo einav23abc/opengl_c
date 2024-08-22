@@ -33,6 +33,15 @@ void handle_event() {
             }
             break;
         }
+
+        case SDL_KEYDOWN:
+            // page specific
+            if (page >= 0 && page < PAGES_AMOUNT) {
+                if (pages[page].key_press != NULL) {
+                    pages[page].key_press();
+                }
+            }
+            break;
     }
     
 

@@ -13,17 +13,21 @@ gcc ^
     code/spaces.c ^
     code/nine_slices.c ^
     code/fonts.c ^
+    code/billboards.c ^
     code/ui_lists.c ^
     code/alerts.c ^
-    code/billboards.c ^
     code/init.c ^
     code/update.c ^
     code/render.c ^
     code/handle_event.c ^
     code/clean.c ^
+    code/pages/scrolled_background.c ^
     code/pages/in_game/page.c ^
+    code/pages/in_game/against_ai.c ^
+    code/pages/in_game/against_connected.c ^
     code/pages/in_game/init.c ^
     code/pages/in_game/enter.c ^
+    code/pages/in_game/exit.c ^
     code/pages/in_game/update.c ^
     code/pages/in_game/render.c ^
     code/pages/in_game/mouse_press.c ^
@@ -31,6 +35,13 @@ gcc ^
     code/pages/main_menu/render.c ^
     code/pages/how_to_play/enter.c ^
     code/pages/how_to_play/render.c ^
+    code/pages/play/enter.c ^
+    code/pages/play/render.c ^
+    code/pages/open_lan/enter.c ^
+    code/pages/open_lan/render.c ^
+    code/pages/join_lan/enter.c ^
+    code/pages/join_lan/render.c ^
+    code/pages/join_lan/key_press.c ^
     -o ../export/a_scaled_affair.exe ^
     -L"../engine" -l "engine" ^
     -l "SDL2main" ^
@@ -39,4 +50,5 @@ gcc ^
     -l "SDL2_image" ^
     -l "SDL2_mixer" ^
     -l "libpng16-16" ^
+    -l "Ws2_32" ^
     -g

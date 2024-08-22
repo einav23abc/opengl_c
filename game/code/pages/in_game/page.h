@@ -90,30 +90,20 @@ typedef struct {
     uint8_t game_ended;
 } game_t;
 
-typedef int32_t(*ai_action_func_t)(void);
-
-typedef struct {
-    int32_t tile_build_priority;
-    int32_t tile_build_priority_strength; // 0 = always, 1 = 1/2 the time, 2 = 1/3 of the time
-    ai_action_func_t build_func;
-    int32_t tile_attack_priority;
-    ai_action_func_t attack_func;
-} ai_t;
-
+typedef enum {
+    PLAY_TYPE_AGAINST_AI,
+    PLAY_TYPE_AGAINST_CLIENT,
+    PLAY_TYPE_AGAINST_HOST
+} PLAY_TYPE;
 
 extern tile_type_t tile_type_properties[_TILE_TYPES_AMOUNT_];
 
-extern ai_action_func_t ai_build_functions[_AI_BUILD_FUNCTIONS_AMOUNT_];
-extern ai_action_func_t ai_attack_functions[_AI_ATTACK_FUNCTIONS_AMOUNT_];
-
 extern game_t game_struct;
-extern ai_t current_ai;
 extern ivec3_t selected_tile;
 extern ivec2_t hovered_tiles[2];
 extern int8_t in_cooldowns_translation;
 extern int8_t in_tiles_translation;
-extern int32_t ai_action_cooldown;
-extern int8_t player1_ai_played;
+extern PLAY_TYPE play_type;
 
 extern vec3_t camera_pos;
 extern camera_t* camera;
@@ -129,10 +119,13 @@ extern fbo_t* sun_shadow_map_fbo;
 // <page functions>
 void init_in_game();
 void enter_in_game();
+void exit_in_game();
 void update_in_game();
 void render_in_game();
 void mouse_press_in_game();
 // </page functions>
+
+void init_game_struct();
 
 void player_translations_update();
 
@@ -145,14 +138,9 @@ void switch_turn();
 int32_t build_at_tile(int32_t player, int32_t tile_type_id, int32_t at_tile);
 void attack_tile(int32_t player_attacked, int32_t at_tile);
 
+void player_1_turn();
 tile_types_amount_sorted_t get_tile_types_amounts_sorted(int32_t player);
 int32_t get_random_empty_tile_position(int32_t player);
-void player_1_turn();
-void player_1_ai_turn();
-int32_t player_ai_build_first_least_func();
-int32_t player_ai_build_least_func();
-int32_t player_ai_attack_least_func();
-int32_t player_ai_attack_most_func();
 
 void exit_game_button_callback(int32_t ui_list_id, int32_t button_id);
 void build_specific_button_callback(int32_t ui_list_id, int32_t button_id);

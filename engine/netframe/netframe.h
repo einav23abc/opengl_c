@@ -24,7 +24,7 @@
 #endif
 
 #ifndef _CLIENTS_MAX_AMOUNT_
-#define _CLIENTS_MAX_AMOUNT_ (10)
+#define _CLIENTS_MAX_AMOUNT_ (1)
 #endif
 
 
@@ -134,6 +134,31 @@ typedef struct {
 #pragma pack()
 
 
+
+/* Opens a server that listens and accept clients that connect with `join_server()`.
+ * 
+ * The server should be closed with `close_server()`
+ * 
+ * Upon client connections the server will call to `generate_state_packet()` if it exists, And will send the
+ * generated packet to the newly connected client, which will call to `parse_state_packet()` if it exists.
+ * The state packet should contain all the data to reconstruct the shared object at the client, this will be
+ * done by the `parse_state_packet()` function that is defined by the user. The `generate_state_packet()` should
+ * also be defined by the user.
+ * 
+ * Clients (and the server) can send updates to their data by calling `send_update_packet()`. The server will
+ * send the update packet to all clients (including itself) which will call `parse_update_packet()` if it exists.
+ * The update packet should contail all the data to convert the clients' shared object to the server's object, this
+ * will be done by the `parse_update_packet()` function that is defined by the user.
+ * 
+ * When a client connects/disconnects the server will tell all clients which will call to `handle_client_connect()` or
+ * `handle_client_disconnect()` or `handle_disconnect_as_client()` all defined by the user.
+ * 
+ * \param ipaddr The server's IPv4 address as uint32_t.
+ * 
+ * \returns 0 on success or 1 on failure.
+ */
+int32_t open_server_ext(uint32_t ipaddr);
+
 /* Opens a server that listens and accept clients that connect with `join_server()`.
  * 
  * The server should be closed with `close_server()`
@@ -179,6 +204,10 @@ int32_t open_server(const char* ipv4addr);
  * \returns 0 on success or 1 on failure.
  */
 int32_t open_server_local();
+
+/* \returns The IP of the opened server.
+ */
+uint32_t get_server_ip();
 
 /* Closes a server opened by `open_server()` or `open_server_local()`.
  *
@@ -238,5 +267,59 @@ void send_update_packet(client_packet_t packet);
  * should be parsable by `parse_update_packet()` (a user defined function).
  */
 void send_update_packet_as_server(client_packet_t packet);
+
+// user defined functions:
+
+/* \brief Generate a packet that will be sent from the server to a client upon connection.
+ *
+ * The server will only send a state-packet if this function was defined by the framework's user.
+ * 
+ * The packet's `packet_type` must be `SERVER_STATE`.
+ * 
+ * The packet's `client_id` should generally be `-1`.
+ * 
+ * This packet will be parsed by `parse_state_packet` if it was defined by the framework's user.
+ * 
+ * \returns A state-packet of type `server_packet_t`.
+ */
+__attribute__((weak)) server_packet_t generate_state_packet();
+
+/* \brief Parses a state-packet that was sent by the server.
+ * 
+ * The function will only be called it was defined by the framework's user.
+ * 
+ * The server will only send a state-packet if the `generate_state_packet` function was defined by the framework's user.
+ * 
+ * \param packet The state-packet.
+ */
+__attribute__((weak)) void parse_state_packet(server_packet_t packet);
+/* \brief Parse an update-packet that was sent by one of the clients (or the server) connected to the server.
+ * 
+ * The function will only be called it was defined by the framework's user.
+ *
+ * This packet can be sent by calling `send_update_packet` or `send_update_packet_as_server`.
+ * 
+ * \param packet The update-packet.
+ */
+__attribute__((weak)) void parse_update_packet(server_packet_t packet);
+/* \brief Handle a connection of a new client to the server you are connected to.
+ *
+ * The function will only be called it was defined by the framework's user.
+ * 
+ * \param client_id The assigned `client_id` of the newly connected client.
+ */
+__attribute__((weak)) void handle_client_connect(int32_t client_id);
+/* \brief Handle client disconnected from the server you are connected to.
+ *
+ * The function will only be called it was defined by the framework's user.
+ * 
+ * \param client_id The `client_id` of the disconnected client.
+ */
+__attribute__((weak)) void handle_client_disconnect(int32_t client_id);
+/* \brief You were disconnected from the server you were connected to.
+ *
+ * The function will only be called it was defined by the framework's user.
+ */
+__attribute__((weak)) void handle_disconnect_as_client();
 
 #endif

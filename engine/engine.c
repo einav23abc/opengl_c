@@ -207,6 +207,12 @@ uint32_t engine_init() {
     SDL_GetWindowSize(window, &window_width, &window_height);
     SDL_GL_GetDrawableSize(window, &window_drawable_width, &window_drawable_height);
 
+    // sockets init
+    if (init_sockets() != 0) {
+        printf("Failed to init sockets\n");
+        return 1;
+    }
+
     // audio init
     audio_init();
 
@@ -358,6 +364,7 @@ void engine_clean() {
     // game clean
     if (clean) clean();
     
+    clean_sockets();
     clean_shaders();
     clean_textures();
     clean_meshes();

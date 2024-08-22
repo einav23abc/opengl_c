@@ -1,6 +1,11 @@
-#include "enter.h"
+#include "page.h"
+#include "against_ai.h"
+#include "against_connected.h"
 #include "../../ui_lists.h"
 #include "../../alerts.h"
+
+static void switch_turn_button_callback(int32_t ui_list_id, int32_t button_id);
+static void exit_in_game_callback(int32_t ui_list_id, int32_t button_id);
 
 
 void enter_in_game() {
@@ -17,6 +22,7 @@ void enter_in_game() {
     camera->ry = -M_PI*0.15;
     camera->rz = 0;
 
+    // selected and hovered
     selected_tile.x = -1;
     selected_tile.y = -1;
     selected_tile.z = -1;
@@ -25,95 +31,45 @@ void enter_in_game() {
     hovered_tiles[1].x = -1;
     hovered_tiles[1].y = -1;
 
-    game_struct.player_turn = 0;
-    game_struct.game_ended = 0;
+    // game struct ; if playing in LAN the game struct will be set by `generate_state_packet` or `parse_state_packet` 
+    if (play_type == PLAY_TYPE_AGAINST_AI) {
+        init_game_struct();
+    }
 
+    if (play_type == PLAY_TYPE_AGAINST_AI) {
+        int32_t ai_build_func_i  = rand() % _AI_BUILD_FUNCTIONS_AMOUNT_;
+        int32_t ai_attack_func_i = rand() % _AI_ATTACK_FUNCTIONS_AMOUNT_;
+        current_ai = (ai_t) {
+            .build_func = ai_build_functions[ai_build_func_i],
+            .tile_build_priority  = rand() % _TILE_TYPES_AMOUNT_,
+            .tile_build_priority_strength = rand() % 6,
+            .attack_func = ai_attack_functions[ai_attack_func_i],
+            .tile_attack_priority = rand() % _TILE_TYPES_AMOUNT_
+        };
+        #ifdef DEBUG_SOFT_MODE
+        printf(
+            ""      "playing against ai:\n"
+            "\t"        "build_func: %d\n"
+            "\t"        "build_priority: %d\n"
+            "\t"        "build_priority_strength: %d\n"
+            "\t"        "\n"
+            "\t"        "attack_func: %d\n"
+            "\t"        "attack_priority: %d\n"
+            ""      "}\n"
+            ,
+            ai_build_func_i,
+            current_ai.tile_build_priority,
+            current_ai.tile_build_priority_strength,
+            ai_attack_func_i,
+            current_ai.tile_attack_priority
+        );
+        #endif
 
-    int32_t ai_build_func_i  = rand() % _AI_BUILD_FUNCTIONS_AMOUNT_;
-    int32_t ai_attack_func_i = rand() % _AI_ATTACK_FUNCTIONS_AMOUNT_;
-    current_ai = (ai_t) {
-        .build_func = ai_build_functions[ai_build_func_i],
-        .tile_build_priority  = rand() % _TILE_TYPES_AMOUNT_,
-        .tile_build_priority_strength = rand() % 6,
-        .attack_func = ai_attack_functions[ai_attack_func_i],
-        .tile_attack_priority = rand() % _TILE_TYPES_AMOUNT_
-    };
-    #ifdef DEBUG_SOFT_MODE
-    printf(
-        ""      "playing against ai:\n"
-        "\t"        "build_func: %d\n"
-        "\t"        "build_priority: %d\n"
-        "\t"        "build_priority_strength: %d\n"
-        "\t"        "\n"
-        "\t"        "attack_func: %d\n"
-        "\t"        "attack_priority: %d\n"
-        ""      "}\n"
-        ,
-        ai_build_func_i,
-        current_ai.tile_build_priority,
-        current_ai.tile_build_priority_strength,
-        ai_attack_func_i,
-        current_ai.tile_attack_priority
-    );
-    #endif
-
-    ai_action_cooldown = 0;
+        ai_action_cooldown = 0;
+    }
 
     in_cooldowns_translation = 0;
 
-    game_struct.players[0].wheight = 0;
-    game_struct.players[1].wheight = 0;
-    player_translations_update();
-    game_struct.players[0].y_lerp_start_translation = game_struct.players[0].y_translation;
-    game_struct.players[0].y_current_translation = game_struct.players[0].y_translation;
-    game_struct.players[1].y_lerp_start_translation = game_struct.players[1].y_translation;
-    game_struct.players[1].y_current_translation = game_struct.players[1].y_translation;
-
-    game_struct.players[0].translation_lerp_time = 0;
-    game_struct.players[1].translation_lerp_time = 0;
-
-    for (uint32_t i = 0; i < _PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_; i++) {
-        game_struct.players[0].tiles[i].type = TILE_TYPE_EMPTY;
-        game_struct.players[0].tiles[i].attacked_effect_time_to_live = 0;
-        game_struct.players[0].tiles[i].destroyed_effect_time_to_live = 0;
-        game_struct.players[0].tiles[i].built_effect_time_to_live = 0;
-        game_struct.players[0].tiles[i].cooldown_timer = 0;
-        game_struct.players[0].tiles[i].curent_cooldown_timer = 0;
-        game_struct.players[1].tiles[i].type = TILE_TYPE_EMPTY;
-        game_struct.players[1].tiles[i].attacked_effect_time_to_live = 0;
-        game_struct.players[1].tiles[i].destroyed_effect_time_to_live = 0;
-        game_struct.players[1].tiles[i].built_effect_time_to_live = 0;
-        game_struct.players[1].tiles[i].cooldown_timer = 0;
-        game_struct.players[1].tiles[i].curent_cooldown_timer = 0;
-    }
-    int32_t rand_pos;
-    rand_pos = get_random_empty_tile_position(0);
-    game_struct.players[0].tiles[rand_pos].type = TILE_TYPE_HOUSE;
-    game_struct.players[0].tiles[rand_pos].cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
-    game_struct.players[0].tiles[rand_pos].curent_cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
-    rand_pos = get_random_empty_tile_position(0);
-    game_struct.players[0].tiles[rand_pos].type = TILE_TYPE_FOREST;
-    game_struct.players[0].tiles[rand_pos].cooldown_timer = tile_type_properties[TILE_TYPE_FOREST].give_cooldown;
-    game_struct.players[0].tiles[rand_pos].curent_cooldown_timer = tile_type_properties[TILE_TYPE_FOREST].give_cooldown;
-    rand_pos = get_random_empty_tile_position(1);
-    game_struct.players[1].tiles[rand_pos].type = TILE_TYPE_HOUSE;
-    game_struct.players[1].tiles[rand_pos].cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
-    game_struct.players[1].tiles[rand_pos].curent_cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
-    rand_pos = get_random_empty_tile_position(1);
-    game_struct.players[1].tiles[rand_pos].type = TILE_TYPE_FOREST;
-    game_struct.players[1].tiles[rand_pos].cooldown_timer = tile_type_properties[TILE_TYPE_FOREST].give_cooldown;
-    game_struct.players[1].tiles[rand_pos].curent_cooldown_timer = tile_type_properties[TILE_TYPE_FOREST].give_cooldown;
-
-    game_struct.players[0].resources.wood = 2;
-    game_struct.players[0].resources.stone = 2;
-    game_struct.players[0].resources.wheat = 2;
-    game_struct.players[0].resources.soldiers = 0;
-    game_struct.players[0].resources.population = 2;
-    game_struct.players[1].resources.wood = 2;
-    game_struct.players[1].resources.stone = 2;
-    game_struct.players[1].resources.wheat = 2;
-    game_struct.players[1].resources.soldiers = 0;
-    game_struct.players[1].resources.population = 2;
 
     // next turn - ui list
     int32_t ui_list_id = new_ui_list_assign_id();
@@ -316,10 +272,10 @@ void enter_in_game() {
 }
 
 
-void switch_turn_button_callback(int32_t ui_list_id, int32_t button_id) {
+static void switch_turn_button_callback(int32_t ui_list_id, int32_t button_id) {
     request_switch_turn();
 }
-void exit_in_game_callback(int32_t ui_list_id, int32_t button_id) {
+static void exit_in_game_callback(int32_t ui_list_id, int32_t button_id) {
     if (game_struct.game_ended == 1) {
         exit_game_button_callback(-1,-1);
         return;

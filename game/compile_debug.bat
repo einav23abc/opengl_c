@@ -21,9 +21,13 @@ gcc ^
     code/render.c ^
     code/handle_event.c ^
     code/clean.c ^
+    code/pages/scrolled_background.c ^
     code/pages/in_game/page.c ^
+    code/pages/in_game/against_ai.c ^
+    code/pages/in_game/against_connected.c ^
     code/pages/in_game/init.c ^
     code/pages/in_game/enter.c ^
+    code/pages/in_game/exit.c ^
     code/pages/in_game/update.c ^
     code/pages/in_game/render.c ^
     code/pages/in_game/mouse_press.c ^
@@ -31,6 +35,13 @@ gcc ^
     code/pages/main_menu/render.c ^
     code/pages/how_to_play/enter.c ^
     code/pages/how_to_play/render.c ^
+    code/pages/play/enter.c ^
+    code/pages/play/render.c ^
+    code/pages/open_lan/enter.c ^
+    code/pages/open_lan/render.c ^
+    code/pages/join_lan/enter.c ^
+    code/pages/join_lan/render.c ^
+    code/pages/join_lan/key_press.c ^
     -o ../export/a_scaled_affair_debug.exe ^
     -L"../engine" -l "engine_debug" ^
     -l "SDL2main" ^
@@ -39,6 +50,7 @@ gcc ^
     -l "SDL2_image" ^
     -l "SDL2_mixer" ^
     -l "libpng16-16" ^
+    -l "Ws2_32" ^
     -D DEBUG_MODE ^
     -D DEBUG_SOFT_MODE ^
     -g

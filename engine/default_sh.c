@@ -1,4 +1,5 @@
 static char default_frag_arr[] =
+"   #version 150\n"
 "	// simple passthrough shader	\n"
 "		\n"
 "	//varying vec3 v_position;	\n"
@@ -13,6 +14,7 @@ static char default_frag_arr[] =
 static char* default_frag = default_frag_arr;
 
 static char default_vert_arr[] =
+"   #version 150\n"
 "	// simple passthrough shader	\n"
 "		\n"
 "	in vec3 in_vertex_position;	\n"

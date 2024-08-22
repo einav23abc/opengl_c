@@ -193,6 +193,13 @@ int32_t receive_from_socket(socket_t* sock, char* buffer, int32_t buffer_length)
 }
 
 
+int32_t get_socket_ip(socket_t* sock) {
+    struct sockaddr name;
+    int32_t namelen = sizeof(struct sockaddr);
+    getsockname(sock->sock, &name, &namelen);
+    return ntohl(((struct sockaddr_in*)&name)->sin_addr.S_un.S_addr);
+}
+
 int32_t get_socket_connect_time(socket_t* sock) {
     int32_t connect_time;
     int32_t optlen;
@@ -209,6 +216,30 @@ int32_t get_socket_recieve_time_out(socket_t* sock) {
 
 int32_t set_socket_recieve_time_out(socket_t* sock, int32_t timeout) {
     return setsockopt(sock->sock, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(timeout));
+}
+
+int32_t ipstring_from_ipuint(char* str_buf, uint32_t ipaddr) {
+    uint8_t c = 0;
+    for (int8_t b = 3; b >= 0; b--) {
+        uint8_t ipaddrbyte = ((uint8_t*)&ipaddr)[b];
+        if (ipaddrbyte >= 100) {
+            str_buf[c] = '0' + (ipaddrbyte / 100);
+            c += 1;
+        }
+        if (ipaddrbyte >= 10) {
+            str_buf[c] = '0' + ((ipaddrbyte % 100) / 10);
+            c += 1;
+        }
+        str_buf[c] = '0' + (ipaddrbyte % 10);
+        c += 1;
+
+        if (b != 0) {
+            str_buf[c] = '.';
+            c += 1;
+        }
+    }
+    str_buf[c] = '\0';
+    return c;
 }
 
 

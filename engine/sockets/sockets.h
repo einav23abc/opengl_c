@@ -63,7 +63,7 @@ int32_t init_sockets();
  * 
  * The socket should be destroyed when irelevent by calling `destroy_socket(socket_t*)` or `clean_sockets()`.
  * 
- * \param ipaddr The socket's IPv4 address.
+ * \param ipaddr The socket's IPv4 address after htonl call
  * 
  * \param port The socket's port.
  * 
@@ -179,6 +179,10 @@ int32_t receive_from_socket(socket_t* sock, char* buffer, int32_t buffer_length)
  */
 int32_t get_socket_connect_time(socket_t* sock);
 
+/* \returns The IP address of the socket.
+ */
+int32_t get_socket_ip(socket_t* sock);
+
 /* \returns The timeout, in milliseconds, for blocking receive calls (`receive_from_socket`), Or `SOCKET_ERROR` on failure.
  * 
  * The default timeout is zero, which indicates that a receive operation will not time out.
@@ -192,6 +196,17 @@ int32_t get_socket_recieve_time_out(socket_t* sock);
  * \returns `0` If no error occurs, Otherwise, a value of `SOCKET_ERROR` is returned.
  */
 int32_t set_socket_recieve_time_out(socket_t* sock, int32_t timeout);
+
+
+/* \brief Convert a uint32_t to a IPv4 dotted-decimal address string representing it.
+ *
+ * \param str_buf A char buffer the string will be written to. Minimum length 16.
+ * 
+ * \param ipaddr The uint32_t ip address.
+ * 
+ * \returns The length of the written string.
+ */
+int32_t ipstring_from_ipuint(char* str_buf, uint32_t ipaddr);
 
 
 /* \brief Destroys a socket.

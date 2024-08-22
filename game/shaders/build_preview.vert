@@ -1,3 +1,5 @@
+#version 150
+
 in vec3 in_vertex_position;
 in vec2 in_vertex_texcoord;
 

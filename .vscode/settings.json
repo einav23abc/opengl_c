@@ -19,6 +19,10 @@
         "sounds.h": "c",
         "textures.h": "c",
         "billboards.h": "c",
-        "ui_lists.h": "c"
+        "ui_lists.h": "c",
+        "game.h": "c",
+        "scrolled_background.h": "c",
+        "sstream": "c",
+        "against_ai.h": "c"
     }
 }
