@@ -25,7 +25,7 @@ uvec2_t get_alert_box_pos(int32_t i) {
     float x = 0;
     float y = 0;
     if (alerts[i].box_pos_from_world_pos == 1) {
-        vec2_t screen_cord = outport_space_position_from_world_space(vec3(alerts[i].box_world_pos_x, alerts[i].box_world_pos_y, alerts[i].box_world_pos_z));
+        vec2_t screen_cord = outport_space_position_from_world_space(outport_fbo, camera, vec3(alerts[i].box_world_pos_x, alerts[i].box_world_pos_y, alerts[i].box_world_pos_z));
         x = screen_cord.x;
         y = screen_cord.y;
     }
@@ -53,7 +53,7 @@ uvec2_t get_alert_box_pos_padded(int32_t i) {
     return box_pos;
 }
 void add_error_alert_at_cursor(char* string) {
-    vec2_t mouse_outport_space_position = get_mouse_outport_space_position();
+    vec2_t mouse_outport_space_position = get_mouse_outport_space_position(outport_fbo);
 
     uvec2_t string_size = get_str_boxed_size(&letters_font, string, letters_font.letter_height);
 

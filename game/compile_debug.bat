@@ -20,6 +20,16 @@ gcc ^
     code/render.c ^
     code/handle_event.c ^
     code/clean.c ^
+    code/pages/in_game/page.c ^
+    code/pages/in_game/init.c ^
+    code/pages/in_game/enter.c ^
+    code/pages/in_game/update.c ^
+    code/pages/in_game/render.c ^
+    code/pages/in_game/mouse_press.c ^
+    code/pages/main_menu/enter.c ^
+    code/pages/main_menu/render.c ^
+    code/pages/how_to_play/enter.c ^
+    code/pages/how_to_play/render.c ^
     -o ../export/a_scaled_affair_debug.exe ^
     -L"../engine" -l "engine_debug" ^
     -l "SDL2main" ^

@@ -367,6 +367,15 @@ void engine_clean() {
     audio_clean();
 
     SDL_GL_DeleteContext(context);
+    #ifdef DEBUG_SOFT_MODE
+    printf("deleted context successfully\n");
+    #endif
     SDL_DestroyWindow(window);
+    #ifdef DEBUG_SOFT_MODE
+    printf("destroyed window successfully\n");
+    #endif
     SDL_Quit();
+    #ifdef DEBUG_SOFT_MODE
+    printf("quit SDL successfully\n");
+    #endif
 }

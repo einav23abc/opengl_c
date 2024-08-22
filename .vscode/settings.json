@@ -11,6 +11,7 @@
         "nine_slices.h": "c",
         "shaders.h": "c",
         "netframe.h": "c",
-        "meshes.h": "c"
+        "meshes.h": "c",
+        "page.h": "c"
     }
 }
