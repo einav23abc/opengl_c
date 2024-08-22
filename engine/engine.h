@@ -13,6 +13,8 @@
 
 #include "engine_config.h"
 #include "threads/threads.h"
+#include "sockets/sockets.h"
+#include "netframe/netframe.h"
 #include "audio/audio.h"
 #include "utils/utils.h"
 #include "vec_mat_quat/vec_mat_quat.h"

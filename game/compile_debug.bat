@@ -4,22 +4,22 @@
 cd /D "%~dp0"
 
 gcc ^
-    engine_config.c ^
-    game.c ^
-    meshes.c ^
-    shaders.c ^
-    textures.c ^
-    sounds.c ^
-    nine_slices.c ^
-    fonts.c ^
-    billboards.c ^
-    ui_lists.c ^
-    alerts.c ^
-    init.c ^
-    update.c ^
-    render.c ^
-    handle_event.c ^
-    clean.c ^
+    code/engine_config.c ^
+    code/game.c ^
+    code/meshes.c ^
+    code/shaders.c ^
+    code/textures.c ^
+    code/sounds.c ^
+    code/nine_slices.c ^
+    code/fonts.c ^
+    code/billboards.c ^
+    code/ui_lists.c ^
+    code/alerts.c ^
+    code/init.c ^
+    code/update.c ^
+    code/render.c ^
+    code/handle_event.c ^
+    code/clean.c ^
     -o ../export/a_scaled_affair_debug.exe ^
     -L"../engine" -l "engine_debug" ^
     -l "SDL2main" ^

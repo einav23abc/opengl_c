@@ -9,6 +9,9 @@ gcc ^
     engine_config.c ^
     engine.c ^
     threads/threads.c ^
+    sockets/sockets.c ^
+    netframe/netframe_client.c ^
+    netframe/netframe_server.c ^
     audio/audio.c ^
     utils/utils.c ^
     vec_mat_quat/vec_mat_quat.c ^
@@ -29,6 +32,9 @@ gcc ^
     engine_config.c ^
     engine.c ^
     threads/threads.c ^
+    sockets/sockets.c ^
+    netframe/netframe_client.c ^
+    netframe/netframe_server.c ^
     audio/audio.c ^
     utils/utils.c ^
     vec_mat_quat/vec_mat_quat.c ^
@@ -51,6 +57,9 @@ gcc ^
     engine_config.c ^
     engine.c ^
     threads/threads.c ^
+    sockets/sockets.c ^
+    netframe/netframe_client.c ^
+    netframe/netframe_server.c ^
     audio/audio.c ^
     utils/utils.c ^
     vec_mat_quat/vec_mat_quat.c ^
@@ -62,6 +71,7 @@ gcc ^
     simple_draw_module/simple_draw_module.c ^
     -D DEBUG_MODE ^
     -D DEBUG_SOFT_MODE ^
+    -D NETFRAME_DEBUG ^
     -c ^
     -g
 

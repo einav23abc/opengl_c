@@ -9,6 +9,8 @@
         "billboard.h": "c",
         "sdl.h": "c",
         "nine_slices.h": "c",
-        "shaders.h": "c"
+        "shaders.h": "c",
+        "netframe.h": "c",
+        "meshes.h": "c"
     }
 }
