@@ -1,4 +1,7 @@
 #include "update.h"
+#include "../../sounds.h"
+#include "../../ui_lists.h"
+#include "../../alerts.h"
 
 
 void update_in_game() {

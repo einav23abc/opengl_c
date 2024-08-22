@@ -1,4 +1,10 @@
 #include "render.h"
+#include "../../shaders.h"
+#include "../../meshes.h"
+#include "../../textures.h"
+#include "../../billboards.h"
+#include "../../ui_lists.h"
+#include "../../alerts.h"
 
 void render_in_game() {
     // <sun shadow map>

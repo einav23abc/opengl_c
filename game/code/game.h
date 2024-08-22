@@ -6,18 +6,6 @@
 
 #include "../../engine/engine.h"
 
-#include "meshes.h"
-#include "shaders.h"
-#include "textures.h"
-#include "sounds.h"
-
-#include "spaces.h"
-#include "nine_slices.h"
-#include "fonts.h"
-#include "billboards.h"
-#include "ui_lists.h"
-#include "alerts.h"
-
 
 #define _OUTPORT_WIDTH_ (380*2)
 #define _OUTPORT_HEIGHT_ (260*2)
@@ -27,7 +15,6 @@
 #define _OUTPORT_BACKGROUND_COLOR_B_ (107.0/255)
 
 #define PAGES_AMOUNT (3)
-
 
 
 enum PAGE_NAMES {
@@ -48,13 +35,6 @@ extern int32_t page;
 extern page_t pages[PAGES_AMOUNT];
 
 extern fbo_t* outport_fbo;
-
-extern nine_slice_t nine_slice1;
-extern nine_slice_t nine_slice2;
-extern nine_slice_t nine_slice3;
-
-extern font_t letters_font;
-extern font_t big_letters_font;
 
 extern camera_t* ui_camera;
 

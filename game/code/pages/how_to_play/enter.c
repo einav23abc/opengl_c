@@ -1,4 +1,6 @@
 #include "enter.h"
+#include "../../ui_lists.h"
+#include "../../alerts.h"
 
 void enter_how_to_play() {
     close_all_ui_lists();

@@ -1,4 +1,11 @@
 #include "page.h"
+#include "../../shaders.h"
+#include "../../textures.h"
+#include "../../meshes.h"
+#include "../../nine_slices.h"
+#include "../../ui_lists.h"
+#include "../../alerts.h"
+
 
 void render_how_to_play() {
     glDisable(GL_DEPTH_TEST);

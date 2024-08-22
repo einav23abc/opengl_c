@@ -1,4 +1,9 @@
 #include "page.h"
+#include "../../shaders.h"
+#include "../../textures.h"
+#include "../../meshes.h"
+#include "../../ui_lists.h"
+#include "../../alerts.h"
 
 void render_main_menu() {
     glDisable(GL_DEPTH_TEST);

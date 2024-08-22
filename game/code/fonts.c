@@ -1,5 +1,33 @@
 #include "fonts.h"
 
+#include "textures.h"
+#include "meshes.h"
+#include "shaders.h"
+
+font_t letters_font;
+font_t big_letters_font;
+
+void fonts_init() {
+    // <letters_font>
+        letters_font = (font_t){
+            .font_texture = letters_font_texture,
+            .letters_in_row = 16,
+            .letters_in_col = 10,
+            .letter_width = 6,
+            .letter_height = 12
+        };
+    // </letters_font>
+
+    // <big_letters_font>
+        big_letters_font = (font_t){
+            .font_texture = big_letters_font_texture,
+            .letters_in_row = 16,
+            .letters_in_col = 10,
+            .letter_width = 12,
+            .letter_height = 24
+        };
+    // </big_letters_font>
+}
 float draw_string(font_t font, char* str, vec3_t pos, quat_t rot, float height, float color_r, float color_b, float color_g) {
     int32_t string_len = min(strlen(str), _MAX_TEXT_ROW_LENGTH);
 

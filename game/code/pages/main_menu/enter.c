@@ -1,4 +1,6 @@
 #include "enter.h"
+#include "../../ui_lists.h"
+#include "../../alerts.h"
 
 
 void enter_main_menu() {

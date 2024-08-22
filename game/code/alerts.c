@@ -1,4 +1,6 @@
 #include "alerts.h"
+#include "game.h"
+#include "spaces.h"
 
 alert_t alerts[_MAX_ALERTS_AMOUNT_];
 

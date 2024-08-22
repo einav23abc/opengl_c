@@ -1,4 +1,8 @@
 #include "page.h"
+#include "../../sounds.h"
+#include "../../spaces.h"
+#include "../../ui_lists.h"
+#include "../../alerts.h"
 
 
 tile_type_t tile_type_properties[_TILE_TYPES_AMOUNT_];

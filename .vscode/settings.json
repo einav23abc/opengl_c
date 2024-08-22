@@ -12,6 +12,13 @@
         "shaders.h": "c",
         "netframe.h": "c",
         "meshes.h": "c",
-        "page.h": "c"
+        "page.h": "c",
+        "fonts.h": "c",
+        "spaces.h": "c",
+        "update.h": "c",
+        "sounds.h": "c",
+        "textures.h": "c",
+        "billboards.h": "c",
+        "ui_lists.h": "c"
     }
 }

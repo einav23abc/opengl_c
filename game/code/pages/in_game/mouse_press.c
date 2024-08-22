@@ -1,4 +1,7 @@
 #include "page.h"
+#include "../../sounds.h"
+#include "../../ui_lists.h"
+#include "../../alerts.h"
 
 
 void mouse_press_in_game() {
@@ -93,7 +96,7 @@ void mouse_press_in_game() {
             ui_lists[ui_list_id] = (ui_list_t){
                 .active = 1,
                 .permenant = 0,
-                
+
                 .hidden = 0,
 
                 .font = &letters_font,

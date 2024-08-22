@@ -1,7 +1,8 @@
 #ifndef ALERTS_H
 #define ALERTS_H
 
-#include "game.h"
+#include "../../engine/engine.h"
+#include "fonts.h"
 
 
 #define _MAX_ALERTS_AMOUNT_ (8)

@@ -1,5 +1,5 @@
 #include "game.h"
-
+#include "alerts.h"
 
 void update() {
     if (page >= 0 && page < PAGES_AMOUNT) {

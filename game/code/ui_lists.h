@@ -5,7 +5,6 @@
 #include "../../engine/engine.h"
 #include "nine_slices.h"
 #include "fonts.h"
-#include "game.h"
 
 
 #define _MAX_UI_LISTS_AMOUNT_ (12)

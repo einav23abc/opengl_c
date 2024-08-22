@@ -1,4 +1,6 @@
 #include "game.h"
+#include "sounds.h"
+#include "ui_lists.h"
 
 void handle_event() {
     switch(event.type) {

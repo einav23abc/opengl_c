@@ -1,4 +1,6 @@
 #include "ui_lists.h"
+#include "game.h"
+#include "spaces.h"
 
 ui_list_t ui_lists[_MAX_UI_LISTS_AMOUNT_];
 

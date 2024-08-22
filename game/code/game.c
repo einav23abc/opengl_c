@@ -36,13 +36,6 @@ int32_t page = -1;
 
 fbo_t* outport_fbo;
 
-nine_slice_t nine_slice1;
-nine_slice_t nine_slice2;
-nine_slice_t nine_slice3;
-
-font_t letters_font;
-font_t big_letters_font;
-
 camera_t* ui_camera;
 
 

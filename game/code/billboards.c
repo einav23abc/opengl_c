@@ -1,4 +1,6 @@
 #include "billboards.h"
+#include "meshes.h"
+#include "spaces.h"
 
 uvec2_t get_billboard_box_pos(billboard_t billboard) {
     float x = 0;

@@ -1,10 +1,20 @@
 #include "game.h"
+#include "meshes.h"
+#include "shaders.h"
+#include "textures.h"
+#include "sounds.h"
+#include "nine_slices.h"
+#include "fonts.h"
+#include "ui_lists.h"
+#include "alerts.h"
 
 uint8_t init() {
     game_meshes_init();
     game_shaders_init();
     game_textures_init();
     game_sounds_init();
+    nine_slices_init();
+    fonts_init();
 
     // <ui_cameras>
         ui_camera = create_camera(
@@ -19,49 +29,6 @@ uint8_t init() {
     // </ui_cameras>
 
     outport_fbo = create_fbo(_OUTPORT_WIDTH_, _OUTPORT_HEIGHT_, 1, GL_RGB, 4);
-
-    // <letters_font>
-        letters_font = (font_t){
-            .font_texture = letters_font_texture,
-            .letters_in_row = 16,
-            .letters_in_col = 10,
-            .letter_width = 6,
-            .letter_height = 12
-        };
-    // </letters_font>
-
-    // <big_letters_font>
-        big_letters_font = (font_t){
-            .font_texture = big_letters_font_texture,
-            .letters_in_row = 16,
-            .letters_in_col = 10,
-            .letter_width = 12,
-            .letter_height = 24
-        };
-    // </big_letters_font>
-
-    // <nine_slices>
-        nine_slice1 = (nine_slice_t){
-            .texture_width = 16,
-            .texture_height = 16,
-            .padding = 3,
-            .texture = nine_slice1_texture
-        };
-        
-        nine_slice2 = (nine_slice_t){
-            .texture_width = 16,
-            .texture_height = 16,
-            .padding = 3,
-            .texture = nine_slice2_texture
-        };
-        
-        nine_slice3 = (nine_slice_t){
-            .texture_width = 16,
-            .texture_height = 16,
-            .padding = 3,
-            .texture = nine_slice3_texture
-        };
-    // </nine_slices>
 
     for (int32_t i = 0; i < _MAX_UI_LISTS_AMOUNT_; i++) ui_lists[i].active = 0;
     for (int32_t i = 0; i < _MAX_ALERTS_AMOUNT_; i++) alerts[i].time_to_live = 0;

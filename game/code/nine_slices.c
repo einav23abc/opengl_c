@@ -1,4 +1,34 @@
 #include "nine_slices.h"
+#include "meshes.h"
+#include "shaders.h"
+#include "textures.h"
+
+nine_slice_t nine_slice1;
+nine_slice_t nine_slice2;
+nine_slice_t nine_slice3;
+
+void nine_slices_init() {
+    nine_slice1 = (nine_slice_t){
+        .texture_width = 16,
+        .texture_height = 16,
+        .padding = 3,
+        .texture = nine_slice1_texture
+    };
+    
+    nine_slice2 = (nine_slice_t){
+        .texture_width = 16,
+        .texture_height = 16,
+        .padding = 3,
+        .texture = nine_slice2_texture
+    };
+    
+    nine_slice3 = (nine_slice_t){
+        .texture_width = 16,
+        .texture_height = 16,
+        .padding = 3,
+        .texture = nine_slice3_texture
+    };
+}
 
 void draw_nine_slice(nine_slice_t nine_slice, int32_t x, int32_t y, int32_t width, int32_t height) {
     shader_t* last_shader = shaders_list[current_shader];
