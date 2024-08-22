@@ -6,16 +6,7 @@ uint8_t init() {
     game_textures_init();
     game_sounds_init();
 
-    // <cameras>
-        camera = create_camera(
-            0, 0, 0,
-            M_PI*1.8, -M_PI*0.15, 0,
-            380, 260, 1600,
-            -32000, 32000,
-            0, 60,
-            0, 0, _OUTPORT_WIDTH_, _OUTPORT_HEIGHT_
-        );
-
+    // <ui_cameras>
         ui_camera = create_camera(
             _OUTPORT_WIDTH_*0.5, _OUTPORT_HEIGHT_*0.5, 0,
             0, 0, 0,
@@ -25,24 +16,9 @@ uint8_t init() {
             0, 0, _OUTPORT_WIDTH_, _OUTPORT_HEIGHT_
         );
         ui_camera->active = 0;
-    // </cameras>
+    // </ui_cameras>
 
-    // <sun shadow map>
-        sun_shadow_map_camera = create_camera(
-            0, 0, 0,
-            M_PI*1.8, M_PI*1.1, 0,
-            1080, 1080, 1600,
-            -32000, 32000,
-            0, 45,
-            0, 0, 3240, 3240
-        );
-    // </sun shadow map>
-
-    // <fbos>
-        outport_fbo = create_fbo(_OUTPORT_WIDTH_, _OUTPORT_HEIGHT_, 1, GL_RGB, 4);
-
-        sun_shadow_map_fbo = create_fbo(3240, 3240, 0, 0, 2);
-    // </fbos>
+    outport_fbo = create_fbo(_OUTPORT_WIDTH_, _OUTPORT_HEIGHT_, 1, GL_RGB, 4);
 
     // <letters_font>
         letters_font = (font_t){

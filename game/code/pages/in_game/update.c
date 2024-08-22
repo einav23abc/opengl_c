@@ -259,6 +259,7 @@ void tile_cooldowns_update() {
                             .box_world_pos_x = 0.5*_TILE_SIZE_ + x*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
                             .box_world_pos_y =   1*_TILE_SIZE_ + game_struct.players[i].y_current_translation,
                             .box_world_pos_z = 0.5*_TILE_SIZE_ + z*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_,
+                            .box_world_pos_camera = camera,
                             .x = 0,
                             .y = 0,
                             

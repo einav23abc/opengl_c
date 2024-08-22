@@ -115,6 +115,15 @@ extern int8_t in_tiles_translation;
 extern int32_t ai_action_cooldown;
 extern int8_t player1_ai_played;
 
+extern vec3_t camera_pos;
+extern camera_t* camera;
+
+extern float sun_vector_x;
+extern float sun_vector_y;
+extern float sun_vector_z;
+extern camera_t* sun_shadow_map_camera;
+extern fbo_t* sun_shadow_map_fbo;
+
 
 
 // <page functions>

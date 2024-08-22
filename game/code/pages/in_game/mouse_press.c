@@ -73,6 +73,7 @@ void mouse_press_in_game() {
                 .box_world_pos_x = selected_tile.x*_TILE_SIZE_ + game_struct.players[0].x_current_translation + _TILE_SIZE_*0.5,
                 .box_world_pos_y = game_struct.players[0].y_current_translation,
                 .box_world_pos_z = selected_tile.y*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_ + _TILE_SIZE_*0.5,
+                .box_world_pos_camera = camera,
                 .x = 0,
                 .y = 0,
 
@@ -92,7 +93,7 @@ void mouse_press_in_game() {
             ui_lists[ui_list_id] = (ui_list_t){
                 .active = 1,
                 .permenant = 0,
-
+                
                 .hidden = 0,
 
                 .font = &letters_font,
@@ -107,6 +108,7 @@ void mouse_press_in_game() {
                 .box_world_pos_x = selected_tile.x*_TILE_SIZE_ + game_struct.players[0].x_current_translation + _TILE_SIZE_*0.5,
                 .box_world_pos_y = game_struct.players[0].y_current_translation,
                 .box_world_pos_z = selected_tile.y*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_ + _TILE_SIZE_*0.5,
+                .box_world_pos_camera = camera,
                 .x = 0,
                 .y = 0,
 
@@ -151,6 +153,7 @@ void mouse_press_in_game() {
                 .box_world_pos_x = selected_tile.x*_TILE_SIZE_ + game_struct.players[1].x_current_translation + _TILE_SIZE_*0.5,
                 .box_world_pos_y = game_struct.players[1].y_current_translation,
                 .box_world_pos_z = selected_tile.y*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_ + _TILE_SIZE_*0.5,
+                .box_world_pos_camera = camera,
                 .x = 0,
                 .y = 0,
 

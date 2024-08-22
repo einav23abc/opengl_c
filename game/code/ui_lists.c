@@ -51,7 +51,7 @@ uvec2_t get_ui_list_box_pos(int32_t i) {
     float x = 0;
     float y = 0;
     if (ui_lists[i].box_pos_from_world_pos == 1) {
-        vec2_t screen_cord = outport_space_position_from_world_space(outport_fbo, camera, vec3(ui_lists[i].box_world_pos_x, ui_lists[i].box_world_pos_y, ui_lists[i].box_world_pos_z));
+        vec2_t screen_cord = fbo_view_position_from_world_position(outport_fbo, ui_lists[i].box_world_pos_camera, vec3(ui_lists[i].box_world_pos_x, ui_lists[i].box_world_pos_y, ui_lists[i].box_world_pos_z));
         x = screen_cord.x;
         y = screen_cord.y;
     }
@@ -73,7 +73,7 @@ uvec2_t get_ui_list_box_pos_padded(int32_t i) {
     return box_pos;
 }
 ivec3_t get_ui_list_inside_pos() {
-    vec2_t outport_space_position = get_mouse_outport_space_position(outport_fbo);
+    vec2_t outport_space_position = fbo_view_position_from_mouse_position(outport_fbo);
     
     for (int32_t i = 0; i < _MAX_UI_LISTS_AMOUNT_; i++) {
         if (ui_lists[i].active == 0) continue;

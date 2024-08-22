@@ -347,4 +347,27 @@ void init_in_game() {
             strcpy(tile_type_properties[i].demolish_info_string, demolish_info_string);
         }
     // </tile_type_properties>
+
+    camera = create_camera(
+        0, 0, 0,
+        M_PI*1.8, -M_PI*0.15, 0,
+        380, 260, 1600,
+        -32000, 32000,
+        0, 60,
+        0, 0, _OUTPORT_WIDTH_, _OUTPORT_HEIGHT_
+    );
+
+    // <sun shadow map>
+        sun_shadow_map_camera = create_camera(
+            0, 0, 0,
+            M_PI*1.8, M_PI*1.1, 0,
+            1080, 1080, 1600,
+            -32000, 32000,
+            0, 45,
+            0, 0, 3240, 3240
+        );
+        
+        sun_shadow_map_fbo = create_fbo(3240, 3240, 0, 0, 2);
+    // </sun shadow map>
+    
 }

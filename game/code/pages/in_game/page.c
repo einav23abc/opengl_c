@@ -21,6 +21,15 @@ int8_t in_tiles_translation;
 int32_t ai_action_cooldown;
 int8_t player1_ai_played;
 
+vec3_t camera_pos;
+camera_t* camera;
+
+float sun_vector_x;
+float sun_vector_y;
+float sun_vector_z;
+camera_t* sun_shadow_map_camera;
+fbo_t* sun_shadow_map_fbo;
+
 
 
 void player_translations_update() {
@@ -79,7 +88,7 @@ void player_translations_update() {
 }
 
 ivec2_t get_hovered_tile_position(uint8_t player_i) {
-    vec3_t world_space_position = get_mouse_world_space_position_at_y(outport_fbo, camera, game_struct.players[player_i].y_current_translation);
+    vec3_t world_space_position = world_position_at_y_from_mouse_position(outport_fbo, camera, game_struct.players[player_i].y_current_translation);
 
     return (ivec2_t){
         .x = (int32_t)floor((world_space_position.x - game_struct.players[player_i].x_current_translation)/_TILE_SIZE_),
@@ -150,7 +159,7 @@ void switch_turn() {
 }
 int32_t build_at_tile(int32_t player, int32_t tile_type_id, int32_t at_tile) {
     // dont build if not enough resources
-    if (has_enough_resources(1, tile_type_id) == 0) return 0;
+    if (has_enough_resources(player, tile_type_id) == 0) return 0;
 
     tile_type_t* tile_type = &(tile_type_properties[tile_type_id]);
     
@@ -433,15 +442,13 @@ void build_specific_button_callback(int32_t ui_list_id, int32_t button_id) {
 
     int32_t tile_type_id = button_id;
 
-    if (has_enough_resources(0, tile_type_id) == 0) {
+    if (build_at_tile(0, tile_type_id, selected_tile.y*_PLAYER_GRID_WIDTH_ + selected_tile.x) == 0) {
         // not enough resources
         audio_sound_play(error_sound);
         add_error_alert_at_cursor("Not enough resources");
         make_ui_list_safe(ui_list_id);
         return;
     }
-    
-    build_at_tile(0, tile_type_id, selected_tile.y*_PLAYER_GRID_WIDTH_ + selected_tile.x);
 
     close_unperm_ui_lists();
     // unselect tile
@@ -482,6 +489,7 @@ void build_button_callback(int32_t ui_list_id, int32_t button_id) {
         .box_world_pos_x = ui_lists[ui_list_id].box_world_pos_x,
         .box_world_pos_y = ui_lists[ui_list_id].box_world_pos_y,
         .box_world_pos_z = ui_lists[ui_list_id].box_world_pos_z,
+        .box_world_pos_camera = camera,
         .x = get_ui_list_width(ui_list_id) + ui_lists[ui_list_id].padding,
         .y = 0,
 
@@ -577,6 +585,7 @@ void demolish_sure_button_callback(int32_t ui_list_id, int32_t button_id) {
         .box_world_pos_x = 0.5*_TILE_SIZE_ + selected_tile.x*_TILE_SIZE_ + game_struct.players[0].x_current_translation,
         .box_world_pos_y =   1*_TILE_SIZE_ + game_struct.players[0].y_current_translation,
         .box_world_pos_z = 0.5*_TILE_SIZE_ + selected_tile.y*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_,
+        .box_world_pos_camera = camera,
         .x = 0,
         .y = 0,
         
@@ -626,6 +635,7 @@ void demolish_button_callback(int32_t ui_list_id, int32_t button_id) {
         .box_world_pos_x = ui_lists[ui_list_id].box_world_pos_x,
         .box_world_pos_y = ui_lists[ui_list_id].box_world_pos_y,
         .box_world_pos_z = ui_lists[ui_list_id].box_world_pos_z,
+        .box_world_pos_camera = camera,
         .x = get_ui_list_width(ui_list_id) + ui_lists[ui_list_id].padding,
         .y = 0,
 

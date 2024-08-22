@@ -10,6 +10,7 @@ gcc ^
     code/shaders.c ^
     code/textures.c ^
     code/sounds.c ^
+    code/spaces.c ^
     code/nine_slices.c ^
     code/fonts.c ^
     code/ui_lists.c ^

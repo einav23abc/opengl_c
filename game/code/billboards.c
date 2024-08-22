@@ -4,7 +4,7 @@ uvec2_t get_billboard_box_pos(billboard_t billboard) {
     float x = 0;
     float y = 0;
     if (billboard.box_pos_from_world_pos == 1) {
-        vec2_t screen_cord = outport_space_position_from_world_space(outport_fbo, camera, vec3(billboard.box_world_pos_x, billboard.box_world_pos_y, billboard.box_world_pos_z));
+        vec2_t screen_cord = fbo_view_position_from_world_position(outport_fbo, billboard.box_world_pos_camera, vec3(billboard.box_world_pos_x, billboard.box_world_pos_y, billboard.box_world_pos_z));
         x = screen_cord.x;
         y = screen_cord.y;
     }

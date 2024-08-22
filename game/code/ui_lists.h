@@ -36,6 +36,7 @@ typedef struct {
     float box_world_pos_x;
     float box_world_pos_y;
     float box_world_pos_z;
+    camera_t* box_world_pos_camera;
     // if box_pos_from_world_pos = 1, this is a screen-x translation
     int32_t x;
     // if box_pos_from_world_pos = 1, this is a screen-y translation

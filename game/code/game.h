@@ -11,6 +11,7 @@
 #include "textures.h"
 #include "sounds.h"
 
+#include "spaces.h"
 #include "nine_slices.h"
 #include "fonts.h"
 #include "billboards.h"
@@ -55,23 +56,12 @@ extern nine_slice_t nine_slice3;
 extern font_t letters_font;
 extern font_t big_letters_font;
 
-extern vec3_t camera_pos;
-extern camera_t* camera;
 extern camera_t* ui_camera;
-
-extern float sun_vector_x;
-extern float sun_vector_y;
-extern float sun_vector_z;
-extern camera_t* sun_shadow_map_camera;
-extern fbo_t* sun_shadow_map_fbo;
 
 
 void switch_page(int32_t page_i);
 
-vec2_t outport_space_position_from_world_space(fbo_t* fbo, camera_t* camera, vec3_t pos);
-vec2_t get_mouse_outport_space_position(fbo_t* fbo);
-vec2_t get_mouse_camera_space_position(fbo_t* fbo, camera_t* camera);
-vec3_t get_mouse_world_space_position_at_y(fbo_t* fbo, camera_t* camera, float at_y);
+
 
 
 #endif

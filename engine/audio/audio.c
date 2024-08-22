@@ -38,7 +38,13 @@ const int32_t AUDIO_CHUNKSIZE = _AUDIO_CHUNKSIZE_;
 
 
 void audio_init() {
-    SDL_Init(SDL_INIT_AUDIO);
+    if (SDL_WasInit(SDL_INIT_AUDIO) == 0) {
+        SDL_Init(SDL_INIT_AUDIO);
+    }else {
+        #ifdef DEBUG_SOFT_MODE
+        printf("not initialising SDL_AUDIO beacuse it was already initialised\n");
+        #endif
+    }
     Mix_Init(MIX_INIT_FLAC | MIX_INIT_MOD | MIX_INIT_MP3 | MIX_INIT_OGG | MIX_INIT_MID | MIX_INIT_OPUS | MIX_INIT_WAVPACK);
 
     if (Mix_OpenAudio(AUDIO_RATE, AUDIO_FORMAT, AUDIO_CHANNELS_AMOUNT, AUDIO_CHUNKSIZE)) {
