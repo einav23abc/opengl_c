@@ -6,21 +6,21 @@ void player_1_connected_turn() {
 
 // <netframe functions>
 
-server_packet_t generate_state_packet() {
+nf_packet_t generate_state_packet() {
     // started hosting and a client connected
     init_game_struct();
-    server_packet_t packet = (server_packet_t){
+    nf_packet_t packet = (nf_packet_t){
         .packet_len = 2,
         .client_id = -1,
         .packet_type = SERVER_STATE
     };
 }
 
-void parse_state_packet(server_packet_t packet) {
+void parse_state_packet(nf_packet_t packet) {
 
 }
 
-void parse_update_packet(server_packet_t packet) {
+void parse_update_packet(nf_packet_t packet) {
 
 }
 

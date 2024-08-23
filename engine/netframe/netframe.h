@@ -17,29 +17,45 @@
 #endif
 
 #ifndef _PACKET_MAX_LENGTH_
-#define _PACKET_MAX_LENGTH_ (128)
+#define _PACKET_MAX_LENGTH_ (2048)
 #endif
 #ifndef _PACKETS_STACK_LENGTH_
 #define _PACKETS_STACK_LENGTH_ (8)
 #endif
 
 #ifndef _CLIENTS_MAX_AMOUNT_
-#define _CLIENTS_MAX_AMOUNT_ (1)
+#define _CLIENTS_MAX_AMOUNT_ (10)
 #endif
 
 
 enum PACKET_TYPE {
+    /* States that an error ocoured when receiving a packet.
+     *
+     * An error code `0` means: Connection with socket ended.
+     * 
+     * An error code `1` means: Received a packet bigger then `_PACKET_MAX_LENGTH_`.
+     * 
+     * An error code `SOCKET_ERROR` means: Buffer from socket did not arrive.
+     * 
+     * \param packet_type `RECV_ERROR`.
+     * \param client_id Always `-1`.
+     * \param packet_body[0] The recv error code.
+     */
+    RECV_ERROR,
+
     /* Sent from the `client-out-socket`.
      *
      * Completes the connection.
      * 
      * \param packet_type `CLIENT_OUT_SOCKET_CONNECT`.
+     * \param client_id The id of the client that sent the packet
      * \param packet_body The `client ID` as `int8_t` that was issued by `SERVER_ASSIGNED_CLIENT_ID` to the `client-in-socket`.
      */
     CLIENT_OUT_SOCKET_CONNECT,
     /* Sent from the `client-out-socket`.
      * 
      * \param packet_type `CLIENT_UPDATE`.
+     * \param client_id The id of the client that sent the packet
      * \param packet_body The update.
      */
     CLIENT_UPDATE,
@@ -104,35 +120,20 @@ enum PACKET_TYPE {
     SERVER_CLIENT_UPDATE,
 };
 
-
 #pragma pack(1)
 typedef struct {
     int32_t packet_len;
-    char packet[_PACKET_MAX_LENGTH_];
-} packet_t;
+
+    union {
+        char packet[_PACKET_MAX_LENGTH_];
+        struct {
+            uint8_t packet_type;
+            int8_t client_id; // the client id refrencing
+            char packet_body[_PACKET_MAX_LENGTH_-2];
+        };
+    };
+} nf_packet_t;
 #pragma pack()
-
-#pragma pack(1)
-// packets sent from the client
-typedef struct {
-    int32_t packet_len;
-
-    uint8_t packet_type;
-    char packet_body[_PACKET_MAX_LENGTH_-1];
-} client_packet_t;
-#pragma pack()
-
-#pragma pack(1)
-// packets sent from the server
-typedef struct {
-    int32_t packet_len;
-
-    uint8_t packet_type;
-    int8_t client_id; // the client id the server is refrencing
-    char packet_body[_PACKET_MAX_LENGTH_-2];
-} server_packet_t;
-#pragma pack()
-
 
 
 /* Opens a server that listens and accept clients that connect with `join_server()`.
@@ -142,40 +143,16 @@ typedef struct {
  * Upon client connections the server will call to `generate_state_packet()` if it exists, And will send the
  * generated packet to the newly connected client, which will call to `parse_state_packet()` if it exists.
  * The state packet should contain all the data to reconstruct the shared object at the client, this will be
- * done by the `parse_state_packet()` function that is defined by the user. The `generate_state_packet()` should
- * also be defined by the user.
+ * done by the `parse_state_packet()` function that is defined by the framework's user. The `generate_state_packet()` should
+ * also be defined by the framework's user.
  * 
  * Clients (and the server) can send updates to their data by calling `send_update_packet()`. The server will
  * send the update packet to all clients (including itself) which will call `parse_update_packet()` if it exists.
  * The update packet should contail all the data to convert the clients' shared object to the server's object, this
- * will be done by the `parse_update_packet()` function that is defined by the user.
+ * will be done by the `parse_update_packet()` function that is defined by the framework's user.
  * 
  * When a client connects/disconnects the server will tell all clients which will call to `handle_client_connect()` or
- * `handle_client_disconnect()` or `handle_disconnect_as_client()` all defined by the user.
- * 
- * \param ipaddr The server's IPv4 address as uint32_t.
- * 
- * \returns 0 on success or 1 on failure.
- */
-int32_t open_server_ext(uint32_t ipaddr);
-
-/* Opens a server that listens and accept clients that connect with `join_server()`.
- * 
- * The server should be closed with `close_server()`
- * 
- * Upon client connections the server will call to `generate_state_packet()` if it exists, And will send the
- * generated packet to the newly connected client, which will call to `parse_state_packet()` if it exists.
- * The state packet should contain all the data to reconstruct the shared object at the client, this will be
- * done by the `parse_state_packet()` function that is defined by the user. The `generate_state_packet()` should
- * also be defined by the user.
- * 
- * Clients (and the server) can send updates to their data by calling `send_update_packet()`. The server will
- * send the update packet to all clients (including itself) which will call `parse_update_packet()` if it exists.
- * The update packet should contail all the data to convert the clients' shared object to the server's object, this
- * will be done by the `parse_update_packet()` function that is defined by the user.
- * 
- * When a client connects/disconnects the server will tell all clients which will call to `handle_client_connect()` or
- * `handle_client_disconnect()` or `handle_disconnect_as_client()` all defined by the user.
+ * `handle_client_disconnect()` or `handle_disconnect_as_client()` all defined by the framework's user.
  * 
  * \param ipv4addr The server's IPv4 dotted-decimal address string.
  * 
@@ -190,16 +167,16 @@ int32_t open_server(const char* ipv4addr);
  * Upon client connections the server will call to `generate_state_packet()` if it exists, And will send the
  * generated packet to the newly connected client, which will call to `parse_state_packet()` if it exists.
  * The state packet should contain all the data to reconstruct the shared object at the client, this will be
- * done by the `parse_state_packet()` function that is defined by the user. The `generate_state_packet()` should
- * also be defined by the user.
+ * done by the `parse_state_packet()` function that is defined by the framework's user. The `generate_state_packet()` should
+ * also be defined by the framework's user.
  * 
  * Clients (and the server) can send updates to their data by calling `send_update_packet()`. The server will
  * send the update packet to all clients (including itself) which will call `parse_update_packet()` if it exists.
  * The update packet should contail all the data to convert the clients' shared object to the server's object, this
- * will be done by the `parse_update_packet()` function that is defined by the user.
+ * will be done by the `parse_update_packet()` function that is defined by the framework's user.
  * 
  * When a client connects/disconnects the server will tell all clients which will call to `handle_client_connect()` or
- * `handle_client_disconnect()` or `handle_disconnect_as_client()` all defined by the user.
+ * `handle_client_disconnect()` or `handle_disconnect_as_client()` all defined by the framework's user.
  * 
  * \returns 0 on success or 1 on failure.
  */
@@ -222,16 +199,16 @@ void close_server();
  * Upon client connections the server will call to `generate_state_packet()` if it exists, And will send the
  * generated packet to the newly connected client, which will call to `parse_state_packet()` if it exists.
  * The state packet should contain all the data to reconstruct the shared object at the client, this will be
- * done by the `parse_state_packet()` function that is defined by the user. The `generate_state_packet()` should
- * also be defined by the user.
+ * done by the `parse_state_packet()` function that is defined by the framework's user. The `generate_state_packet()` should
+ * also be defined by the framework's user.
  * 
  * Clients (and the server) can send updates to their data by calling `send_update_packet()`. The server will
  * send the update packet to all clients (including itself) which will call `parse_update_packet()` if it exists.
  * The update packet should contail all the data to convert the clients' shared object to the server's object, this
- * will be done by the `parse_update_packet()` function that is defined by the user.
+ * will be done by the `parse_update_packet()` function that is defined by the framework's user.
  * 
  * When a client connects/disconnects the server will tell all clients which will call to `handle_client_connect()` or
- * `handle_client_disconnect()` or `handle_disconnect_as_client()` all defined by the user.
+ * `handle_client_disconnect()` or `handle_disconnect_as_client()` all defined by the framework's user.
  *
  * \param ipv4addr The server's IPv4 dotted-decimal address string.
  * 
@@ -248,12 +225,12 @@ void exit_server();
  * The server will send the update packet to all clients which will call `parse_update_packet()` if it exists.
  * The server will also call `parse_update_packet()` to allow it to act as a client too. The update packet should
  * contail all the data to convert the clients' shared object to the server's object, this will be done by
- * the `parse_update_packet()` function that is defined by the user.
+ * the `parse_update_packet()` function that is defined by the framework's user.
  * 
- * \param packet A client_packet_t created by the client. The packet should have a type of `CLIENT_UPDATE` and
- * should be parsable by `parse_update_packet()` (a user defined function).
+ * \param packet A nf_packet_t created by the client. The packet should have a type of `CLIENT_UPDATE` and
+ * should be parsable by `parse_update_packet()` (defined by the framework's user).
  */
-void send_update_packet(client_packet_t packet);
+void send_update_packet(nf_packet_t packet);
 
 
 /* Send an update packet to the server from the server pretending to be a client with id `-1`.
@@ -261,12 +238,13 @@ void send_update_packet(client_packet_t packet);
  * The server will send the update packet to all clients which will call `parse_update_packet()` if it exists.
  * The server will also call `parse_update_packet()` to allow it to act as a client too. The update packet should
  * contail all the data to convert the clients' shared object to the server's object, this will be done by
- * the `parse_update_packet()` function that is defined by the user.
+ * the `parse_update_packet()` function that is defined by the framework's user.
  * 
- * \param packet A client_packet_t created by the server. The packet should have a type of `CLIENT_UPDATE` and
- * should be parsable by `parse_update_packet()` (a user defined function).
+ * \param packet A nf_packet_t created by the server. The packet should have a type of `CLIENT_UPDATE` and
+ * should be parsable by `parse_update_packet()` (defined by the framework's user).
  */
-void send_update_packet_as_server(client_packet_t packet);
+void send_update_packet_as_server(nf_packet_t packet);
+
 
 // user defined functions:
 
@@ -280,9 +258,9 @@ void send_update_packet_as_server(client_packet_t packet);
  * 
  * This packet will be parsed by `parse_state_packet` if it was defined by the framework's user.
  * 
- * \returns A state-packet of type `server_packet_t`.
+ * \returns A state-packet of type `nf_packet_t`.
  */
-__attribute__((weak)) server_packet_t generate_state_packet();
+__attribute__((weak)) nf_packet_t generate_state_packet();
 
 /* \brief Parses a state-packet that was sent by the server.
  * 
@@ -292,7 +270,7 @@ __attribute__((weak)) server_packet_t generate_state_packet();
  * 
  * \param packet The state-packet.
  */
-__attribute__((weak)) void parse_state_packet(server_packet_t packet);
+__attribute__((weak)) void parse_state_packet(nf_packet_t packet);
 /* \brief Parse an update-packet that was sent by one of the clients (or the server) connected to the server.
  * 
  * The function will only be called it was defined by the framework's user.
@@ -301,7 +279,7 @@ __attribute__((weak)) void parse_state_packet(server_packet_t packet);
  * 
  * \param packet The update-packet.
  */
-__attribute__((weak)) void parse_update_packet(server_packet_t packet);
+__attribute__((weak)) void parse_update_packet(nf_packet_t packet);
 /* \brief Handle a connection of a new client to the server you are connected to.
  *
  * The function will only be called it was defined by the framework's user.
