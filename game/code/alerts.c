@@ -94,6 +94,30 @@ void add_error_alert_at_cursor(char* string) {
         .string = string
     };
 }
+void add_big_error_alert(char* string) {
+    audio_sound_play(error_sound);
+
+    vec2_t mouse_outport_space_position = fbo_view_position_from_mouse_position(outport_fbo);
+
+    uvec2_t string_size = get_str_boxed_size(&big_letters_font, string, big_letters_font.letter_height);
+    
+    alerts[0] = (alert_t){
+        .time_to_live = 3000,
+
+        .font = &big_letters_font,
+        .padding = 7,
+
+        .initial_time_to_live = 3000,
+        .y_full_transform = 0,
+        .easing_function = &ease_linear,
+
+        .box_pos_from_world_pos = 0,
+        .x = _OUTPORT_WIDTH_*0.5  - string_size.x*0.5,
+        .y = _OUTPORT_HEIGHT_*0.5 - string_size.y*0.5,
+
+        .string = string
+    };
+}
 void close_all_alerts() {
     for (int32_t i = 0; i < _MAX_ALERTS_AMOUNT_; i++) alerts[i].time_to_live = 0;
 }

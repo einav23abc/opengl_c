@@ -1,4 +1,5 @@
 #include "against_connected.h"
+#include "../../alerts.h"
 
 
 int32_t my_client_id;
@@ -36,8 +37,11 @@ nf_packet_t generate_state_packet() {
         .packet_type = SERVER_STATE,
         .client_id = -1
     };
-    memcpy(packet.packet_body, tile_positions, sizeof(tile_positions));
+    memcpy(&(packet.packet_body[0]),                               &game_struct.player_turn, sizeof(game_struct.player_turn));
+    packet.packet_len += sizeof(game_struct.player_turn);
+    memcpy(&(packet.packet_body[sizeof(game_struct.player_turn)]), tile_positions,           sizeof(tile_positions));
     packet.packet_len += sizeof(tile_positions);
+
     return packet;
 }
 
@@ -47,7 +51,8 @@ void parse_state_packet(nf_packet_t packet) {
     // set game_struct according to packet
     init_game_struct();
     int32_t tile_positions[4];
-    memcpy(tile_positions, packet.packet_body, sizeof(tile_positions));
+    memcpy(&game_struct.player_turn, &(packet.packet_body[0]),                               sizeof(game_struct.player_turn));
+    memcpy(tile_positions,           &(packet.packet_body[sizeof(game_struct.player_turn)]), sizeof(tile_positions));
     game_struct_set_starting_tiles(
         tile_positions[0],
         tile_positions[1],
@@ -58,7 +63,7 @@ void parse_state_packet(nf_packet_t packet) {
     player_t tmp_player = game_struct.players[0];
     game_struct.players[0] = game_struct.players[1];
     game_struct.players[1] = tmp_player;
-    game_struct.player_turn = !game_struct.player_turn;
+    game_struct.player_turn = 1-game_struct.player_turn;
 
     // send state packet arried confirmation
     nf_packet_t update_packet = (nf_packet_t){
@@ -145,12 +150,19 @@ void parse_update_packet(nf_packet_t packet) {
 
 void handle_client_disconnect(int32_t client_id) {
     if (page == PAGE_MAIN_MENU || next_page == PAGE_MAIN_MENU) return;
+    
 
     if (play_type == PLAY_TYPE_AGAINST_CLIENT) {
-        switch_page(PAGE_DISCONNECTED_FROM_CLIENT);
         #ifdef DEBUG_SOFT_MODE
         printf("client disconnected, closing server\n");
         #endif
+
+        if (game_struct.game_ended == 1) {
+            add_big_error_alert("Disconnected from client");
+        }else{
+            switch_page(PAGE_DISCONNECTED_FROM_CLIENT);
+        }
+        
         close_server();
     }
 }
@@ -159,10 +171,15 @@ void handle_disconnect_as_client() {
     if (page == PAGE_MAIN_MENU || next_page == PAGE_MAIN_MENU) return;
 
     if (play_type == PLAY_TYPE_AGAINST_HOST) {
-        switch_page(PAGE_DISCONNECTED_FROM_HOST);
         #ifdef DEBUG_SOFT_MODE
         printf("server disconnected\n");
         #endif
+
+        if (game_struct.game_ended == 1) {
+            add_big_error_alert("Disconnected from host");
+        }else {
+            switch_page(PAGE_DISCONNECTED_FROM_HOST);
+        }
     }
 }
 // </netframe functions>

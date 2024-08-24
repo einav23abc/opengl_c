@@ -10,7 +10,7 @@ void attemp_lan_join() {
 
     int32_t join_res = join_server(ip_input_string);
     if (join_res == -1) {
-        add_error_alert_at_cursor("Failed to join");
+        add_big_error_alert("Failed to join");
         return;
     }
     my_client_id = join_res;

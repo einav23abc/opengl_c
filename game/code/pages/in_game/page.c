@@ -27,7 +27,7 @@ fbo_t* sun_shadow_map_fbo;
 
 
 void init_game_struct() {
-    game_struct.player_turn = 0;
+    game_struct.player_turn = rand() % 2;
     game_struct.game_ended = 0;
 
     game_struct.players[0].wheight = 0;
