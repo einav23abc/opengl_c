@@ -12,7 +12,6 @@ gcc ^
     sockets/sockets.c ^
     netframe/netframe_client.c ^
     netframe/netframe_server.c ^
-    netframe/netframe_internal.c ^
     audio/audio.c ^
     utils/utils.c ^
     vec_mat_quat/vec_mat_quat.c ^
@@ -36,7 +35,6 @@ gcc ^
     sockets/sockets.c ^
     netframe/netframe_client.c ^
     netframe/netframe_server.c ^
-    netframe/netframe_internal.c ^
     audio/audio.c ^
     utils/utils.c ^
     vec_mat_quat/vec_mat_quat.c ^
@@ -62,7 +60,6 @@ gcc ^
     sockets/sockets.c ^
     netframe/netframe_client.c ^
     netframe/netframe_server.c ^
-    netframe/netframe_internal.c ^
     audio/audio.c ^
     utils/utils.c ^
     vec_mat_quat/vec_mat_quat.c ^

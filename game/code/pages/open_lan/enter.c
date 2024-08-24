@@ -1,4 +1,5 @@
 #include "page.h"
+#include "../in_game/against_connected.h"
 #include "../../ui_lists.h"
 #include "../../alerts.h"
 
@@ -9,8 +10,6 @@ static void main_menu_button_callback(int32_t ui_list_id, int32_t button_id);
 void enter_open_lan() {
     close_all_ui_lists();
     close_all_alerts();
-    
-    int32_t ui_list_id;
 
     if (open_server_local() != 0) {
         #ifdef DEBUG_SOFT_MODE
@@ -20,6 +19,10 @@ void enter_open_lan() {
         add_error_alert_at_cursor("Failed to open server locally.");
         return;
     }
+
+    // client id of server is `-1`
+    my_client_id = -1;
+    play_type = PLAY_TYPE_AGAINST_CLIENT;
     
     // <generate waiting for connetction message>
         char ip_string[16];
@@ -45,6 +48,8 @@ void enter_open_lan() {
         open_lan_waiting_for_connection_string[c] = '\0';
     // </generate waiting for connetction message>
 
+    
+    int32_t ui_list_id;
     
     // main menu
     ui_list_id = new_ui_list_assign_id();

@@ -15,5 +15,6 @@ extern int8_t ip_input_byte_current_number[4];
 void enter_join_lan();
 void render_join_lan();
 void key_press_join_lan();
+void attemp_lan_join();
 
 #endif

@@ -34,6 +34,12 @@ void enter_in_game() {
     // game struct ; if playing in LAN the game struct will be set by `generate_state_packet` or `parse_state_packet` 
     if (play_type == PLAY_TYPE_AGAINST_AI) {
         init_game_struct();
+        game_struct_set_starting_tiles(
+            get_random_empty_tile_position(0),
+            get_random_empty_tile_position(0),
+            get_random_empty_tile_position(1),
+            get_random_empty_tile_position(1)
+        );
     }
 
     if (play_type == PLAY_TYPE_AGAINST_AI) {
@@ -267,8 +273,6 @@ void enter_in_game() {
         .child_ui_list = -1,
         .parent_ui_list = -1
     };
-
-    page = PAGE_IN_GAME;
 }
 
 

@@ -1,6 +1,7 @@
 #include "alerts.h"
 #include "game.h"
 #include "spaces.h"
+#include "sounds.h"
 
 alert_t alerts[_MAX_ALERTS_AMOUNT_];
 
@@ -55,6 +56,8 @@ uvec2_t get_alert_box_pos_padded(int32_t i) {
     return box_pos;
 }
 void add_error_alert_at_cursor(char* string) {
+    audio_sound_play(error_sound);
+
     vec2_t mouse_outport_space_position = fbo_view_position_from_mouse_position(outport_fbo);
 
     uvec2_t string_size = get_str_boxed_size(&letters_font, string, letters_font.letter_height);

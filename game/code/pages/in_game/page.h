@@ -119,13 +119,13 @@ extern fbo_t* sun_shadow_map_fbo;
 // <page functions>
 void init_in_game();
 void enter_in_game();
-void exit_in_game();
 void update_in_game();
 void render_in_game();
 void mouse_press_in_game();
 // </page functions>
 
 void init_game_struct();
+void game_struct_set_starting_tiles(int32_t tile1_pos, int32_t tile2_pos, int32_t tile3_pos, int32_t tile4_pos);
 
 void player_translations_update();
 
@@ -136,7 +136,8 @@ int32_t has_enough_resources(int32_t player_id, int32_t tile_type_id);
 void request_switch_turn();
 void switch_turn();
 int32_t build_at_tile(int32_t player, int32_t tile_type_id, int32_t at_tile);
-void attack_tile(int32_t player_attacked, int32_t at_tile);
+int32_t attack_tile(int32_t player_attacked, int32_t at_tile);
+void demolish_tile(int32_t player, int32_t at_tile);
 
 void player_1_turn();
 tile_types_amount_sorted_t get_tile_types_amounts_sorted(int32_t player);

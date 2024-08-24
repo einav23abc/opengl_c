@@ -6,13 +6,11 @@
 
 void mouse_press_in_game() {
     if (game_struct.game_ended == 1) {
-        audio_sound_play(error_sound);
         add_error_alert_at_cursor("The game has ended");
         return;
     }
     
     if (game_struct.player_turn == 1) {
-        audio_sound_play(error_sound);
         add_error_alert_at_cursor("It is not your turn");
         return;
     }

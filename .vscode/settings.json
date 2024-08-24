@@ -23,6 +23,15 @@
         "game.h": "c",
         "scrolled_background.h": "c",
         "sstream": "c",
-        "against_ai.h": "c"
+        "against_ai.h": "c",
+        "system_error": "c",
+        "against_connected.h": "c",
+        "array": "c",
+        "functional": "c",
+        "scoped_allocator": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c",
+        "message_page_enter.h": "c"
     }
 }

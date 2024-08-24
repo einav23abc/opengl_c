@@ -14,16 +14,19 @@
 #define _OUTPORT_BACKGROUND_COLOR_G_ (65.0/255)
 #define _OUTPORT_BACKGROUND_COLOR_B_ (107.0/255)
 
-#define PAGES_AMOUNT (6)
+#define PAGES_AMOUNT (9)
 
-enum PAGE_NAMES {
+typedef enum {
     PAGE_IN_GAME,
     PAGE_MAIN_MENU,
     PAGE_HOW_TO_PLAY,
     PAGE_PLAY,
     PAGE_OPEN_LAN,
-    PAGE_JOIN_LAN
-};
+    PAGE_JOIN_LAN,
+    PAGE_JOINING_GAME,
+    PAGE_DISCONNECTED_FROM_HOST,
+    PAGE_DISCONNECTED_FROM_CLIENT
+} PAGE_NAMES;
 typedef struct {
     void(*init)(void);
     void(*enter)(void);
@@ -34,15 +37,16 @@ typedef struct {
     void(*key_press)(void);
 } page_t;
 
-extern int32_t page;
 extern page_t pages[PAGES_AMOUNT];
+extern PAGE_NAMES page;
+extern PAGE_NAMES next_page;
 
 extern fbo_t* outport_fbo;
 
 extern camera_t* ui_camera;
 
 
-void switch_page(int32_t page_i);
+void switch_page(PAGE_NAMES page);
 
 
 

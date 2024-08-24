@@ -10,6 +10,8 @@ void enter_join_lan() {
     close_all_ui_lists();
     close_all_alerts();
     
+    play_type = PLAY_TYPE_AGAINST_HOST;
+    
     int32_t ui_list_id;
 
     // main menu
@@ -75,19 +77,5 @@ static void main_menu_button_callback(int32_t ui_list_id, int32_t button_id) {
     switch_page(PAGE_MAIN_MENU);
 }
 static void join_button_callback(int32_t ui_list_id, int32_t button_id) {
-    if (ip_input_current_byte < 3 || ip_input_byte_current_number[3] == 0) {
-        add_error_alert_at_cursor("Invalid ip address");
-        return;
-    }
-
-    int32_t join_res = join_server(ip_input_string);
-    if (join_res == -1) {
-        add_error_alert_at_cursor("Failed to join");
-        return;
-    }
-    
-    // play_type = PLAY_TYPE_AGAINST_HOST;
-    // switch_page(PAGE_IN_GAME);
-
-    exit_server();
+    attemp_lan_join();
 }

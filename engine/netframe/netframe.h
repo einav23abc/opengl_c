@@ -17,32 +17,18 @@
 #endif
 
 #ifndef _PACKET_MAX_LENGTH_
-#define _PACKET_MAX_LENGTH_ (2048)
+#define _PACKET_MAX_LENGTH_ (128)
 #endif
 #ifndef _PACKETS_STACK_LENGTH_
 #define _PACKETS_STACK_LENGTH_ (8)
 #endif
 
 #ifndef _CLIENTS_MAX_AMOUNT_
-#define _CLIENTS_MAX_AMOUNT_ (10)
+#define _CLIENTS_MAX_AMOUNT_ (1)
 #endif
 
 
 enum PACKET_TYPE {
-    /* States that an error ocoured when receiving a packet.
-     *
-     * An error code `0` means: Connection with socket ended.
-     * 
-     * An error code `1` means: Received a packet bigger then `_PACKET_MAX_LENGTH_`.
-     * 
-     * An error code `SOCKET_ERROR` means: Buffer from socket did not arrive.
-     * 
-     * \param packet_type `RECV_ERROR`.
-     * \param client_id Always `-1`.
-     * \param packet_body[0] The recv error code.
-     */
-    RECV_ERROR,
-
     /* Sent from the `client-out-socket`.
      *
      * Completes the connection.
@@ -187,6 +173,9 @@ int32_t open_server_local();
 uint32_t get_server_ip();
 
 /* Closes a server opened by `open_server()` or `open_server_local()`.
+ *
+ * If `close_server` is called from within a user-defined netframe function,
+ * The function will not continue executing after the call beacuse the thread will be terminated.
  *
  * All connected clients will be disconnected.
  */

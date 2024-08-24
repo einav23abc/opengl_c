@@ -72,6 +72,10 @@ void key_press_join_lan() {
 
             break;
         }
+        case SDL_SCANCODE_RETURN: {
+            attemp_lan_join();
+            break;
+        }
         default:
             add_error_alert_at_cursor("Enter a IP - numbers and periods only");
             break;

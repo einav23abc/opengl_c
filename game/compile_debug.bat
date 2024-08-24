@@ -22,12 +22,12 @@ gcc ^
     code/handle_event.c ^
     code/clean.c ^
     code/pages/scrolled_background.c ^
+    code/pages/message_page_enter.c ^
     code/pages/in_game/page.c ^
     code/pages/in_game/against_ai.c ^
     code/pages/in_game/against_connected.c ^
     code/pages/in_game/init.c ^
     code/pages/in_game/enter.c ^
-    code/pages/in_game/exit.c ^
     code/pages/in_game/update.c ^
     code/pages/in_game/render.c ^
     code/pages/in_game/mouse_press.c ^
@@ -39,9 +39,14 @@ gcc ^
     code/pages/play/render.c ^
     code/pages/open_lan/enter.c ^
     code/pages/open_lan/render.c ^
+    code/pages/join_lan/page.c ^
     code/pages/join_lan/enter.c ^
     code/pages/join_lan/render.c ^
     code/pages/join_lan/key_press.c ^
+    code/pages/joining_game/enter.c ^
+    code/pages/joining_game/render.c ^
+    code/pages/disconnected_from_host/render.c ^
+    code/pages/disconnected_from_client/render.c ^
     -o ../export/a_scaled_affair_debug.exe ^
     -L"../engine" -l "engine_debug" ^
     -l "SDL2main" ^
