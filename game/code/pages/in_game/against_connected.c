@@ -20,18 +20,9 @@ nf_packet_t generate_state_packet() {
 
     // create state packet of game_struct
     init_game_struct();
-    int32_t tile_positions[4] = {
-        get_random_empty_tile_position(0),
-        get_random_empty_tile_position(0),
-        get_random_empty_tile_position(1),
-        get_random_empty_tile_position(1)
-    };
-    game_struct_set_starting_tiles(
-        tile_positions[0],
-        tile_positions[1],
-        tile_positions[2],
-        tile_positions[3]
-    );
+    int32_t starting_tile_positions[4];
+    generate_starting_tile_positions(starting_tile_positions);
+    game_struct_set_starting_tiles(starting_tile_positions);
     nf_packet_t packet = (nf_packet_t){
         .packet_len = 2,
         .packet_type = SERVER_STATE,
@@ -39,8 +30,8 @@ nf_packet_t generate_state_packet() {
     };
     memcpy(&(packet.packet_body[0]),                               &game_struct.player_turn, sizeof(game_struct.player_turn));
     packet.packet_len += sizeof(game_struct.player_turn);
-    memcpy(&(packet.packet_body[sizeof(game_struct.player_turn)]), tile_positions,           sizeof(tile_positions));
-    packet.packet_len += sizeof(tile_positions);
+    memcpy(&(packet.packet_body[sizeof(game_struct.player_turn)]), starting_tile_positions,  sizeof(starting_tile_positions));
+    packet.packet_len += sizeof(starting_tile_positions);
 
     return packet;
 }
@@ -50,15 +41,10 @@ void parse_state_packet(nf_packet_t packet) {
 
     // set game_struct according to packet
     init_game_struct();
-    int32_t tile_positions[4];
+    int32_t starting_tile_positions[4];
     memcpy(&game_struct.player_turn, &(packet.packet_body[0]),                               sizeof(game_struct.player_turn));
-    memcpy(tile_positions,           &(packet.packet_body[sizeof(game_struct.player_turn)]), sizeof(tile_positions));
-    game_struct_set_starting_tiles(
-        tile_positions[0],
-        tile_positions[1],
-        tile_positions[2],
-        tile_positions[3]
-    );
+    memcpy(starting_tile_positions,  &(packet.packet_body[sizeof(game_struct.player_turn)]), sizeof(starting_tile_positions));
+    game_struct_set_starting_tiles(starting_tile_positions);
     // flip players
     player_t tmp_player = game_struct.players[0];
     game_struct.players[0] = game_struct.players[1];

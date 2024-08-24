@@ -26,61 +26,6 @@ camera_t* sun_shadow_map_camera;
 fbo_t* sun_shadow_map_fbo;
 
 
-void init_game_struct() {
-    game_struct.player_turn = rand() % 2;
-    game_struct.game_ended = 0;
-
-    game_struct.players[0].wheight = 0;
-    game_struct.players[1].wheight = 0;
-    player_translations_update();
-    game_struct.players[0].y_lerp_start_translation = game_struct.players[0].y_translation;
-    game_struct.players[0].y_current_translation = game_struct.players[0].y_translation;
-    game_struct.players[1].y_lerp_start_translation = game_struct.players[1].y_translation;
-    game_struct.players[1].y_current_translation = game_struct.players[1].y_translation;
-
-    game_struct.players[0].translation_lerp_time = 0;
-    game_struct.players[1].translation_lerp_time = 0;
-
-    for (uint32_t i = 0; i < _PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_; i++) {
-        game_struct.players[0].tiles[i].type = TILE_TYPE_EMPTY;
-        game_struct.players[0].tiles[i].attacked_effect_time_to_live = 0;
-        game_struct.players[0].tiles[i].destroyed_effect_time_to_live = 0;
-        game_struct.players[0].tiles[i].built_effect_time_to_live = 0;
-        game_struct.players[0].tiles[i].cooldown_timer = 0;
-        game_struct.players[0].tiles[i].curent_cooldown_timer = 0;
-        game_struct.players[1].tiles[i].type = TILE_TYPE_EMPTY;
-        game_struct.players[1].tiles[i].attacked_effect_time_to_live = 0;
-        game_struct.players[1].tiles[i].destroyed_effect_time_to_live = 0;
-        game_struct.players[1].tiles[i].built_effect_time_to_live = 0;
-        game_struct.players[1].tiles[i].cooldown_timer = 0;
-        game_struct.players[1].tiles[i].curent_cooldown_timer = 0;
-    }
-
-    game_struct.players[0].resources.wood = 2;
-    game_struct.players[0].resources.stone = 2;
-    game_struct.players[0].resources.wheat = 2;
-    game_struct.players[0].resources.soldiers = 0;
-    game_struct.players[0].resources.population = 2;
-    game_struct.players[1].resources.wood = 2;
-    game_struct.players[1].resources.stone = 2;
-    game_struct.players[1].resources.wheat = 2;
-    game_struct.players[1].resources.soldiers = 0;
-    game_struct.players[1].resources.population = 2;
-}
-void game_struct_set_starting_tiles(int32_t tile1_pos, int32_t tile2_pos, int32_t tile3_pos, int32_t tile4_pos) {
-    game_struct.players[0].tiles[tile1_pos].type = TILE_TYPE_HOUSE;
-    game_struct.players[0].tiles[tile1_pos].cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
-    game_struct.players[0].tiles[tile1_pos].curent_cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
-    game_struct.players[0].tiles[tile2_pos].type = TILE_TYPE_FOREST;
-    game_struct.players[0].tiles[tile2_pos].cooldown_timer = tile_type_properties[TILE_TYPE_FOREST].give_cooldown;
-    game_struct.players[0].tiles[tile2_pos].curent_cooldown_timer = tile_type_properties[TILE_TYPE_FOREST].give_cooldown;
-    game_struct.players[1].tiles[tile3_pos].type = TILE_TYPE_HOUSE;
-    game_struct.players[1].tiles[tile3_pos].cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
-    game_struct.players[1].tiles[tile3_pos].curent_cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
-    game_struct.players[1].tiles[tile4_pos].type = TILE_TYPE_FOREST;
-    game_struct.players[1].tiles[tile4_pos].cooldown_timer = tile_type_properties[TILE_TYPE_FOREST].give_cooldown;
-    game_struct.players[1].tiles[tile4_pos].curent_cooldown_timer = tile_type_properties[TILE_TYPE_FOREST].give_cooldown;
-}
 
 void player_translations_update() {
     in_tiles_translation = 0;
@@ -144,21 +89,6 @@ ivec2_t get_hovered_tile_position(uint8_t player_i) {
         .x = (int32_t)floor((world_space_position.x - game_struct.players[player_i].x_current_translation)/_TILE_SIZE_),
         .y = (int32_t)floor((world_space_position.z - _PLAYER_CONSTANT_Z_TRANSLATION_)                    /_TILE_SIZE_)
     };
-}
-
-int32_t has_enough_resources(int32_t player_id, int32_t tile_type_id) {
-    tile_type_t* tile_type = &(tile_type_properties[tile_type_id]);
-
-    if (
-        game_struct.players[player_id].resources.wood       < tile_type->cost.wood       ||
-        game_struct.players[player_id].resources.stone      < tile_type->cost.stone      ||
-        game_struct.players[player_id].resources.wheat      < tile_type->cost.wheat      ||
-        game_struct.players[player_id].resources.population < tile_type->cost.population ||
-        game_struct.players[player_id].resources.soldiers   < tile_type->cost.soldiers
-    ) {
-        return 0;
-    }
-    return 1;
 }
 
 void request_switch_turn() {
@@ -384,6 +314,89 @@ void player_1_turn() {
         player_1_connected_turn();
     }
 }
+
+int32_t get_random_empty_tile_position(int32_t player) {
+    // check if empty space exists
+    int32_t empty_tile_exists = 0;
+    for (uint32_t j = 0; j < _PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_; j++) {
+        if (game_struct.players[player].tiles[j].type == TILE_TYPE_EMPTY) {
+            empty_tile_exists = 1;
+            break;
+        }
+    }
+    if (empty_tile_exists == 0) return -1;
+
+    while (1) {
+        int32_t tile_pos = rand() % (_PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_);
+        if (game_struct.players[player].tiles[tile_pos].type == TILE_TYPE_EMPTY) return tile_pos;
+    }
+}
+void init_game_struct() {
+    game_struct.player_turn = rand() % 2;
+    game_struct.game_ended = 0;
+
+    game_struct.players[0].wheight = 0;
+    game_struct.players[1].wheight = 0;
+    player_translations_update();
+    game_struct.players[0].y_lerp_start_translation = game_struct.players[0].y_translation;
+    game_struct.players[0].y_current_translation = game_struct.players[0].y_translation;
+    game_struct.players[1].y_lerp_start_translation = game_struct.players[1].y_translation;
+    game_struct.players[1].y_current_translation = game_struct.players[1].y_translation;
+
+    game_struct.players[0].translation_lerp_time = 0;
+    game_struct.players[1].translation_lerp_time = 0;
+
+    for (uint32_t i = 0; i < _PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_; i++) {
+        game_struct.players[0].tiles[i].type = TILE_TYPE_EMPTY;
+        game_struct.players[0].tiles[i].attacked_effect_time_to_live = 0;
+        game_struct.players[0].tiles[i].destroyed_effect_time_to_live = 0;
+        game_struct.players[0].tiles[i].built_effect_time_to_live = 0;
+        game_struct.players[0].tiles[i].cooldown_timer = 0;
+        game_struct.players[0].tiles[i].curent_cooldown_timer = 0;
+        game_struct.players[1].tiles[i].type = TILE_TYPE_EMPTY;
+        game_struct.players[1].tiles[i].attacked_effect_time_to_live = 0;
+        game_struct.players[1].tiles[i].destroyed_effect_time_to_live = 0;
+        game_struct.players[1].tiles[i].built_effect_time_to_live = 0;
+        game_struct.players[1].tiles[i].cooldown_timer = 0;
+        game_struct.players[1].tiles[i].curent_cooldown_timer = 0;
+    }
+
+    game_struct.players[0].resources.wood = 2;
+    game_struct.players[0].resources.stone = 2;
+    game_struct.players[0].resources.wheat = 2;
+    game_struct.players[0].resources.soldiers = 0;
+    game_struct.players[0].resources.population = 2;
+    game_struct.players[1].resources.wood = 2;
+    game_struct.players[1].resources.stone = 2;
+    game_struct.players[1].resources.wheat = 2;
+    game_struct.players[1].resources.soldiers = 0;
+    game_struct.players[1].resources.population = 2;
+}
+void generate_starting_tile_positions(int32_t tile_positions[4]) {
+    tile_positions[0] = rand() % (_PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_);
+    do {
+        tile_positions[1] = rand() % (_PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_);
+    } while (tile_positions[1] == tile_positions[0]);
+
+    tile_positions[2] = rand() % (_PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_);
+    do {
+        tile_positions[3] = rand() % (_PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_);
+    } while (tile_positions[3] == tile_positions[2]);
+}
+void game_struct_set_starting_tiles(int32_t tile_positions[4]) {
+    game_struct.players[0].tiles[tile_positions[0]].type = TILE_TYPE_HOUSE;
+    game_struct.players[0].tiles[tile_positions[0]].cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
+    game_struct.players[0].tiles[tile_positions[0]].curent_cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
+    game_struct.players[0].tiles[tile_positions[1]].type = TILE_TYPE_FOREST;
+    game_struct.players[0].tiles[tile_positions[1]].cooldown_timer = tile_type_properties[TILE_TYPE_FOREST].give_cooldown;
+    game_struct.players[0].tiles[tile_positions[1]].curent_cooldown_timer = tile_type_properties[TILE_TYPE_FOREST].give_cooldown;
+    game_struct.players[1].tiles[tile_positions[2]].type = TILE_TYPE_HOUSE;
+    game_struct.players[1].tiles[tile_positions[2]].cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
+    game_struct.players[1].tiles[tile_positions[2]].curent_cooldown_timer = tile_type_properties[TILE_TYPE_HOUSE].give_cooldown;
+    game_struct.players[1].tiles[tile_positions[3]].type = TILE_TYPE_FOREST;
+    game_struct.players[1].tiles[tile_positions[3]].cooldown_timer = tile_type_properties[TILE_TYPE_FOREST].give_cooldown;
+    game_struct.players[1].tiles[tile_positions[3]].curent_cooldown_timer = tile_type_properties[TILE_TYPE_FOREST].give_cooldown;
+}
 tile_types_amount_sorted_t get_tile_types_amounts_sorted(int32_t player) {
     tile_types_amount_sorted_t ttas;
 
@@ -419,21 +432,19 @@ tile_types_amount_sorted_t get_tile_types_amounts_sorted(int32_t player) {
 
     return ttas;
 }
-int32_t get_random_empty_tile_position(int32_t player) {
-    // check if empty space exists
-    int32_t empty_tile_exists = 0;
-    for (uint32_t j = 0; j < _PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_; j++) {
-        if (game_struct.players[player].tiles[j].type == TILE_TYPE_EMPTY) {
-            empty_tile_exists = 1;
-            break;
-        }
-    }
-    if (empty_tile_exists == 0) return -1;
+int32_t has_enough_resources(int32_t player_id, int32_t tile_type_id) {
+    tile_type_t* tile_type = &(tile_type_properties[tile_type_id]);
 
-    while (1) {
-        int32_t tile_pos = rand() % (_PLAYER_GRID_WIDTH_*_PLAYER_GRID_DEPTH_);
-        if (game_struct.players[player].tiles[tile_pos].type == TILE_TYPE_EMPTY) return tile_pos;
+    if (
+        game_struct.players[player_id].resources.wood       < tile_type->cost.wood       ||
+        game_struct.players[player_id].resources.stone      < tile_type->cost.stone      ||
+        game_struct.players[player_id].resources.wheat      < tile_type->cost.wheat      ||
+        game_struct.players[player_id].resources.population < tile_type->cost.population ||
+        game_struct.players[player_id].resources.soldiers   < tile_type->cost.soldiers
+    ) {
+        return 0;
     }
+    return 1;
 }
 
 void exit_game_button_callback(int32_t ui_list_id, int32_t button_id) {

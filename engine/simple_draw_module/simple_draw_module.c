@@ -40,6 +40,7 @@ int32_t simple_draw_module_init() {
 
     // <simple_draw_module_rectangle_mesh>
         if(1){
+        #ifdef RESAVE_MESHES
         float vertices_position_arr[] = {
             0,0,0,
             0,1,0,
@@ -63,7 +64,6 @@ int32_t simple_draw_module_init() {
             0, 2, 3
         };
 
-        #ifdef RESAVE_MESHES
         simple_draw_module_rectangle_mesh = generate_mesh(vbo_datas_arr, 1, indices_array, 6, 1);
         if (simple_draw_module_rectangle_mesh == NULL) {
             printf("failed to generate simple_draw_module_rectangle_mesh\n");
@@ -77,6 +77,7 @@ int32_t simple_draw_module_init() {
 
     // <simple_draw_module_cube_mesh>
         if(1){
+        #ifdef RESAVE_MESHES
         float vertices_position_arr[] = {
             0,0,0,
             1,0,0,
@@ -121,7 +122,6 @@ int32_t simple_draw_module_init() {
             4, 5, 7
         };
 
-        #ifdef RESAVE_MESHES
         simple_draw_module_cube_mesh = generate_mesh(vbo_datas_arr, 1, indices_array, 6*6, 1);
         if (simple_draw_module_cube_mesh == NULL) {
             printf("failed to generate simple_draw_module_cube_mesh\n");
@@ -164,6 +164,7 @@ int32_t simple_draw_module_init() {
     // <simple_draw_module_screen_quad_mesh>
         // used along with simple_draw_module_screen_quad_mesh_shader to draw a texture to a section of the screen
         if(1){
+        #ifdef RESAVE_MESHES
         float vertices_data_arr[] = {
             0,0,
             0,1,
@@ -187,7 +188,6 @@ int32_t simple_draw_module_init() {
             2, 0, 3
         };
 
-        #ifdef RESAVE_MESHES
         simple_draw_module_screen_quad_mesh = generate_mesh(vbo_datas_arr, 1, indices_array, 6, 1);
         if (simple_draw_module_screen_quad_mesh == NULL) {
             printf("failed to generate simple_draw_module_screen_quad_mesh\n");

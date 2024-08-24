@@ -360,6 +360,40 @@ void engine_render() {
     SDL_GL_SwapWindow(window);
 }
 
+static void* sdl_quit_routine(void* args) {
+    SDL_Quit();
+    exit_thread(0);
+}
+static void attempt_sdl_quit() {
+    thread_t sdl_quit_routine_thread;
+    int32_t create_thread_res = create_thread(
+        &sdl_quit_routine_thread,
+        NULL,
+        &sdl_quit_routine,
+        NULL
+    );
+    if (create_thread_res != 0) {
+        // give up on quiting SDL and leave cleanup to the OS
+        #ifdef DEBUG_SOFT_MODE
+        printf("Failed to create a thread for SDL_Quit, giving up on it.\n");
+        #endif
+        return;
+    }
+    // give SDL_Quit 2 secconds to quit, if it doesnt quit in this time, give up on quiting SDL and leave cleanup to the OS
+    sleep(2000);
+    if (get_thread_exit_code(sdl_quit_routine_thread) == STILL_ACTIVE) {
+        #ifdef DEBUG_SOFT_MODE
+        printf("SDL_Quit is stuck and blocking other thread, giving up on SDL_Quit.\n");
+        #endif
+        terminate_thread(sdl_quit_routine_thread);
+    }else {
+        #ifdef DEBUG_SOFT_MODE
+        printf("SDL_Quit finished successfully.\n");
+        #endif
+        join_thread(sdl_quit_routine_thread);
+    }
+    return;
+}
 void engine_clean() {
     // game clean
     if (clean) clean();
@@ -381,8 +415,5 @@ void engine_clean() {
     #ifdef DEBUG_SOFT_MODE
     printf("destroyed window successfully\n");
     #endif
-    SDL_Quit();
-    #ifdef DEBUG_SOFT_MODE
-    printf("quit SDL successfully\n");
-    #endif
+    attempt_sdl_quit();
 }

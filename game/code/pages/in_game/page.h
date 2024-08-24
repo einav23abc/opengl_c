@@ -124,14 +124,9 @@ void render_in_game();
 void mouse_press_in_game();
 // </page functions>
 
-void init_game_struct();
-void game_struct_set_starting_tiles(int32_t tile1_pos, int32_t tile2_pos, int32_t tile3_pos, int32_t tile4_pos);
-
 void player_translations_update();
 
 ivec2_t get_hovered_tile_position(uint8_t player_i);
-
-int32_t has_enough_resources(int32_t player_id, int32_t tile_type_id);
 
 void request_switch_turn();
 void switch_turn();
@@ -140,8 +135,13 @@ int32_t attack_tile(int32_t player_attacked, int32_t at_tile);
 void demolish_tile(int32_t player, int32_t at_tile);
 
 void player_1_turn();
-tile_types_amount_sorted_t get_tile_types_amounts_sorted(int32_t player);
+
 int32_t get_random_empty_tile_position(int32_t player);
+void init_game_struct();
+void generate_starting_tile_positions(int32_t tile_positions[4]);
+void game_struct_set_starting_tiles(int32_t tile_positions[4]);
+tile_types_amount_sorted_t get_tile_types_amounts_sorted(int32_t player);
+int32_t has_enough_resources(int32_t player_id, int32_t tile_type_id);
 
 void exit_game_button_callback(int32_t ui_list_id, int32_t button_id);
 void build_specific_button_callback(int32_t ui_list_id, int32_t button_id);
