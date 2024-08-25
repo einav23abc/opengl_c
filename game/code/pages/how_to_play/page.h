@@ -3,7 +3,6 @@
 
 #include "../../game.h"
 
-void enter_how_to_play();
 void render_how_to_play();
 
 #endif

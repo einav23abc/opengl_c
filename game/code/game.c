@@ -34,7 +34,7 @@ page_t pages[PAGES_AMOUNT] = {
     },
     [PAGE_HOW_TO_PLAY] = (page_t){
         .init = NULL,
-        .enter = &enter_how_to_play,
+        .enter = &message_page_enter,
         .exit = NULL,
         .update = NULL,
         .render = &render_how_to_play,

@@ -41,39 +41,49 @@ void update_in_game() {
             message = "You lost.";
             audio_sound_play(lose_game_sound);
         }
-        int32_t ui_list_id = new_ui_list_assign_id();
-        ui_lists[ui_list_id] = (ui_list_t){
-            .active = 1,
-            .permenant = 1,
-
-            .hidden = 0,
-
-            .font = &big_letters_font,
-            .info_string_font = &letters_font,
-            .padding = 1,
-            .button_padding = 4,
-            .box_nslice = &nine_slice2,
-            .button_hover_nslice = &nine_slice3,
-            .info_string_nslice = &nine_slice1,
-
-            .box_pos_from_world_pos = 0,
-            .x = _OUTPORT_WIDTH_*0.5  - (max(strlen(message), strlen("Exit game"))*big_letters_font.letter_width + 4*2)*0.5,
-            .y = _OUTPORT_HEIGHT_*0.5 + big_letters_font.letter_height + 4*2,
-
-            .buttons_amount = 2,
-            .button_strings = {
-                "Exit game",
-                message
-            },
-            .button_info_strings = {"",""},
-            .button_callbacks = {
-                &exit_game_button_callback,
-                NULL
-            },
-
-            .child_ui_list = -1,
-            .parent_ui_list = -1
-        };
+        int32_t ui_list_id = new_ui_list(
+            _OUTPORT_WIDTH_*0.5  - (max(strlen(message), strlen("Exit game"))*big_letters_font.letter_width + 5*2)*0.5,
+            _OUTPORT_HEIGHT_*0.5 + big_letters_font.letter_height + 5*2,
+            3,
+            &nine_slice1
+        );
+        make_ui_list_permenant(ui_list_id);
+        ui_list_add_element(
+            ui_list_id,
+            (ui_list_element_t){
+                .type = ELEMENT_TYPE_BUTTON,
+                .button = {
+                    .callback = &exit_game_button_callback,
+                    .string = "Exit game",
+                    .font = &big_letters_font,
+                    .padding = 5,
+                    .nslice = &nine_slice2,
+                    .hover_nslice = &nine_slice3,
+                    .info_string = "",
+                    .info_string_font = NULL,
+                    .info_string_padding = 0,
+                    .info_string_nslice = NULL
+                }
+            }
+        );
+        ui_list_add_element(
+            ui_list_id,
+            (ui_list_element_t){
+                .type = ELEMENT_TYPE_BUTTON,
+                .button = {
+                    .callback = NULL,
+                    .string = message,
+                    .font = &big_letters_font,
+                    .padding = 5,
+                    .nslice = NULL,
+                    .hover_nslice = NULL,
+                    .info_string = "",
+                    .info_string_font = NULL,
+                    .info_string_padding = 0,
+                    .info_string_nslice = NULL
+                }
+            }
+        );
     }
 
 

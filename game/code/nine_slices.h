@@ -13,6 +13,7 @@ typedef struct {
 extern nine_slice_t nine_slice1;
 extern nine_slice_t nine_slice2;
 extern nine_slice_t nine_slice3;
+extern nine_slice_t nine_slice4;
 
 void nine_slices_init();
 void draw_nine_slice(nine_slice_t nine_slice, int32_t x, int32_t y, int32_t width, int32_t height);

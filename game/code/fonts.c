@@ -93,7 +93,7 @@ float draw_string(font_t font, char* str, vec3_t pos, quat_t rot, float height, 
 
     return size_x;
 }
-uvec2_t get_str_boxed_size(font_t* font, char* str, float row_height) {
+ivec2_t get_str_boxed_size(font_t* font, char* str, float row_height) {
     uint32_t w = 0;
     uint32_t h = row_height;
     uint32_t x = 0;
@@ -131,13 +131,13 @@ uvec2_t get_str_boxed_size(font_t* font, char* str, float row_height) {
         w = max(w, x);
     }
 
-    return (uvec2_t){
+    return (ivec2_t){
         .x = w * font->letter_width*(row_height/font->letter_height),
         .y = h
     };
 }
 void draw_str_boxed(char* str, font_t font, nine_slice_t nslice, uint32_t left_x, uint32_t bottom_y, uint32_t padding, uint32_t row_height) {
-    uvec2_t str_size = get_str_boxed_size(&font, str, row_height);
+    ivec2_t str_size = get_str_boxed_size(&font, str, row_height);
 
     uint8_t color_r = 249;
     uint8_t color_g = 245;

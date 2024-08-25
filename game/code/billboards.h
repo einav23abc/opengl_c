@@ -18,7 +18,7 @@ typedef struct {
     int32_t box_height;
 } billboard_t;
 
-uvec2_t get_billboard_box_pos(billboard_t billboard);
+ivec2_t get_billboard_box_pos(billboard_t billboard);
 /* \brief Draw a ui billboard element with a shader.
  * 
  * Assumes the shader's uniform0 is vec2 u_position.

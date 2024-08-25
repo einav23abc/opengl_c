@@ -24,7 +24,7 @@ void render_join_lan() {
         }
     }
 
-    uvec2_t size = get_str_boxed_size(&big_letters_font, "XXX.XXX.XXX.XXX", big_letters_font.letter_height);
+    ivec2_t size = get_str_boxed_size(&big_letters_font, "XXX.XXX.XXX.XXX", big_letters_font.letter_height);
     draw_str_boxed(
         ip_input_flashing_string,
         big_letters_font,

@@ -6,6 +6,7 @@
 nine_slice_t nine_slice1;
 nine_slice_t nine_slice2;
 nine_slice_t nine_slice3;
+nine_slice_t nine_slice4;
 
 void nine_slices_init() {
     nine_slice1 = (nine_slice_t){
@@ -27,6 +28,13 @@ void nine_slices_init() {
         .texture_height = 16,
         .padding = 3,
         .texture = nine_slice3_texture
+    };
+    
+    nine_slice4 = (nine_slice_t){
+        .texture_width = 16,
+        .texture_height = 16,
+        .padding = 3,
+        .texture = nine_slice4_texture
     };
 }
 

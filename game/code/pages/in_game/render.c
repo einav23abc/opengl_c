@@ -414,19 +414,21 @@ void render_game_effects() {
     // </win bases>
 
     // <preview building>
-        ivec2_t hovered_button = get_ui_list_hovered_button();
-        if (hovered_button.x != -1) {
-            if (ui_lists[hovered_button.x].button_callbacks[hovered_button.y] == &build_specific_button_callback) {
-                use_shader(build_preview_shader);
-                // u_color
-                glUniform3f(shaders_list[current_shader]->uniform_locations[3], ((float)108)/255, ((float)140)/255, ((float)80)/255);
-                // u_speed
-                glUniform1f(shaders_list[current_shader]->uniform_locations[4], 0.003);
-                // u_freq
-                glUniform1f(shaders_list[current_shader]->uniform_locations[5], 3);
-                // u_time
-                glUniform1f(shaders_list[current_shader]->uniform_locations[6], (float)time);
-                draw_tile(0, selected_tile.x, selected_tile.y, hovered_button.y, 1);
+        ivec2_t hovered_element = get_ui_list_hovered_element();
+        if (hovered_element.x != -1 && hovered_element.y != -1) {
+            if (ui_lists[hovered_element.x].elements[hovered_element.y].type == ELEMENT_TYPE_BUTTON) {
+                if (ui_lists[hovered_element.x].elements[hovered_element.y].button.callback == &build_specific_button_callback) {
+                    use_shader(build_preview_shader);
+                    // u_color
+                    glUniform3f(shaders_list[current_shader]->uniform_locations[3], ((float)108)/255, ((float)140)/255, ((float)80)/255);
+                    // u_speed
+                    glUniform1f(shaders_list[current_shader]->uniform_locations[4], 0.003);
+                    // u_freq
+                    glUniform1f(shaders_list[current_shader]->uniform_locations[5], 3);
+                    // u_time
+                    glUniform1f(shaders_list[current_shader]->uniform_locations[6], (float)time);
+                    draw_tile(0, selected_tile.x, selected_tile.y, hovered_element.y, 1);
+                }
             }
         }
     // </preview building>
@@ -607,11 +609,11 @@ void render_game_ui() {
             .wheat = 0,
             .wood = 0
         };
-        ivec2_t hovered_button = get_ui_list_hovered_button();
-        if (hovered_button.x != -1) {
-            if (hovered_button.y >= 0 && hovered_button.y < ui_lists[hovered_button.x].buttons_amount) {
-                if (ui_lists[hovered_button.x].button_callbacks[hovered_button.y] == &build_specific_button_callback) {
-                    resources_delta = tile_type_properties[hovered_button.y].cost;
+        ivec2_t hovered_element = get_ui_list_hovered_element();
+        if (hovered_element.x != -1 && hovered_element.y != -1) {
+            if (ui_lists[hovered_element.x].elements[hovered_element.y].type == ELEMENT_TYPE_BUTTON) {
+                if (ui_lists[hovered_element.x].elements[hovered_element.y].button.callback == &build_specific_button_callback) {
+                    resources_delta = tile_type_properties[hovered_element.y].cost;
                 }
             }
         }
@@ -770,7 +772,7 @@ void render_game_ui() {
 
         resources_string[c] = '\0';
 
-        uvec2_t str_box_size = get_str_boxed_size(&big_letters_font, resources_string, big_letters_font.letter_height);
+        ivec2_t str_box_size = get_str_boxed_size(&big_letters_font, resources_string, big_letters_font.letter_height);
         draw_str_boxed(resources_string, big_letters_font, nine_slice1, _OUTPORT_WIDTH_-str_box_size.x-6, 6, 6, big_letters_font.letter_height);
     // </player 0 resources>
 

@@ -29,7 +29,7 @@ void render_how_to_play() {
         ""      "     Using the 'Soldiers' resource,\n"
         ""      "  you can attack the enemy's buildings."
     ;
-    uvec2_t size = get_str_boxed_size(&big_letters_font, str, big_letters_font.letter_height);
+    ivec2_t size = get_str_boxed_size(&big_letters_font, str, big_letters_font.letter_height);
     draw_str_boxed(
         str,
         big_letters_font,

@@ -15,7 +15,7 @@ void render_open_lan() {
     draw_scrolled_background();
 
     // open_lan_waiting_for_connection_string is generated and declared in "open_lan/enter.c"
-    uvec2_t size = get_str_boxed_size(&big_letters_font, open_lan_waiting_for_connection_string, big_letters_font.letter_height);
+    ivec2_t size = get_str_boxed_size(&big_letters_font, open_lan_waiting_for_connection_string, big_letters_font.letter_height);
     draw_str_boxed(
         open_lan_waiting_for_connection_string,
         big_letters_font,

@@ -495,56 +495,108 @@ void build_button_callback(int32_t ui_list_id, int32_t button_id) {
         selected_tile.y = -1;
         return;
     }
-
+    
     // close child (if exists)
     close_ui_list(ui_lists[ui_list_id].child_ui_list);
 
     // create child
-    int32_t new_ui_list_id = new_ui_list_assign_id();
-    ui_lists[new_ui_list_id] = (ui_list_t){
-        .active = 1,
-        .permenant = 0,
-
-        .hidden = 0,
-
-        .font = &letters_font,
-        .info_string_font = &letters_font,
-        .padding = 1,
-        .button_padding = 2,
-        .box_nslice = &nine_slice2,
-        .button_hover_nslice = &nine_slice3,
-        .info_string_nslice = &nine_slice1,
-
-        .box_pos_from_world_pos = 1,
-        .box_world_pos_x = ui_lists[ui_list_id].box_world_pos_x,
-        .box_world_pos_y = ui_lists[ui_list_id].box_world_pos_y,
-        .box_world_pos_z = ui_lists[ui_list_id].box_world_pos_z,
-        .box_world_pos_camera = camera,
-        .x = get_ui_list_width(ui_list_id) + ui_lists[ui_list_id].padding,
-        .y = 0,
-
-        .buttons_amount = _TILE_TYPES_AMOUNT_,
-        .button_strings = {"House", "Barracks", "Field", "Mine", "Forest"},
-        .button_info_strings = {
-            tile_type_properties[0].build_info_string,
-            tile_type_properties[1].build_info_string,
-            tile_type_properties[2].build_info_string,
-            tile_type_properties[3].build_info_string,
-            tile_type_properties[4].build_info_string
-        },
-        .button_callbacks = {
-            &build_specific_button_callback,
-            &build_specific_button_callback,
-            &build_specific_button_callback,
-            &build_specific_button_callback,
-            &build_specific_button_callback
-        },
-
-        .child_ui_list = -1,
-        .parent_ui_list = ui_list_id
-    };
-    ui_lists[ui_list_id].child_ui_list = new_ui_list_id;
-
+    int32_t new_ui_list_id = new_ui_list_child(
+        ui_list_id,
+        get_ui_list_width(ui_list_id) + ui_lists[ui_list_id].padding,
+        0,
+        1,
+        &nine_slice2
+    );
+    ui_list_add_element(
+        new_ui_list_id,
+        (ui_list_element_t){
+            .type = ELEMENT_TYPE_BUTTON,
+            .button = {
+                .callback = &build_specific_button_callback,
+                .string = "House   ",
+                .font = &letters_font,
+                .padding = 2,
+                .nslice = NULL,
+                .hover_nslice = &nine_slice3,
+                .info_string = tile_type_properties[0].build_info_string,
+                .info_string_font = &letters_font,
+                .info_string_padding = 3,
+                .info_string_nslice = &nine_slice1
+            }
+        }
+    );
+    ui_list_add_element(
+        new_ui_list_id,
+        (ui_list_element_t){
+            .type = ELEMENT_TYPE_BUTTON,
+            .button = {
+                .callback = &build_specific_button_callback,
+                .string = "Barracks",
+                .font = &letters_font,
+                .padding = 2,
+                .nslice = NULL,
+                .hover_nslice = &nine_slice3,
+                .info_string = tile_type_properties[1].build_info_string,
+                .info_string_font = &letters_font,
+                .info_string_padding = 3,
+                .info_string_nslice = &nine_slice1
+            }
+        }
+    );
+    ui_list_add_element(
+        new_ui_list_id,
+        (ui_list_element_t){
+            .type = ELEMENT_TYPE_BUTTON,
+            .button = {
+                .callback = &build_specific_button_callback,
+                .string = "Field   ",
+                .font = &letters_font,
+                .padding = 2,
+                .nslice = NULL,
+                .hover_nslice = &nine_slice3,
+                .info_string = tile_type_properties[2].build_info_string,
+                .info_string_font = &letters_font,
+                .info_string_padding = 3,
+                .info_string_nslice = &nine_slice1
+            }
+        }
+    );
+    ui_list_add_element(
+        new_ui_list_id,
+        (ui_list_element_t){
+            .type = ELEMENT_TYPE_BUTTON,
+            .button = {
+                .callback = &build_specific_button_callback,
+                .string = "Mine    ",
+                .font = &letters_font,
+                .padding = 2,
+                .nslice = NULL,
+                .hover_nslice = &nine_slice3,
+                .info_string = tile_type_properties[3].build_info_string,
+                .info_string_font = &letters_font,
+                .info_string_padding = 3,
+                .info_string_nslice = &nine_slice1
+            }
+        }
+    );
+    ui_list_add_element(
+        new_ui_list_id,
+        (ui_list_element_t){
+            .type = ELEMENT_TYPE_BUTTON,
+            .button = {
+                .callback = &build_specific_button_callback,
+                .string = "Forest  ",
+                .font = &letters_font,
+                .padding = 2,
+                .nslice = NULL,
+                .hover_nslice = &nine_slice3,
+                .info_string = tile_type_properties[3].build_info_string,
+                .info_string_font = &letters_font,
+                .info_string_padding = 3,
+                .info_string_nslice = &nine_slice1
+            }
+        }
+    );
     make_ui_list_safe(new_ui_list_id);
 }
 void attack_button_callback(int32_t ui_list_id, int32_t button_id) {
@@ -600,41 +652,48 @@ void demolish_button_callback(int32_t ui_list_id, int32_t button_id) {
     close_ui_list(ui_lists[ui_list_id].child_ui_list);
 
     // create child
-    int32_t new_ui_list_id = new_ui_list_assign_id();
-    ui_lists[new_ui_list_id] = (ui_list_t){
-        .active = 1,
-        .permenant = 0,
-
-        .hidden = 0,
-
-        .font = &letters_font,
-        .info_string_font = &letters_font,
-        .padding = 1,
-        .button_padding = 2,
-        .box_nslice = &nine_slice2,
-        .button_hover_nslice = &nine_slice3,
-        .info_string_nslice = &nine_slice1,
-
-        .box_pos_from_world_pos = 1,
-        .box_world_pos_x = ui_lists[ui_list_id].box_world_pos_x,
-        .box_world_pos_y = ui_lists[ui_list_id].box_world_pos_y,
-        .box_world_pos_z = ui_lists[ui_list_id].box_world_pos_z,
-        .box_world_pos_camera = camera,
-        .x = get_ui_list_width(ui_list_id) + ui_lists[ui_list_id].padding,
-        .y = 0,
-
-        .buttons_amount = 2,
-        .button_strings = {"Yes", "Are you sure?"},
-        .button_info_strings = {"", ""},
-        .button_callbacks = {
-            &demolish_sure_button_callback,
-            NULL
-        },
-
-        .child_ui_list = -1,
-        .parent_ui_list = ui_list_id
-    };
-    ui_lists[ui_list_id].child_ui_list = new_ui_list_id;
-
+    int32_t new_ui_list_id = new_ui_list_child(
+        ui_list_id,
+        get_ui_list_width(ui_list_id) + ui_lists[ui_list_id].padding + 2 - 1,
+        ui_lists[ui_list_id].padding - 2,
+        2,
+        &nine_slice1
+    );
+    ui_list_add_element(
+        new_ui_list_id,
+        (ui_list_element_t){
+            .type = ELEMENT_TYPE_BUTTON,
+            .button = {
+                .callback = &demolish_sure_button_callback,
+                .string = "Yes",
+                .font = &letters_font,
+                .padding = 3,
+                .nslice = &nine_slice2,
+                .hover_nslice = &nine_slice4,
+                .info_string = "",
+                .info_string_font = NULL,
+                .info_string_padding = 0,
+                .info_string_nslice = NULL
+            }
+        }
+    );
+    ui_list_add_element(
+        new_ui_list_id,
+        (ui_list_element_t){
+            .type = ELEMENT_TYPE_BUTTON,
+            .button = {
+                .callback = NULL,
+                .string = "Are you sure?",
+                .font = &letters_font,
+                .padding = 3,
+                .nslice = NULL,
+                .hover_nslice = NULL,
+                .info_string = "",
+                .info_string_font = NULL,
+                .info_string_padding = 0,
+                .info_string_nslice = NULL
+            }
+        }
+    );
     make_ui_list_safe(new_ui_list_id);
 }

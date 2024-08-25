@@ -33,7 +33,6 @@ gcc ^
     code/pages/in_game/mouse_press.c ^
     code/pages/main_menu/enter.c ^
     code/pages/main_menu/render.c ^
-    code/pages/how_to_play/enter.c ^
     code/pages/how_to_play/render.c ^
     code/pages/play/enter.c ^
     code/pages/play/render.c ^

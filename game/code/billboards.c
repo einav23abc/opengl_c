@@ -2,7 +2,7 @@
 #include "meshes.h"
 #include "spaces.h"
 
-uvec2_t get_billboard_box_pos(billboard_t billboard) {
+ivec2_t get_billboard_box_pos(billboard_t billboard) {
     float x = 0;
     float y = 0;
     if (billboard.box_pos_from_world_pos == 1) {
@@ -16,14 +16,14 @@ uvec2_t get_billboard_box_pos(billboard_t billboard) {
 
     y -= billboard.box_height;
 
-    return (uvec2_t){
+    return (ivec2_t){
         .x = x,
         .y = y
     };
 }
 
 void draw_billboard_shaded(billboard_t billboard) {
-    uvec2_t pos = get_billboard_box_pos(billboard);
+    ivec2_t pos = get_billboard_box_pos(billboard);
     
     // u_position
     glUniform2f(

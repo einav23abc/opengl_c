@@ -3,18 +3,41 @@
 
 
 #include "../../engine/engine.h"
+#include "billboards.h"
 #include "nine_slices.h"
 #include "fonts.h"
 
 
 #define _MAX_UI_LISTS_AMOUNT_ (12)
-#define _UI_LIST_MAX_BUTTONS_AMOUNT_ (8)
+#define _UI_LIST_MAX_ELEMENTS_AMOUNT_ (8)
 
 
 /* param 1: the ui_list id
  * param 2: the button id
  */
 typedef void(*button_callback_t)(int32_t, int32_t);
+
+typedef enum {
+    ELEMENT_TYPE_BUTTON
+} UI_LIST_ELEMENT_TYPE;
+
+typedef struct {
+    UI_LIST_ELEMENT_TYPE type;
+    union {
+        struct {
+            button_callback_t callback;
+            char* string;
+            font_t* font;
+            int32_t padding;
+            nine_slice_t* nslice;
+            nine_slice_t* hover_nslice;
+            char* info_string;
+            font_t* info_string_font;
+            int32_t info_string_padding;
+            nine_slice_t* info_string_nslice;
+        } button;
+    };
+} ui_list_element_t;
 
 typedef struct {
     uint8_t active : 1;
@@ -23,28 +46,12 @@ typedef struct {
 
     uint8_t hidden : 1;
 
-    font_t* font;
-    font_t* info_string_font;
+    billboard_t billboard;
     int32_t padding;
-    int32_t button_padding;
-    nine_slice_t* box_nslice;
-    nine_slice_t* button_hover_nslice;
-    nine_slice_t* info_string_nslice;
+    nine_slice_t* nslice;
 
-    uint8_t box_pos_from_world_pos : 1;
-    float box_world_pos_x;
-    float box_world_pos_y;
-    float box_world_pos_z;
-    camera_t* box_world_pos_camera;
-    // if box_pos_from_world_pos = 1, this is a screen-x translation
-    int32_t x;
-    // if box_pos_from_world_pos = 1, this is a screen-y translation
-    int32_t y;
-
-    uint32_t buttons_amount;
-    char* button_strings[_UI_LIST_MAX_BUTTONS_AMOUNT_];
-    char* button_info_strings[_UI_LIST_MAX_BUTTONS_AMOUNT_];
-    button_callback_t button_callbacks[_UI_LIST_MAX_BUTTONS_AMOUNT_];
+    uint32_t elements_amount;
+    ui_list_element_t elements[_UI_LIST_MAX_ELEMENTS_AMOUNT_];
 
     int32_t parent_ui_list;
     int32_t child_ui_list;
@@ -55,29 +62,55 @@ extern ui_list_t ui_lists[_MAX_UI_LISTS_AMOUNT_];
 
 
 int32_t new_ui_list_assign_id();
+int32_t new_ui_list(int32_t x, int32_t y, int32_t padding, nine_slice_t* nine_slice);
+int32_t new_ui_list_billboarded(int32_t world_pos_x, int32_t world_pos_y, int32_t world_pos_z, camera_t* billboard_camera,
+                                int32_t offset_x, int32_t offset_y,
+                                int32_t padding, nine_slice_t* nine_slice);
+int32_t new_ui_list_child(int32_t parent_id, int32_t offset_x, int32_t offset_y, int32_t padding, nine_slice_t* nine_slice);
+
+void ui_list_add_element(int32_t id, ui_list_element_t element);
+
 void set_ui_lists_to_unsafe();
-void close_ui_list(int32_t i);
-void make_ui_list_safe(int32_t i);
+void close_ui_list(int32_t id);
+void make_ui_list_safe(int32_t id);
+void make_ui_list_permenant(int32_t id);
+void make_ui_list_hidden(int32_t id);
 void close_unsafe_ui_lists();
 void close_unperm_ui_lists();
 void close_all_ui_lists();
-uint32_t get_ui_list_width(int32_t i);
-uint32_t get_ui_list_height(int32_t i);
-uvec2_t get_ui_list_box_pos(int32_t i);
-uvec2_t get_ui_list_box_pos_padded(int32_t i);
-/* x = x pos inside box
- * y = y pos inside box
+
+uint32_t get_ui_list_button_element_width(ui_list_element_t* button_element);
+uint32_t get_ui_list_button_element_height(ui_list_element_t* button_element);
+uint32_t get_ui_list_element_width(int32_t id, int32_t element_i);
+uint32_t get_ui_list_element_height(int32_t id, int32_t element_i);
+void update_ui_list_billboard_size(int32_t id);
+int32_t get_ui_list_width(int32_t id);
+int32_t get_ui_list_height(int32_t id);
+ivec2_t get_ui_list_element_pos(int32_t id, int32_t ei);
+ivec2_t get_ui_list_pos(int32_t id);
+ivec2_t get_ui_list_pos_padded(int32_t id);
+/* x = x pos inside ui-list
+ * y = y pos inside ui-list
  * z = ui_list-index
  * or `-1` in everything if not inside ui_list
  */
 ivec3_t get_ui_list_inside_pos();
+
+// is anybody even using this???
+ivec2_t get_ui_list_button_element_info_size(int32_t id, int32_t element_i, char* info_str);
+
 /* x = ui_list_id
- * y = button_id
+ * y = element_i
  */
-ivec2_t get_ui_list_hovered_button();
-uvec2_t get_ui_list_button_info_size(int32_t i, char* info_str);
-void draw_ui_list(int32_t i);
-void draw_ui_list_hovered_button_info_string();
+ivec2_t get_ui_list_hovered_element();
+
+void ui_list_button_element_pressed(int32_t id, int32_t ei);
+void ui_list_handle_mouse_presse();
+
+void draw_ui_list_hovered_element_info_string();
+void draw_ui_list_button_element(int32_t id, int32_t element_i, int8_t hovered);
+void draw_ui_list_element(int32_t id, int32_t element_i, int8_t hovered);
+void draw_ui_list(int32_t id);
 void draw_all_ui_lists();
 
 #endif

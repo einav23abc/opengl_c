@@ -17,6 +17,7 @@ extern texture_t* big_letters_font_texture;
 extern texture_t* nine_slice1_texture;
 extern texture_t* nine_slice2_texture;
 extern texture_t* nine_slice3_texture;
+extern texture_t* nine_slice4_texture;
 extern texture_t* menu_background_scroll_texture;
 
 void game_textures_init();

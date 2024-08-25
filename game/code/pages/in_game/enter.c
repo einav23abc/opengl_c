@@ -74,202 +74,197 @@ void enter_in_game() {
     in_cooldowns_translation = 0;
 
 
+    int32_t ui_list_id;
+
     // next turn - ui list
-    int32_t ui_list_id = new_ui_list_assign_id();
-    ui_lists[ui_list_id] = (ui_list_t){
-        .active = 1,
-        .permenant = 1,
-
-        .hidden = 0,
-
-        .font = &big_letters_font,
-        .info_string_font = &letters_font,
-        .padding = 1,
-        .button_padding = 7,
-        .box_nslice = &nine_slice2,
-        .button_hover_nslice = &nine_slice3,
-        .info_string_nslice = &nine_slice1,
-
-        .box_pos_from_world_pos = 0,
-        .x = 1,
-        .y = _OUTPORT_HEIGHT_ - 1,
-
-        .buttons_amount = 1,
-        .button_strings = {"End turn"},
-        .button_info_strings = {""},
-        .button_callbacks = {&switch_turn_button_callback},
-
-        .child_ui_list = -1,
-        .parent_ui_list = -1
-    };
+    ui_list_id = new_ui_list(
+        1,
+        _OUTPORT_HEIGHT_ - 1,
+        1,
+        &nine_slice2
+    );
+    make_ui_list_permenant(ui_list_id);
+    ui_list_add_element(
+        ui_list_id,
+        (ui_list_element_t){
+            .type = ELEMENT_TYPE_BUTTON,
+            .button = {
+                .callback = &switch_turn_button_callback,
+                .string = "End turn",
+                .font = &big_letters_font,
+                .padding = 5,
+                .nslice = NULL,
+                .hover_nslice = &nine_slice3,
+                .info_string = "",
+                .info_string_font = NULL,
+                .info_string_padding = 0,
+                .info_string_nslice = NULL
+            }
+        }
+    );
     
     // exit game - ui list
-    ui_list_id = new_ui_list_assign_id();
-    ui_lists[ui_list_id] = (ui_list_t){
-        .active = 1,
-        .permenant = 1,
-
-        .hidden = 0,
-
-        .font = &letters_font,
-        .info_string_font = &letters_font,
-        .padding = 1,
-        .button_padding = 5,
-        .box_nslice = &nine_slice2,
-        .button_hover_nslice = &nine_slice3,
-        .info_string_nslice = &nine_slice1,
-
-        .box_pos_from_world_pos = 0,
-        .x = _OUTPORT_WIDTH_ - (strlen("Exit game")*letters_font.letter_width + 5*2) - 1,
-        .y = _OUTPORT_HEIGHT_ - 1,
-
-        .buttons_amount = 1,
-        .button_strings = {"Exit game"},
-        .button_info_strings = {""},
-        .button_callbacks = {&exit_in_game_callback},
-
-        .child_ui_list = -1,
-        .parent_ui_list = -1
-    };
-
-
+    ui_list_id = new_ui_list(
+        _OUTPORT_WIDTH_ - (strlen("Exit game")*letters_font.letter_width + 5*2) - 1,
+        _OUTPORT_HEIGHT_ - 1,
+        1,
+        &nine_slice2
+    );
+    make_ui_list_permenant(ui_list_id);
+    ui_list_add_element(
+        ui_list_id,
+        (ui_list_element_t){
+            .type = ELEMENT_TYPE_BUTTON,
+            .button = {
+                .callback = &exit_in_game_callback,
+                .string = "Exit game",
+                .font = &letters_font,
+                .padding = 5,
+                .nslice = NULL,
+                .hover_nslice = &nine_slice3,
+                .info_string = "",
+                .info_string_font = NULL,
+                .info_string_padding = 0,
+                .info_string_nslice = NULL
+            }
+        }
+    );
 
     // type infos - ui list hack
-    ui_list_id = new_ui_list_assign_id();
-    ui_lists[ui_list_id] = (ui_list_t){
-        .active = 1,
-        .permenant = 1,
+    ui_list_id = new_ui_list(
+        _OUTPORT_WIDTH_ - ((2)*big_letters_font.letter_width + 6*2) + 1,
+        (big_letters_font.letter_height + 6*2) - 1,
+        1,
+        &nine_slice2
+    );
+    make_ui_list_permenant(ui_list_id);
+    make_ui_list_hidden(ui_list_id);
+    ui_list_add_element(
+        ui_list_id,
+        (ui_list_element_t){
+            .type = ELEMENT_TYPE_BUTTON,
+            .button = {
+                .callback = NULL,
+                .string = "\x19\x1a",
+                .font = &big_letters_font,
+                .padding = 5,
+                .nslice = NULL,
+                .hover_nslice = &nine_slice3,
+                .info_string = "Soldiers \x19\x1a:\n* Created by the Barracks.\n* Use on enemy tiles to destroy buildings.",
+                .info_string_font = &letters_font,
+                .info_string_padding = 3,
+                .info_string_nslice = &nine_slice1
+            }
+        }
+    );
+    
+    ui_list_id = new_ui_list(
+        _OUTPORT_WIDTH_ - ((2+4)*big_letters_font.letter_width + 6*2) + 1,
+        (big_letters_font.letter_height + 6*2) - 1,
+        1,
+        &nine_slice2
+    );
+    make_ui_list_permenant(ui_list_id);
+    make_ui_list_hidden(ui_list_id);
+    ui_list_add_element(
+        ui_list_id,
+        (ui_list_element_t){
+            .type = ELEMENT_TYPE_BUTTON,
+            .button = {
+                .callback = NULL,
+                .string = "\x17\x18",
+                .font = &big_letters_font,
+                .padding = 5,
+                .nslice = NULL,
+                .hover_nslice = &nine_slice3,
+                .info_string = "Stone \x17\x18:\n* Created by the Mine.",
+                .info_string_font = &letters_font,
+                .info_string_padding = 3,
+                .info_string_nslice = &nine_slice1
+            }
+        }
+    );
+    
+    ui_list_id = new_ui_list(
+        _OUTPORT_WIDTH_ - ((2+8)*big_letters_font.letter_width + 6*2) + 1,
+        (big_letters_font.letter_height + 6*2) - 1,
+        1,
+        &nine_slice2
+    );
+    make_ui_list_permenant(ui_list_id);
+    make_ui_list_hidden(ui_list_id);
+    ui_list_add_element(
+        ui_list_id,
+        (ui_list_element_t){
+            .type = ELEMENT_TYPE_BUTTON,
+            .button = {
+                .callback = NULL,
+                .string = "\x15\x16",
+                .font = &big_letters_font,
+                .padding = 5,
+                .nslice = NULL,
+                .hover_nslice = &nine_slice3,
+                .info_string = "Wood \x15\x16:\n* Created by the Forest.",
+                .info_string_font = &letters_font,
+                .info_string_padding = 3,
+                .info_string_nslice = &nine_slice1
+            }
+        }
+    );
 
-        .hidden = 1,
+    ui_list_id = new_ui_list(
+        _OUTPORT_WIDTH_ - ((2+12)*big_letters_font.letter_width + 6*2) + 1,
+        (big_letters_font.letter_height + 6*2) - 1,
+        1,
+        &nine_slice2
+    );
+    make_ui_list_permenant(ui_list_id);
+    make_ui_list_hidden(ui_list_id);
+    ui_list_add_element(
+        ui_list_id,
+        (ui_list_element_t){
+            .type = ELEMENT_TYPE_BUTTON,
+            .button = {
+                .callback = NULL,
+                .string = "\x13\x14",
+                .font = &big_letters_font,
+                .padding = 5,
+                .nslice = NULL,
+                .hover_nslice = &nine_slice3,
+                .info_string = "Wheat \x13\x14:\n* Created by the Field.",
+                .info_string_font = &letters_font,
+                .info_string_padding = 3,
+                .info_string_nslice = &nine_slice1
+            }
+        }
+    );
 
-        .font = &big_letters_font,
-        .info_string_font = &letters_font,
-        .padding = 1,
-        .button_padding = 5,
-        .box_nslice = &nine_slice2,
-        .button_hover_nslice = &nine_slice3,
-        .info_string_nslice = &nine_slice1,
-
-        .box_pos_from_world_pos = 0,
-        .x = _OUTPORT_WIDTH_ - ((2)*big_letters_font.letter_width + 6*2) + 1,
-        .y = (big_letters_font.letter_height + 6*2) - 1,
-
-        .buttons_amount = 1,
-        .button_strings = {"\x19\x1a"},
-        .button_info_strings = {"Soldiers \x19\x1a:\n* Created by the Barracks.\n* Use on enemy tiles to destroy buildings."},
-        .button_callbacks = {NULL},
-
-        .child_ui_list = -1,
-        .parent_ui_list = -1
-    };
-    ui_list_id = new_ui_list_assign_id();
-    ui_lists[ui_list_id] = (ui_list_t){
-        .active = 1,
-        .permenant = 1,
-
-        .hidden = 1,
-
-        .font = &big_letters_font,
-        .info_string_font = &letters_font,
-        .padding = 1,
-        .button_padding = 5,
-        .box_nslice = &nine_slice2,
-        .button_hover_nslice = &nine_slice3,
-        .info_string_nslice = &nine_slice1,
-
-        .box_pos_from_world_pos = 0,
-        .x = _OUTPORT_WIDTH_ - ((2+4)*big_letters_font.letter_width + 6*2) + 1,
-        .y = (big_letters_font.letter_height + 6*2) - 1,
-
-        .buttons_amount = 1,
-        .button_strings = {"\x17\x18"},
-        .button_info_strings = {"Stone \x17\x18:\n* Created by the Mine."},
-        .button_callbacks = {NULL},
-
-        .child_ui_list = -1,
-        .parent_ui_list = -1
-    };
-    ui_list_id = new_ui_list_assign_id();
-    ui_lists[ui_list_id] = (ui_list_t){
-        .active = 1,
-        .permenant = 1,
-
-        .hidden = 1,
-
-        .font = &big_letters_font,
-        .info_string_font = &letters_font,
-        .padding = 1,
-        .button_padding = 5,
-        .box_nslice = &nine_slice2,
-        .button_hover_nslice = &nine_slice3,
-        .info_string_nslice = &nine_slice1,
-
-        .box_pos_from_world_pos = 0,
-        .x = _OUTPORT_WIDTH_ - ((2+8)*big_letters_font.letter_width + 6*2) + 1,
-        .y = (big_letters_font.letter_height + 6*2) - 1,
-
-        .buttons_amount = 1,
-        .button_strings = {"\x15\x16"},
-        .button_info_strings = {"Wood \x15\x16:\n* Created by the Forest."},
-        .button_callbacks = {NULL},
-
-        .child_ui_list = -1,
-        .parent_ui_list = -1
-    };
-    ui_list_id = new_ui_list_assign_id();
-    ui_lists[ui_list_id] = (ui_list_t){
-        .active = 1,
-        .permenant = 1,
-
-        .hidden = 1,
-
-        .font = &big_letters_font,
-        .info_string_font = &letters_font,
-        .padding = 1,
-        .button_padding = 5,
-        .box_nslice = &nine_slice2,
-        .button_hover_nslice = &nine_slice3,
-        .info_string_nslice = &nine_slice1,
-
-        .box_pos_from_world_pos = 0,
-        .x = _OUTPORT_WIDTH_ - ((2+12)*big_letters_font.letter_width + 6*2) + 1,
-        .y = (big_letters_font.letter_height + 6*2) - 1,
-
-        .buttons_amount = 1,
-        .button_strings = {"\x13\x14"},
-        .button_info_strings = {"Wheat \x13\x14:\n* Created by the Field."},
-        .button_callbacks = {NULL},
-
-        .child_ui_list = -1,
-        .parent_ui_list = -1
-    };
-    ui_list_id = new_ui_list_assign_id();
-    ui_lists[ui_list_id] = (ui_list_t){
-        .active = 1,
-        .permenant = 1,
-
-        .hidden = 1,
-
-        .font = &big_letters_font,
-        .info_string_font = &letters_font,
-        .padding = 1,
-        .button_padding = 5,
-        .box_nslice = &nine_slice2,
-        .button_hover_nslice = &nine_slice3,
-        .info_string_nslice = &nine_slice1,
-
-        .box_pos_from_world_pos = 0,
-        .x = _OUTPORT_WIDTH_ - ((2+16)*big_letters_font.letter_width + 6*2) + 1,
-        .y = (big_letters_font.letter_height + 6*2) - 1,
-
-        .buttons_amount = 1,
-        .button_strings = {"\x11\x12"},
-        .button_info_strings = {"People \x11\x12:\n* Created by the House."},
-        .button_callbacks = {NULL},
-
-        .child_ui_list = -1,
-        .parent_ui_list = -1
-    };
+    ui_list_id = new_ui_list(
+        _OUTPORT_WIDTH_ - ((2+16)*big_letters_font.letter_width + 6*2) + 1,
+        (big_letters_font.letter_height + 6*2) - 1,
+        1,
+        &nine_slice2
+    );
+    make_ui_list_permenant(ui_list_id);
+    make_ui_list_hidden(ui_list_id);
+    ui_list_add_element(
+        ui_list_id,
+        (ui_list_element_t){
+            .type = ELEMENT_TYPE_BUTTON,
+            .button = {
+                .callback = NULL,
+                .string = "\x11\x12",
+                .font = &big_letters_font,
+                .padding = 5,
+                .nslice = NULL,
+                .hover_nslice = &nine_slice3,
+                .info_string = "People \x11\x12:\n* Created by the House.",
+                .info_string_font = &letters_font,
+                .info_string_padding = 3,
+                .info_string_nslice = &nine_slice1
+            }
+        }
+    );
 }
 
 
@@ -286,37 +281,48 @@ static void exit_in_game_callback(int32_t ui_list_id, int32_t button_id) {
     close_ui_list(ui_lists[ui_list_id].child_ui_list);
 
     // create child
-    int32_t new_ui_list_id = new_ui_list_assign_id();
-    ui_lists[new_ui_list_id] = (ui_list_t){
-        .active = 1,
-        .permenant = 0,
-
-        .hidden = 0,
-
-        .font = &letters_font,
-        .info_string_font = &letters_font,
-        .padding = 1,
-        .button_padding = 2,
-        .box_nslice = &nine_slice2,
-        .button_hover_nslice = &nine_slice3,
-        .info_string_nslice = &nine_slice1,
-
-        .box_pos_from_world_pos = 0,
-        .x = ui_lists[ui_list_id].x + get_ui_list_width(ui_list_id) + ui_lists[ui_list_id].padding - (strlen("Are you sure?")*letters_font.letter_width + 2*2 + 1),
-        .y = ui_lists[ui_list_id].y - get_ui_list_height(ui_list_id) - ui_lists[ui_list_id].padding,
-
-        .buttons_amount = 2,
-        .button_strings = {"Yes", "Are you sure?"},
-        .button_info_strings = {"", ""},
-        .button_callbacks = {
-            &exit_game_button_callback,
-            NULL
-        },
-
-        .child_ui_list = -1,
-        .parent_ui_list = ui_list_id
-    };
-    ui_lists[ui_list_id].child_ui_list = new_ui_list_id;
-
+    int32_t new_ui_list_id = new_ui_list_child(
+        ui_list_id,
+        get_ui_list_width(ui_list_id) + ui_lists[ui_list_id].padding - (strlen("Are you sure?")*letters_font.letter_width + 3*2 + 2),
+        - get_ui_list_height(ui_list_id) - ui_lists[ui_list_id].padding - 2 + 1,
+        2,
+        &nine_slice1
+    );
+    ui_list_add_element(
+        new_ui_list_id,
+        (ui_list_element_t){
+            .type = ELEMENT_TYPE_BUTTON,
+            .button = {
+                .callback = &exit_game_button_callback,
+                .string = "Yes",
+                .font = &letters_font,
+                .padding = 3,
+                .nslice = &nine_slice2,
+                .hover_nslice = &nine_slice4,
+                .info_string = "",
+                .info_string_font = NULL,
+                .info_string_padding = 0,
+                .info_string_nslice = NULL
+            }
+        }
+    );
+    ui_list_add_element(
+        new_ui_list_id,
+        (ui_list_element_t){
+            .type = ELEMENT_TYPE_BUTTON,
+            .button = {
+                .callback = NULL,
+                .string = "Are you sure?",
+                .font = &letters_font,
+                .padding = 3,
+                .nslice = NULL,
+                .hover_nslice = NULL,
+                .info_string = "",
+                .info_string_font = NULL,
+                .info_string_padding = 0,
+                .info_string_nslice = NULL
+            }
+        }
+    );
     make_ui_list_safe(new_ui_list_id);
 }

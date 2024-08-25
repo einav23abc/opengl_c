@@ -16,7 +16,7 @@ void render_joining_game() {
 
     char message[] = "Joining game";
     
-    uvec2_t size = get_str_boxed_size(&big_letters_font, message, big_letters_font.letter_height);
+    ivec2_t size = get_str_boxed_size(&big_letters_font, message, big_letters_font.letter_height);
     draw_str_boxed(
         message,
         big_letters_font,

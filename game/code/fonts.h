@@ -20,7 +20,7 @@ extern font_t big_letters_font;
 void fonts_init();
 // returns the drawn width
 float draw_string(font_t font, char* str, vec3_t pos, quat_t rot, float height, float color_r, float color_b, float color_g);
-uvec2_t get_str_boxed_size(font_t* font, char* str, float row_height);
+ivec2_t get_str_boxed_size(font_t* font, char* str, float row_height);
 void draw_str_boxed(char* str, font_t font, nine_slice_t nslice, uint32_t left_x, uint32_t bottom_y, uint32_t padding, uint32_t row_height);
 
 #endif

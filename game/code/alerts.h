@@ -34,9 +34,9 @@ extern alert_t alerts[_MAX_ALERTS_AMOUNT_];
 
 // will not return 0. alert 0 is error alert
 int32_t new_alert_assign_id();
-uvec2_t get_alert_box_size(int32_t i);
-uvec2_t get_alert_box_pos(int32_t i);
-uvec2_t get_alert_box_pos_padded(int32_t i);
+ivec2_t get_alert_box_size(int32_t i);
+ivec2_t get_alert_box_pos(int32_t i);
+ivec2_t get_alert_box_pos_padded(int32_t i);
 void add_error_alert_at_cursor(char* string);
 void add_big_error_alert(char* string);
 void close_all_alerts();

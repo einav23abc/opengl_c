@@ -16,120 +16,113 @@ void enter_play() {
 
     
     // main menu
-    ui_list_id = new_ui_list_assign_id();
-    ui_lists[ui_list_id] = (ui_list_t){
-        .active = 1,
-        .permenant = 1,
-
-        .hidden = 0,
-
-        .font = &letters_font,
-        .info_string_font = &letters_font,
-        .padding = 1,
-        .button_padding = 5,
-        .box_nslice = &nine_slice2,
-        .button_hover_nslice = &nine_slice3,
-        .info_string_nslice = &nine_slice1,
-
-        .box_pos_from_world_pos = 0,
-        .x = _OUTPORT_WIDTH_ - (strlen("Main menu")*letters_font.letter_width + 5*2) - 1,
-        .y = _OUTPORT_HEIGHT_ - 1,
-
-        .buttons_amount = 1,
-        .button_strings = {"Main menu"},
-        .button_info_strings = {""},
-        .button_callbacks = {&main_menu_button_callback},
-
-        .child_ui_list = -1,
-        .parent_ui_list = -1
-    };
+    ui_list_id = new_ui_list(
+        _OUTPORT_WIDTH_ - (strlen("Main menu")*letters_font.letter_width + 5*2) - 1,
+        _OUTPORT_HEIGHT_ - 1,
+        1,
+        &nine_slice2
+    );
+    ui_list_add_element(
+        ui_list_id,
+        (ui_list_element_t){
+            .type = ELEMENT_TYPE_BUTTON,
+            .button = {
+                .callback = &main_menu_button_callback,
+                .string = "Main menu",
+                .font = &letters_font,
+                .padding = 5,
+                .nslice = NULL,
+                .hover_nslice = &nine_slice3,
+                .info_string = "",
+                .info_string_font = NULL,
+                .info_string_padding = 0,
+                .info_string_nslice = NULL
+            }
+        }
+    );
+    make_ui_list_permenant(ui_list_id);
 
     // against ai
-    ui_list_id = new_ui_list_assign_id();
-    ui_lists[ui_list_id] = (ui_list_t){
-        .active = 1,
-        .permenant = 1,
+    ui_list_id = new_ui_list(
+        _OUTPORT_WIDTH_*0.5  - (strlen("Play against AIs")*big_letters_font.letter_width + 4*2)*0.5,
+        _OUTPORT_HEIGHT_*0.5 + big_letters_font.letter_height*0.5 + 4 + big_letters_font.letter_height*2,
+        1,
+        &nine_slice2
+    );
+    ui_list_add_element(
+        ui_list_id,
+        (ui_list_element_t){
+            .type = ELEMENT_TYPE_BUTTON,
+            .button = {
+                .callback = &play_against_ai_button_callback,
+                .string = "Play against AIs",
+                .font = &big_letters_font,
+                .padding = 4,
+                .nslice = NULL,
+                .hover_nslice = &nine_slice3,
+                .info_string = "Play against varying enemy AIs",
+                .info_string_font = &letters_font,
+                .info_string_padding = 3,
+                .info_string_nslice = &nine_slice1
+            }
+        }
+    );
+    make_ui_list_permenant(ui_list_id);
 
-        .hidden = 0,
-
-        .font = &big_letters_font,
-        .info_string_font = &letters_font,
-        .padding = 1,
-        .button_padding = 4,
-        .box_nslice = &nine_slice2,
-        .button_hover_nslice = &nine_slice3,
-        .info_string_nslice = &nine_slice1,
-
-        .box_pos_from_world_pos = 0,
-        .x = _OUTPORT_WIDTH_*0.5  - (strlen("Play against AIs")*big_letters_font.letter_width + 4*2)*0.5,
-        .y = _OUTPORT_HEIGHT_*0.5 + big_letters_font.letter_height*0.5 + 4 + big_letters_font.letter_height*2,
-
-        .buttons_amount = 1,
-        .button_strings = {"Play against AIs"},
-        .button_info_strings = {"Play against varying enemy AIs"},
-        .button_callbacks = {&play_against_ai_button_callback},
-
-        .child_ui_list = -1,
-        .parent_ui_list = -1
-    };
 
     // open LAN
-    ui_list_id = new_ui_list_assign_id();
-    ui_lists[ui_list_id] = (ui_list_t){
-        .active = 1,
-        .permenant = 1,
-
-        .hidden = 0,
-
-        .font = &big_letters_font,
-        .info_string_font = &letters_font,
-        .padding = 1,
-        .button_padding = 4,
-        .box_nslice = &nine_slice2,
-        .button_hover_nslice = &nine_slice3,
-        .info_string_nslice = &nine_slice1,
-
-        .box_pos_from_world_pos = 0,
-        .x = _OUTPORT_WIDTH_*0.5  - (strlen("Open LAN game")*big_letters_font.letter_width + 4*2)*0.5,
-        .y = _OUTPORT_HEIGHT_*0.5 + big_letters_font.letter_height*0.5 + 4,
-
-        .buttons_amount = 1,
-        .button_strings = {"Open LAN game"},
-        .button_info_strings = {"Play against a friend on LAN"},
-        .button_callbacks = {&open_lan_button_callback},
-
-        .child_ui_list = -1,
-        .parent_ui_list = -1
-    };
+    ui_list_id = new_ui_list(
+        _OUTPORT_WIDTH_*0.5  - (strlen("Open LAN game")*big_letters_font.letter_width + 4*2)*0.5,
+        _OUTPORT_HEIGHT_*0.5 + big_letters_font.letter_height*0.5 + 4,
+        1,
+        &nine_slice2
+    );
+    ui_list_add_element(
+        ui_list_id,
+        (ui_list_element_t){
+            .type = ELEMENT_TYPE_BUTTON,
+            .button = {
+                .callback = &open_lan_button_callback,
+                .string = "Open LAN game",
+                .font = &big_letters_font,
+                .padding = 4,
+                .nslice = NULL,
+                .hover_nslice = &nine_slice3,
+                .info_string = "Play against a friend on LAN",
+                .info_string_font = &letters_font,
+                .info_string_padding = 3,
+                .info_string_nslice = &nine_slice1
+            }
+        }
+    );
+    make_ui_list_permenant(ui_list_id);
 
     // join LAN
-    ui_list_id = new_ui_list_assign_id();
-    ui_lists[ui_list_id] = (ui_list_t){
-        .active = 1,
-        .permenant = 1,
-
-        .hidden = 0,
-
-        .font = &big_letters_font,
-        .info_string_font = &letters_font,
-        .padding = 1,
-        .button_padding = 4,
-        .box_nslice = &nine_slice2,
-        .button_hover_nslice = &nine_slice3,
-        .info_string_nslice = &nine_slice1,
-
-        .box_pos_from_world_pos = 0,
-        .x = _OUTPORT_WIDTH_*0.5  - (strlen("Join LAN game")*big_letters_font.letter_width + 4*2)*0.5,
-        .y = _OUTPORT_HEIGHT_*0.5 + big_letters_font.letter_height*0.5 + 4 - big_letters_font.letter_height*2,
-
-        .buttons_amount = 1,
-        .button_strings = {"Join LAN game"},
-        .button_info_strings = {"Play against a friend on LAN"},
-        .button_callbacks = {&join_lan_button_callback},
-
-        .child_ui_list = -1,
-        .parent_ui_list = -1
-    };
+    ui_list_id = new_ui_list(
+        _OUTPORT_WIDTH_*0.5  - (strlen("Join LAN game")*big_letters_font.letter_width + 4*2)*0.5,
+        _OUTPORT_HEIGHT_*0.5 + big_letters_font.letter_height*0.5 + 4 - big_letters_font.letter_height*2,
+        1,
+        &nine_slice2
+    );
+    ui_list_add_element(
+        ui_list_id,
+        (ui_list_element_t){
+            .type = ELEMENT_TYPE_BUTTON,
+            .button = {
+                .callback = &join_lan_button_callback,
+                .string = "Join LAN game",
+                .font = &big_letters_font,
+                .padding = 4,
+                .nslice = NULL,
+                .hover_nslice = &nine_slice3,
+                .info_string = "Play against a friend on LAN",
+                .info_string_font = &letters_font,
+                .info_string_padding = 3,
+                .info_string_nslice = &nine_slice1
+            }
+        }
+    );
+    make_ui_list_permenant(ui_list_id);
 }
 
 static void main_menu_button_callback(int32_t ui_list_id, int32_t button_id) {

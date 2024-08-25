@@ -21,10 +21,10 @@ int32_t new_alert_assign_id() {
     }
     return min_time_to_live_i;
 }
-uvec2_t get_alert_box_size(int32_t i) {
+ivec2_t get_alert_box_size(int32_t i) {
     return get_str_boxed_size(alerts[i].font, alerts[i].string, alerts[i].font->letter_height);
 }
-uvec2_t get_alert_box_pos(int32_t i) {
+ivec2_t get_alert_box_pos(int32_t i) {
     float x = 0;
     float y = 0;
     if (alerts[i].box_pos_from_world_pos == 1) {
@@ -44,13 +44,13 @@ uvec2_t get_alert_box_pos(int32_t i) {
     if (x < alerts[i].padding) x = alerts[i].padding;
     if (y < alerts[i].padding) y = alerts[i].padding;
 
-    return (uvec2_t){
+    return (ivec2_t){
         .x = x,
         .y = y
     };
 }
-uvec2_t get_alert_box_pos_padded(int32_t i) {
-    uvec2_t box_pos = get_alert_box_pos(i);
+ivec2_t get_alert_box_pos_padded(int32_t i) {
+    ivec2_t box_pos = get_alert_box_pos(i);
     box_pos.x -= alerts[i].padding;
     box_pos.y -= alerts[i].padding;
     return box_pos;
@@ -60,7 +60,7 @@ void add_error_alert_at_cursor(char* string) {
 
     vec2_t mouse_outport_space_position = fbo_view_position_from_mouse_position(outport_fbo);
 
-    uvec2_t string_size = get_str_boxed_size(&letters_font, string, letters_font.letter_height);
+    ivec2_t string_size = get_str_boxed_size(&letters_font, string, letters_font.letter_height);
 
     float x = mouse_outport_space_position.x - string_size.x*0.5;
     float y = mouse_outport_space_position.y - string_size.y*0.5;
@@ -99,7 +99,7 @@ void add_big_error_alert(char* string) {
 
     vec2_t mouse_outport_space_position = fbo_view_position_from_mouse_position(outport_fbo);
 
-    uvec2_t string_size = get_str_boxed_size(&big_letters_font, string, big_letters_font.letter_height);
+    ivec2_t string_size = get_str_boxed_size(&big_letters_font, string, big_letters_font.letter_height);
     
     alerts[0] = (alert_t){
         .time_to_live = 3000,
@@ -124,9 +124,9 @@ void close_all_alerts() {
 void draw_all_alerts() {
     for (int32_t i = 0; i < _MAX_ALERTS_AMOUNT_; i++) {
         if (alerts[i].time_to_live <= 0) continue;
-        uvec2_t box_pos = get_alert_box_pos(i);
-        uint32_t left_x = box_pos.x;
-        uint32_t bottom_y = box_pos.y;
+        ivec2_t box_pos = get_alert_box_pos(i);
+        int32_t left_x = box_pos.x;
+        int32_t bottom_y = box_pos.y;
         draw_str_boxed(alerts[i].string, letters_font, nine_slice1, left_x, bottom_y, alerts[i].padding, alerts[i].font->letter_height);
     }
 }
