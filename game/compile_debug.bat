@@ -59,5 +59,6 @@ gcc ^
     -D DEBUG_SOFT_MODE ^
     -g
 
-    @REM -D TEXTURES_FROM_FILES ^
     @REM -D RESAVE_MESHES ^
+    @REM -D RESAVE_SOUNDS ^
+    @REM -D TEXTURES_FROM_FILES ^

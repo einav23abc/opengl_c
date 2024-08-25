@@ -6,6 +6,7 @@
 extern sound_t* build_tile_sound;
 extern sound_t* attack_tile_sound;
 extern sound_t* demolish_tile_sound;
+extern sound_t* shield_sound;
 extern sound_t* wheight_up_sound;
 extern sound_t* wheight_down_sound;
 extern sound_t* resource_give_sound;

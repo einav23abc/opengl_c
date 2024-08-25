@@ -13,6 +13,7 @@ mesh_t* forest_tree_tile_mesh;
 mesh_t* mine_tile_mesh;
 mesh_t* house_tile_mesh;
 mesh_t* barracks_tile_mesh;
+mesh_t* wall_mesh;
 mesh_t* scale_base_mesh;
 mesh_t* scale_head_mesh;
 #else
@@ -28,6 +29,7 @@ mesh_t* scale_head_mesh;
 #include "../models/mine_tile_mesh.c"
 #include "../models/house_tile_mesh.c"
 #include "../models/barracks_tile_mesh.c"
+#include "../models/wall_mesh.c"
 #include "../models/scale_base_mesh.c"
 #include "../models/scale_head_mesh.c"
 #endif
@@ -371,9 +373,9 @@ void game_meshes_init() {
                     },
                     .rot = quat_from_axis_angles_yzx(-0, -0, -0),
                     .scale = (vec3_t){
-                        .x = 0.167,
-                        .y = 0.167,
-                        .z = 0.167
+                        .x = 0.125,
+                        .y = 0.125,
+                        .z = 0.125
                     }
                 },
                 1
@@ -390,9 +392,9 @@ void game_meshes_init() {
                     },
                     .rot = quat_from_axis_angles_yzx(-0, -0, -0),
                     .scale = (vec3_t){
-                        .x = 0.167,
-                        .y = 0.167,
-                        .z = 0.167
+                        .x = 0.125,
+                        .y = 0.125,
+                        .z = 0.125
                     }
                 },
                 1
@@ -411,9 +413,9 @@ void game_meshes_init() {
                     },
                     .rot = quat_from_axis_angles_yzx(-0, -0, -0),
                     .scale = (vec3_t){
-                        .x = 0.167,
-                        .y = 0.167,
-                        .z = 0.167
+                        .x = 0.125,
+                        .y = 0.125,
+                        .z = 0.125
                     }
                 },
                 1
@@ -430,9 +432,9 @@ void game_meshes_init() {
                     },
                     .rot = quat_from_axis_angles_yzx(-0, -0, -0),
                     .scale = (vec3_t){
-                        .x = 0.167,
-                        .y = 0.167,
-                        .z = 0.167
+                        .x = 0.125,
+                        .y = 0.125,
+                        .z = 0.125
                     }
                 },
                 1
@@ -451,9 +453,9 @@ void game_meshes_init() {
                     },
                     .rot = quat_from_axis_angles_yzx(-0, -0, -0),
                     .scale = (vec3_t){
-                        .x = 0.167,
-                        .y = 0.167,
-                        .z = 0.167
+                        .x = 0.125,
+                        .y = 0.125,
+                        .z = 0.125
                     }
                 },
                 1
@@ -466,15 +468,15 @@ void game_meshes_init() {
                 "./game/models/house.obj",
                 (quat_vec_vec_t){
                     .pos = (vec3_t){
-                        .x = 0.4,
+                        .x = 0.6,
                         .y = 0,
-                        .z = 0.35
+                        .z = 0.65
                     },
                     .rot = quat_from_axis_angles_yzx(-0, -M_PI*1.6, -0),
                     .scale = (vec3_t){
-                        .x = 0.167,
-                        .y = 0.167,
-                        .z = 0.167
+                        .x = 0.125,
+                        .y = 0.125,
+                        .z = 0.125
                     }
                 },
                 1
@@ -493,15 +495,36 @@ void game_meshes_init() {
                     },
                     .rot = quat_from_axis_angles_yzx(-0, -M_PI*0.05, -0),
                     .scale = (vec3_t){
-                        .x = 0.167,
-                        .y = 0.167,
-                        .z = 0.167
+                        .x = 0.125,
+                        .y = 0.125,
+                        .z = 0.125
                     }
                 },
                 1
             );
             save_mesh_to_c_file(barracks_tile_mesh, "barracks_tile_mesh", "./game/models/barracks_tile_mesh.c");
         // </barracks_tile_mesh>
+        
+        // <wall_mesh>
+            wall_mesh = mesh_from_wavefront_obj_ext(
+                "./game/models/wall.obj",
+                (quat_vec_vec_t){
+                    .pos = (vec3_t){
+                        .x = 0.55,
+                        .y = 0,
+                        .z = 0.55
+                    },
+                    .rot = quat_from_axis_angles_yzx(-0, -0, -0),
+                    .scale = (vec3_t){
+                        .x = 0.125,
+                        .y = 0.125,
+                        .z = 0.125
+                    }
+                },
+                1
+            );
+            save_mesh_to_c_file(wall_mesh, "wall_mesh", "./game/models/wall_mesh.c");
+        // </wall_mesh>
 
         // <scale_base_mesh>
             scale_base_mesh = mesh_from_wavefront_obj_ext(
@@ -558,6 +581,7 @@ void game_meshes_init() {
     bind_mesh(mine_tile_mesh);
     bind_mesh(house_tile_mesh);
     bind_mesh(barracks_tile_mesh);
+    bind_mesh(wall_mesh);
     bind_mesh(scale_base_mesh);
     bind_mesh(scale_head_mesh);
 }

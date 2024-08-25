@@ -143,6 +143,10 @@ uint32_t backend_init() {
         return 1;
     }
 
+    if (SDL_GL_SetSwapInterval(1) != 0) {
+        printf("failed to enable Vsync");
+    }
+
     // create window
     window = SDL_CreateWindow(
         WINDOW_TITLE,
@@ -358,6 +362,7 @@ void engine_render() {
     
     // show drawn image
     SDL_GL_SwapWindow(window);
+    glFinish();
 }
 
 static void* sdl_quit_routine(void* args) {

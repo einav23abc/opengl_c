@@ -15,6 +15,7 @@ extern mesh_t* forest_tree_tile_mesh;
 extern mesh_t* mine_tile_mesh;
 extern mesh_t* house_tile_mesh;
 extern mesh_t* barracks_tile_mesh;
+extern mesh_t* wall_mesh;
 extern mesh_t* scale_base_mesh;
 extern mesh_t* scale_head_mesh;
 

@@ -97,7 +97,6 @@ page_t pages[PAGES_AMOUNT] = {
     }
 };
 PAGE_NAMES page = -1;
-PAGE_NAMES next_page = -1;
 
 fbo_t* outport_fbo;
 
@@ -106,6 +105,11 @@ camera_t* ui_camera;
 
 void switch_page(PAGE_NAMES to_page) {
     if (to_page < 0 || to_page >= PAGES_AMOUNT) return;
-    next_page = to_page;
+    
+    if (page >= 0 && page < PAGES_AMOUNT) {
+        if (pages[page].exit != NULL) pages[page].exit();
+    }
+    page = to_page;
+    if (pages[page].enter != NULL) pages[page].enter();
 }
 

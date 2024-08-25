@@ -2,97 +2,10 @@
 
 void init_in_game() {
     // <tile_type_properties>
-        tile_type_properties[TILE_TYPE_HOUSE] = (tile_type_t){
-            .cost = (resources_t){
-                .wood = 1,
-                .stone = 2,
-                .wheat = 1,
-                .population = 0,
-                .soldiers = 0
-            },
-            .give_cooldown = 3,
-            .give = (resources_t){
-                .wood = 0,
-                .stone = 0,
-                .wheat = 0,
-                .population = 1,
-                .soldiers = 0
-            }
-        };
-        tile_type_properties[TILE_TYPE_BARRACKS] = (tile_type_t){
-            .cost = (resources_t){
-                .wood = 1,
-                .stone = 2,
-                .wheat = 1,
-                .population = 1,
-                .soldiers = 0
-            },
-            .give_cooldown = 3,
-            .give = (resources_t){
-                .wood = 0,
-                .stone = 0,
-                .wheat = 0,
-                .population = 0,
-                .soldiers = 1
-            }
-        };
-        tile_type_properties[TILE_TYPE_FIELD] = (tile_type_t){
-            .cost = (resources_t){
-                .wood = 1,
-                .stone = 0,
-                .wheat = 0,
-                .population = 1,
-                .soldiers = 0
-            },
-            .give_cooldown = 2,
-            .give = (resources_t){
-                .wood = 0,
-                .stone = 0,
-                .wheat = 1,
-                .population = 0,
-                .soldiers = 0
-            }
-        };
-        tile_type_properties[TILE_TYPE_MINE] = (tile_type_t){
-            .cost = (resources_t){
-                .wood = 1,
-                .stone = 0,
-                .wheat = 1,
-                .population = 1,
-                .soldiers = 0
-            },
-            .give_cooldown = 2,
-            .give = (resources_t){
-                .wood = 0,
-                .stone = 1,
-                .wheat = 0,
-                .population = 0,
-                .soldiers = 0
-            }
-        };
-        tile_type_properties[TILE_TYPE_FOREST] = (tile_type_t){
-            .cost = (resources_t){
-                .wood = 0,
-                .stone = 0,
-                .wheat = 1,
-                .population = 1,
-                .soldiers = 0
-            },
-            .give_cooldown = 2,
-            .give = (resources_t){
-                .wood = 1,
-                .stone = 0,
-                .wheat = 0,
-                .population = 0,
-                .soldiers = 0
-            }
-        };
-
         // build_info_string
         for (uint32_t i = 0; i < _TILE_TYPES_AMOUNT_; i++) {
             char build_info_string[_TILE_BUILD_INFO_STRING_MAX_LENGTH_];
             uint32_t c = 0;
-
             
             if (tile_type_properties[i].give_cooldown == 1) {
                 strcpy(&(build_info_string[c]), "Every turn:\n");

@@ -123,6 +123,19 @@ void parse_update_packet(nf_packet_t packet) {
             break;
         }
 
+        case GAME_UPDATE_SHIELD: {
+            #ifdef DEBUG_SOFT_MODE
+            printf("received update shield packet\n");
+            #endif
+
+            int32_t at_tile;
+            
+            memcpy(&at_tile, &(packet.packet_body[1]), sizeof(at_tile));
+
+            shield_tile(1, at_tile);
+            break;
+        }
+
         case GAME_UPDATE_END_TURN: {
             #ifdef DEBUG_SOFT_MODE
             printf("received update end turn packet\n");
@@ -135,7 +148,7 @@ void parse_update_packet(nf_packet_t packet) {
 }
 
 void handle_client_disconnect(int32_t client_id) {
-    if (page == PAGE_MAIN_MENU || next_page == PAGE_MAIN_MENU) return;
+    if (page == PAGE_MAIN_MENU) return;
     
 
     if (play_type == PLAY_TYPE_AGAINST_CLIENT) {
@@ -154,7 +167,7 @@ void handle_client_disconnect(int32_t client_id) {
 }
 
 void handle_disconnect_as_client() {
-    if (page == PAGE_MAIN_MENU || next_page == PAGE_MAIN_MENU) return;
+    if (page == PAGE_MAIN_MENU) return;
 
     if (play_type == PLAY_TYPE_AGAINST_HOST) {
         #ifdef DEBUG_SOFT_MODE

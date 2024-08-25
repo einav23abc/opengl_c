@@ -11,6 +11,7 @@ extern texture_t* forest_tile_texture;
 extern texture_t* mine_tile_texture;
 extern texture_t* house_tile_texture;
 extern texture_t* barracks_tile_texture;
+extern texture_t* wall_texture;
 extern texture_t* attack_effect_texture;
 extern texture_t* letters_font_texture;
 extern texture_t* big_letters_font_texture;

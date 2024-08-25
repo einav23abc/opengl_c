@@ -1,4 +1,5 @@
 #include "render.h"
+#include "page.h"
 #include "../../shaders.h"
 #include "../../meshes.h"
 #include "../../textures.h"
@@ -40,7 +41,7 @@ void render_in_game() {
     // <ui>
 }
 
-void draw_tile(int32_t player_i, int32_t tile_x, int32_t tile_z, int32_t tile_type, int32_t fixed_shader) {
+void draw_tile(int32_t player_i, int32_t tile_x, int32_t tile_z, int32_t tile_type, int32_t shielded) {
     int32_t i = player_i;
     int32_t x = tile_x;
     int32_t z = tile_z;
@@ -140,36 +141,54 @@ void draw_tile(int32_t player_i, int32_t tile_x, int32_t tile_z, int32_t tile_ty
             // u_position
             glUniform3f(
                 shaders_list[current_shader]->uniform_locations[0],
-                0.4*_TILE_SIZE_ + x*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
-                game_struct.players[i].y_current_translation,
-                0.2*_TILE_SIZE_ + z*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
-            );
-            draw_mesh(forest_tree_tile_mesh);
-            // u_position
-            glUniform3f(
-                shaders_list[current_shader]->uniform_locations[0],
-                -0.35*_TILE_SIZE_ + x*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
-                game_struct.players[i].y_current_translation,
-                0.25*_TILE_SIZE_ + z*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
-            );
-            draw_mesh(forest_tree_tile_mesh);
-            // u_position
-            glUniform3f(
-                shaders_list[current_shader]->uniform_locations[0],
                 0.3*_TILE_SIZE_ + x*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
                 game_struct.players[i].y_current_translation,
-                -0.4*_TILE_SIZE_ + z*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
+                0.15*_TILE_SIZE_ + z*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
             );
             draw_mesh(forest_tree_tile_mesh);
             // u_position
             glUniform3f(
                 shaders_list[current_shader]->uniform_locations[0],
-                -0.3*_TILE_SIZE_ + x*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
+                -0.2625*_TILE_SIZE_ + x*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
                 game_struct.players[i].y_current_translation,
-                -0.35*_TILE_SIZE_ + z*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
+                0.1875*_TILE_SIZE_ + z*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
+            );
+            draw_mesh(forest_tree_tile_mesh);
+            // u_position
+            glUniform3f(
+                shaders_list[current_shader]->uniform_locations[0],
+                0.225*_TILE_SIZE_ + x*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
+                game_struct.players[i].y_current_translation,
+                -0.3*_TILE_SIZE_ + z*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
+            );
+            draw_mesh(forest_tree_tile_mesh);
+            // u_position
+            glUniform3f(
+                shaders_list[current_shader]->uniform_locations[0],
+                -0.225*_TILE_SIZE_ + x*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
+                game_struct.players[i].y_current_translation,
+                -0.2625*_TILE_SIZE_ + z*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
             );
             draw_mesh(forest_tree_tile_mesh);
             break;
+    }
+
+    if (shielded == 1) {
+        // u_texture
+        bind_texture(wall_texture, shaders_list[current_shader]->u_texture_loc, 0);
+        // u_position
+        glUniform3f(
+            shaders_list[current_shader]->uniform_locations[0],
+            x*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
+            game_struct.players[i].y_current_translation,
+            z*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
+        );
+        // u_scale
+        glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_, _TILE_SIZE_, _TILE_SIZE_);
+        // u_quat_rotation
+        quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
+        glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
+        draw_mesh(wall_mesh);
     }
 }
 
@@ -278,14 +297,14 @@ void render_game_world() {
     }
     // </players tiles bases>
 
-    // <player tiles>
+    // <player tiles & shields>
     // u_texture
     bind_texture(global_texture, shaders_list[current_shader]->u_texture_loc, 0);
     for (int8_t i = 0; i < 2; i ++) {
         for (uint32_t x = 0; x < _PLAYER_GRID_WIDTH_; x++) {
             for (uint32_t z = 0; z < _PLAYER_GRID_DEPTH_; z++) {
-                int32_t tile_type = game_struct.players[i].tiles[z*_PLAYER_GRID_DEPTH_ + x].type;
-                draw_tile(i, x, z, tile_type, 0);
+                tile_t* tile = &(game_struct.players[i].tiles[z*_PLAYER_GRID_DEPTH_ + x]);
+                draw_tile(i, x, z, tile->type, tile->shielded);
             }
         }
     }
@@ -417,7 +436,11 @@ void render_game_effects() {
         ivec2_t hovered_element = get_ui_list_hovered_element();
         if (hovered_element.x != -1 && hovered_element.y != -1) {
             if (ui_lists[hovered_element.x].elements[hovered_element.y].type == ELEMENT_TYPE_BUTTON) {
-                if (ui_lists[hovered_element.x].elements[hovered_element.y].button.callback == &build_specific_button_callback) {
+                button_callback_t callback = ui_lists[hovered_element.x].elements[hovered_element.y].button.callback;
+                if (
+                    callback == &build_specific_button_callback ||
+                    callback == &shield_button_callback
+                ) {
                     use_shader(build_preview_shader);
                     // u_color
                     glUniform3f(shaders_list[current_shader]->uniform_locations[3], ((float)108)/255, ((float)140)/255, ((float)80)/255);
@@ -427,7 +450,12 @@ void render_game_effects() {
                     glUniform1f(shaders_list[current_shader]->uniform_locations[5], 3);
                     // u_time
                     glUniform1f(shaders_list[current_shader]->uniform_locations[6], (float)time);
-                    draw_tile(0, selected_tile.x, selected_tile.y, hovered_element.y, 1);
+                    if (callback == &build_specific_button_callback) {
+                        draw_tile(0, selected_tile.x, selected_tile.y, hovered_element.y, 0);
+                    }
+                    if (callback == &shield_button_callback) {
+                        draw_tile(0, selected_tile.x, selected_tile.y, TILE_TYPE_EMPTY, 1);
+                    }
                 }
             }
         }
@@ -512,6 +540,46 @@ void render_game_effects() {
         }
         use_shader(ui_shader);
     // </destroyed effect>
+
+    // <shield effect>
+        use_shader(tile_effect_shader);
+        for (int8_t i = 0; i < 2; i ++) {
+            for (uint32_t x = 0; x < _PLAYER_GRID_WIDTH_; x++) {
+                for (uint32_t z = 0; z < _PLAYER_GRID_DEPTH_; z++) {
+                    int32_t effect_time_to_live = game_struct.players[i].tiles[z*_PLAYER_GRID_DEPTH_ + x].shield_effect_time_to_live;
+                    
+                    if (effect_time_to_live <= 0) continue;
+
+                    // u_position
+                    glUniform3f(
+                        shaders_list[current_shader]->uniform_locations[0],
+                        x*_TILE_SIZE_ + game_struct.players[i].x_current_translation,
+                        game_struct.players[i].y_current_translation,
+                        z*_TILE_SIZE_ + _PLAYER_CONSTANT_Z_TRANSLATION_
+                    );
+                    // u_scale
+                    glUniform3f(shaders_list[current_shader]->uniform_locations[1], _TILE_SIZE_, 0.75*_TILE_SIZE_, _TILE_SIZE_);
+                    // u_quat_rotation
+                    quat_t quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
+                    glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
+                    // u_color
+                    glUniform3f(shaders_list[current_shader]->uniform_locations[3], ((float)161)/255, ((float)61)/255, ((float)59)/255);
+                    // u_speed
+                    glUniform1f(shaders_list[current_shader]->uniform_locations[4], 0.0012);
+                    // u_freq
+                    glUniform1f(shaders_list[current_shader]->uniform_locations[5], 8);
+                    // u_time
+                    glUniform1f(shaders_list[current_shader]->uniform_locations[6], _TILE_SHIELD_EFFECT_TIME_-effect_time_to_live);
+                    // u_width
+                    glUniform1f(shaders_list[current_shader]->uniform_locations[7], 0.6);
+                    // u_length
+                    glUniform1f(shaders_list[current_shader]->uniform_locations[8], _TILE_SHIELD_EFFECT_TIME_);
+                    draw_mesh(tile_effect_mesh);
+                }
+            }
+        }
+        use_shader(ui_shader);
+    // </shield effect>
 
     glEnable(GL_CULL_FACE);
 }
@@ -612,16 +680,20 @@ void render_game_ui() {
         ivec2_t hovered_element = get_ui_list_hovered_element();
         if (hovered_element.x != -1 && hovered_element.y != -1) {
             if (ui_lists[hovered_element.x].elements[hovered_element.y].type == ELEMENT_TYPE_BUTTON) {
-                if (ui_lists[hovered_element.x].elements[hovered_element.y].button.callback == &build_specific_button_callback) {
+                button_callback_t callback = ui_lists[hovered_element.x].elements[hovered_element.y].button.callback;
+                if (callback == &build_specific_button_callback) {
                     resources_delta = tile_type_properties[hovered_element.y].cost;
+                }
+                if (callback == &shield_button_callback) {
+                    resources_delta = shield_cost;
                 }
             }
         }
-        player_resources.population -=  resources_delta.population;
-        player_resources.soldiers -=    resources_delta.soldiers;
-        player_resources.stone -=       resources_delta.stone;
-        player_resources.wheat -=       resources_delta.wheat;
-        player_resources.wood -=        resources_delta.wood;
+        player_resources.population -= resources_delta.population;
+        player_resources.soldiers   -= resources_delta.soldiers;
+        player_resources.stone      -= resources_delta.stone;
+        player_resources.wheat      -= resources_delta.wheat;
+        player_resources.wood       -= resources_delta.wood;
         
         int32_t c = 0;
 

@@ -16,7 +16,7 @@ void enter_open_lan() {
         printf("failed to open local server\n");
         #endif
         switch_page(PAGE_MAIN_MENU);
-        add_error_alert_at_cursor("Failed to open server locally.");
+        add_big_error_alert("Failed to open server locally.");
         return;
     }
 

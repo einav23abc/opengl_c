@@ -9,6 +9,7 @@
 #include "../textures/mine_tile_texture_surface.c"
 #include "../textures/house_tile_texture_surface.c"
 #include "../textures/barracks_tile_texture_surface.c"
+#include "../textures/wall_texture_surface.c"
 #include "../textures/attack_effect_texture_surface.c"
 #include "../textures/letters_font_texture_surface.c"
 #include "../textures/big_letters_font_texture_surface.c"
@@ -26,6 +27,7 @@ texture_t* forest_tile_texture;
 texture_t* mine_tile_texture;
 texture_t* house_tile_texture;
 texture_t* barracks_tile_texture;
+texture_t* wall_texture;
 texture_t* attack_effect_texture;
 texture_t* letters_font_texture;
 texture_t* big_letters_font_texture;
@@ -45,6 +47,7 @@ void game_textures_init() {
     mine_tile_texture = load_texture("./game/textures/mine_tile_texture.png");
     house_tile_texture = load_texture("./game/textures/house_tile_texture.png");
     barracks_tile_texture = load_texture("./game/textures/barracks_tile_texture.png");
+    wall_texture = load_texture("./game/textures/wall_texture.png");
     attack_effect_texture = load_texture("./game/textures/attack_effect.png");
 
     letters_font_texture = load_texture("./game/textures/font.png");
@@ -63,6 +66,7 @@ void game_textures_init() {
     save_surface_to_c_file("./game/textures/mine_tile_texture.png", "mine_tile_texture_surface", "./game/textures/mine_tile_texture_surface.c");
     save_surface_to_c_file("./game/textures/house_tile_texture.png", "house_tile_texture_surface", "./game/textures/house_tile_texture_surface.c");
     save_surface_to_c_file("./game/textures/barracks_tile_texture.png", "barracks_tile_texture_surface", "./game/textures/barracks_tile_texture_surface.c");
+    save_surface_to_c_file("./game/textures/wall_texture.png", "wall_texture_surface", "./game/textures/wall_texture_surface.c");
     save_surface_to_c_file("./game/textures/attack_effect.png", "attack_effect_texture_surface", "./game/textures/attack_effect_texture_surface.c");
 
     save_surface_to_c_file("./game/textures/font.png", "letters_font_texture_surface", "./game/textures/letters_font_texture_surface.c");
@@ -81,6 +85,7 @@ void game_textures_init() {
     mine_tile_texture = load_texture_from_surface(mine_tile_texture_surface);
     house_tile_texture = load_texture_from_surface(house_tile_texture_surface);
     barracks_tile_texture = load_texture_from_surface(barracks_tile_texture_surface);
+    wall_texture = load_texture_from_surface(wall_texture_surface);
     attack_effect_texture = load_texture_from_surface(attack_effect_texture_surface);
 
     letters_font_texture = load_texture_from_surface(letters_font_texture_surface);

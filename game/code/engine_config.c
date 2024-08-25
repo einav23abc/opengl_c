@@ -1,6 +1,6 @@
 #include <stdint.h>
 
-char ENGINE_CONFIG_WINDOW_TITLE[] = "My title in engine config";
+char ENGINE_CONFIG_WINDOW_TITLE[] = "A scaled affair";
 
 uint32_t ENGINE_CONFIG_WINDOW_START_WIDTH = 380*2;
 uint32_t ENGINE_CONFIG_WINDOW_START_HEIGHT = 260*2;

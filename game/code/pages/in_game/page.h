@@ -22,6 +22,7 @@
 #define _TILE_ATTACKED_EFFECT_TIME_ (1500)
 #define _TILE_DESTROYED_EFFECT_TIME_ (1000)
 #define _TILE_BUILT_EFFECT_TIME_ (1000)
+#define _TILE_SHIELD_EFFECT_TIME_ (1000)
 
 #define _AI_BUILD_FUNCTIONS_AMOUNT_ (2)
 #define _AI_ATTACK_FUNCTIONS_AMOUNT_ (2)
@@ -57,11 +58,13 @@ enum TILE_TYPES {
 
 typedef struct {
     int32_t type;
+    uint8_t shielded : 1;
     float curent_cooldown_timer;
     int32_t cooldown_timer;
     int32_t attacked_effect_time_to_live;
     int32_t destroyed_effect_time_to_live;
     int32_t built_effect_time_to_live;
+    int32_t shield_effect_time_to_live;
     // uint8_t camoflauged : 1;
 } tile_t;
 
@@ -97,6 +100,7 @@ typedef enum {
 } PLAY_TYPE;
 
 extern tile_type_t tile_type_properties[_TILE_TYPES_AMOUNT_];
+const resources_t shield_cost;
 
 extern game_t game_struct;
 extern ivec3_t selected_tile;
@@ -133,6 +137,7 @@ void switch_turn();
 int32_t build_at_tile(int32_t player, int32_t tile_type_id, int32_t at_tile);
 int32_t attack_tile(int32_t player_attacked, int32_t at_tile);
 void demolish_tile(int32_t player, int32_t at_tile);
+int32_t shield_tile(int32_t player, int32_t at_tile);
 
 void player_1_turn();
 
@@ -141,7 +146,8 @@ void init_game_struct();
 void generate_starting_tile_positions(int32_t tile_positions[4]);
 void game_struct_set_starting_tiles(int32_t tile_positions[4]);
 tile_types_amount_sorted_t get_tile_types_amounts_sorted(int32_t player);
-int32_t has_enough_resources(int32_t player_id, int32_t tile_type_id);
+int32_t has_enough_resources(int32_t player_id, resources_t cost);
+void remove_resources(int32_t player_id, resources_t cost);
 
 void exit_game_button_callback(int32_t ui_list_id, int32_t button_id);
 void build_specific_button_callback(int32_t ui_list_id, int32_t button_id);
@@ -149,5 +155,6 @@ void build_button_callback(int32_t ui_list_id, int32_t button_id);
 void attack_button_callback(int32_t ui_list_id, int32_t button_id);
 void demolish_sure_button_callback(int32_t ui_list_id, int32_t button_id);
 void demolish_button_callback(int32_t ui_list_id, int32_t button_id);
+void shield_button_callback(int32_t ui_list_id, int32_t button_id);
 
 #endif

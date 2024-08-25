@@ -39,7 +39,6 @@ typedef struct {
 
 extern page_t pages[PAGES_AMOUNT];
 extern PAGE_NAMES page;
-extern PAGE_NAMES next_page;
 
 extern fbo_t* outport_fbo;
 

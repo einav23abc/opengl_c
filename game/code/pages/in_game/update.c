@@ -88,7 +88,7 @@ void update_in_game() {
 
 
     player_translations_update();
-    // and attack/built/destroyed effects
+    // and attack/built/destroyed/shield effects
     tile_cooldowns_update();
     camera_update();
     sun_shadow_map_update(); // a bit redundent
@@ -175,19 +175,27 @@ void camera_update() {
                 int32_t attacked_effect_time_to_live  = game_struct.players[i].tiles[z*_PLAYER_GRID_DEPTH_ + x].attacked_effect_time_to_live;
                 int32_t destroyed_effect_time_to_live = game_struct.players[i].tiles[z*_PLAYER_GRID_DEPTH_ + x].destroyed_effect_time_to_live;
                 int32_t built_effect_time_to_live     = game_struct.players[i].tiles[z*_PLAYER_GRID_DEPTH_ + x].built_effect_time_to_live;
+                int32_t shield_effect_time_to_live    = game_struct.players[i].tiles[z*_PLAYER_GRID_DEPTH_ + x].shield_effect_time_to_live;
 
                 float attacked_effect_t  = max(0, ((float)attacked_effect_time_to_live) /(_TILE_ATTACKED_EFFECT_TIME_)*3-2);
                 float destroyed_effect_t = max(0, ((float)destroyed_effect_time_to_live)/(_TILE_DESTROYED_EFFECT_TIME_)*4-3);
                 float built_effect_t     = max(0, ((float)built_effect_time_to_live)    /(_TILE_BUILT_EFFECT_TIME_)*5-4);
+                float shield_effect_t    = max(0, ((float)shield_effect_time_to_live)   /(_TILE_BUILT_EFFECT_TIME_)*5-4);
 
                 float attacked_shake_add  = (ease_out_sine(attacked_effect_t))*5;
                 float destroyed_shake_add = (ease_out_sine(destroyed_effect_t))*3;
                 float built_shake_add     = (ease_out_sine(built_effect_t))*1;
+                float shield_shake_add    = (ease_out_sine(shield_effect_t))*1;
 
-                float shake_add = max(max(
-                    attacked_shake_add,
-                    destroyed_shake_add),
-                    built_shake_add
+                float shake_add = max(
+                    max(
+                        attacked_shake_add,
+                        destroyed_shake_add
+                    ),
+                    max(
+                        built_shake_add,
+                        shield_shake_add
+                    )
                 );
 
                 shake += shake_add;
@@ -233,6 +241,8 @@ void tile_cooldowns_update() {
                 if (tile->destroyed_effect_time_to_live > 0) tile->destroyed_effect_time_to_live -= delta_time;
                 // update built effect
                 if (tile->built_effect_time_to_live > 0) tile->built_effect_time_to_live -= delta_time;
+                // update shield effect
+                if (tile->shield_effect_time_to_live > 0) tile->shield_effect_time_to_live -= delta_time;
                 
                 
                 if (tile->type == TILE_TYPE_EMPTY) continue;
