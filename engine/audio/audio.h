@@ -101,9 +101,19 @@ float audio_get_master_volume();
 float audio_get_sound_volume(sound_t* sound);
 // \returns the playing music's volume - between `0` and `1`
 float audio_get_music_volume();
-// \param volume between `0` and `1`
+/* \brief Set a channel's volume modifier.
+ *
+ * \param channel The channel's id or `-1` for all channels.
+ *
+ * \param volume The volume modifier, Between `0` and `1`
+ */
 void audio_set_channel_volume(int32_t channel, float volume);
-// \param volume between `0` and `1`
+/* \brief Set the master volume modifier.
+ *
+ * The master volume modifier doesnt affect the music volume. 
+ *
+ * \param volume The volume modifier, Between `0` and `1`
+ */
 void audio_set_master_volume(float volume);
 // \param volume between `0` and `1`
 void audio_set_sound_volume(sound_t* sound, float volume);

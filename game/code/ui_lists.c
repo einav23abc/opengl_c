@@ -4,6 +4,7 @@
 #include "spaces.h"
 
 ui_list_t ui_lists[_MAX_UI_LISTS_AMOUNT_];
+static ivec2_t pressed_slider = (ivec2_t){-1, -1};
 
 
 int32_t new_ui_list_assign_id() {
@@ -303,20 +304,63 @@ ivec2_t get_ui_list_hovered_element() {
     };
 }
 
+
+void ui_list_pressed_slider_element_update() {
+    if (pressed_slider.x == -1 || pressed_slider.y == -1) return;
+    
+    
+    if (pressed_slider.x >= _MAX_UI_LISTS_AMOUNT_) {
+        pressed_slider = (ivec2_t){-1, -1};
+        return;
+    }
+    if (pressed_slider.y >= ui_lists[pressed_slider.x].elements_amount) {
+        pressed_slider = (ivec2_t){-1, -1};
+        return;
+    }
+    if (ui_lists[pressed_slider.x].active == 0) {
+        pressed_slider = (ivec2_t){-1, -1};
+        return;
+    }
+    
+    ui_list_element_t* element = &(ui_lists[pressed_slider.x].elements[pressed_slider.y]);
+
+    if (element->type != ELEMENT_TYPE_SLIDER) {
+        pressed_slider = (ivec2_t){-1, -1};
+        return;
+    }
+
+    int32_t pin_x = fbo_view_position_from_mouse_position(outport_fbo).x - get_billboard_box_pos(ui_lists[pressed_slider.x].billboard).x - element->slider.pin_width;
+    float value = ((float)pin_x)/((float)element->slider.width - element->slider.pin_width);
+
+    value = max(0.0, min(1.0, value));
+    
+    *(element->slider.value) = value;
+
+    ui_list_element_callback_t callback = element->slider.callback;
+    if (callback != NULL)
+        callback(pressed_slider.x, pressed_slider.y);
+}
+void ui_lists_update() {
+    ui_list_pressed_slider_element_update();
+}
+
 void ui_list_slider_element_pressed(int32_t id, int32_t ei) {
-    // float value = *(element->slider.value);
-    // int32_t pin_x = (int32_t)(((float)element->slider.width)*value);
+    pressed_slider = (ivec2_t){id, ei};
+    ui_list_pressed_slider_element_update();
 }
 void ui_list_button_element_pressed(int32_t id, int32_t ei) {
     audio_sound_play(button_press_sound);
 
-    button_callback_t button_callback = ui_lists[id].elements[ei].button.callback;
+    ui_list_element_callback_t button_callback = ui_lists[id].elements[ei].button.callback;
     if (button_callback != NULL){
         button_callback(id, ei);
     }
 }
-void ui_list_handle_mouse_pressed() {
+void ui_lists_handle_mouse_pressed() {
     set_ui_lists_to_unsafe();
+
+    // reset pressed slider
+    pressed_slider = (ivec2_t){-1, -1};
     
     ivec2_t hovered_element = get_ui_list_hovered_element();
 
@@ -339,6 +383,11 @@ void ui_list_handle_mouse_pressed() {
     }
 
     close_unsafe_ui_lists();
+}
+
+void ui_lists_handle_mouse_released() {
+    // reset pressed slider
+    pressed_slider = (ivec2_t){-1, -1};
 }
 
 void draw_ui_list_hovered_element_info_string() {
@@ -410,13 +459,13 @@ void draw_ui_list_slider_element(int32_t id, int32_t element_i, int8_t hovered) 
             *(element->slider.nslice),
             padded_pos.x,
             padded_pos.y,
-            width,
-            height
+            width + element->slider.padding*2,
+            height + element->slider.padding*2
         );
     }
 
     float value = *(element->slider.value);
-    int32_t pin_x = (int32_t)(((float)element->slider.width)*value);
+    int32_t pin_x = (int32_t)(ceil(((float)element->slider.pin_width)*0.5) + ((float)element->slider.width - element->slider.pin_width)*value);
 
     // full slider part
     if (element->slider.full_nslice != NULL) {
@@ -494,6 +543,10 @@ void draw_ui_list_element(int32_t id, int32_t element_i, int8_t hovered) {
     switch (ui_lists[id].elements[element_i].type) {
         case ELEMENT_TYPE_BUTTON: {
             draw_ui_list_button_element(id, element_i, hovered);
+            break;
+        }
+        case ELEMENT_TYPE_SLIDER: {
+            draw_ui_list_slider_element(id, element_i, hovered);
             break;
         }
     }

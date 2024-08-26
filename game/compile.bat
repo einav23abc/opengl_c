@@ -34,6 +34,9 @@ gcc ^
     code/pages/main_menu/enter.c ^
     code/pages/main_menu/render.c ^
     code/pages/how_to_play/render.c ^
+    code/pages/settings/enter.c ^
+    code/pages/settings/update.c ^
+    code/pages/settings/render.c ^
     code/pages/play/enter.c ^
     code/pages/play/render.c ^
     code/pages/open_lan/enter.c ^

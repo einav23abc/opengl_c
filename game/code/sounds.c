@@ -63,6 +63,8 @@ void game_sounds_init() {
     audio_save_sound_to_c_file(select_tile_sound, "select_tile_sound", "./game/sounds/select_tile_sound.c");
     #endif
 
+    audio_set_sound_volume(resource_give_sound, 0.8);
+
     talking_mud_music = audio_music_load("./game/sounds/talking_mud.flac");
     if (talking_mud_music == NULL) {
         talking_mud_music = audio_music_load("./src/sounds/talking_mud.flac");

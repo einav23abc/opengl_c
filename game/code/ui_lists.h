@@ -15,7 +15,7 @@
 /* param 1: the ui_list id
  * param 2: the button id
  */
-typedef void(*button_callback_t)(int32_t, int32_t);
+typedef void(*ui_list_element_callback_t)(int32_t, int32_t);
 
 typedef enum {
     ELEMENT_TYPE_BUTTON,
@@ -26,7 +26,7 @@ typedef struct {
     UI_LIST_ELEMENT_TYPE type;
     union {
         struct {
-            button_callback_t callback;
+            ui_list_element_callback_t callback;
             char* string;
             font_t* font;
             int32_t padding;
@@ -40,6 +40,7 @@ typedef struct {
         } button;
         struct {
             float* value;
+            ui_list_element_callback_t callback;
             int32_t width;
             int32_t height;
             int32_t padding;
@@ -125,9 +126,14 @@ ivec2_t get_ui_list_button_element_info_size(int32_t id, int32_t element_i, char
  */
 ivec2_t get_ui_list_hovered_element();
 
+void ui_list_pressed_slider_element_update();
+void ui_lists_update();
+
 void ui_list_slider_element_pressed(int32_t id, int32_t ei);
 void ui_list_button_element_pressed(int32_t id, int32_t ei);
-void ui_list_handle_mouse_pressed();
+void ui_lists_handle_mouse_pressed();
+
+void ui_lists_handle_mouse_released();
 
 void draw_ui_list_hovered_element_info_string();
 void draw_ui_list_slider_element(int32_t id, int32_t element_i, int8_t hovered);

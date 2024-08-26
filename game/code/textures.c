@@ -67,7 +67,7 @@ void game_textures_init() {
     nine_slice5_texture = load_texture("./game/textures/nslice5.png");
     nine_slice_slider_empty_texture = load_texture("./game/textures/nslice_slider_empty.png");
     nine_slice_slider_full_texture = load_texture("./game/textures/nslice_slider_full.png");
-    nine_slice_slider_pin_texture = load_texture("./game/textures/nslice_slider_pi.png");
+    nine_slice_slider_pin_texture = load_texture("./game/textures/nslice_slider_pin.png");
     menu_background_scroll_texture = load_texture("./game/textures/menu_background_scroll.png");
 
     save_surface_to_c_file("./game/textures/floor.png", "floor_texture_surface", "./game/textures/floor_texture_surface.c");

@@ -436,7 +436,7 @@ void render_game_effects() {
         ivec2_t hovered_element = get_ui_list_hovered_element();
         if (hovered_element.x != -1 && hovered_element.y != -1) {
             if (ui_lists[hovered_element.x].elements[hovered_element.y].type == ELEMENT_TYPE_BUTTON) {
-                button_callback_t callback = ui_lists[hovered_element.x].elements[hovered_element.y].button.callback;
+                ui_list_element_callback_t callback = ui_lists[hovered_element.x].elements[hovered_element.y].button.callback;
                 if (
                     callback == &build_specific_button_callback ||
                     callback == &shield_button_callback
@@ -680,7 +680,7 @@ void render_game_ui() {
         ivec2_t hovered_element = get_ui_list_hovered_element();
         if (hovered_element.x != -1 && hovered_element.y != -1) {
             if (ui_lists[hovered_element.x].elements[hovered_element.y].type == ELEMENT_TYPE_BUTTON) {
-                button_callback_t callback = ui_lists[hovered_element.x].elements[hovered_element.y].button.callback;
+                ui_list_element_callback_t callback = ui_lists[hovered_element.x].elements[hovered_element.y].button.callback;
                 if (callback == &build_specific_button_callback) {
                     resources_delta = tile_type_properties[hovered_element.y].cost;
                 }

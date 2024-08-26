@@ -147,7 +147,7 @@ void draw_str_boxed(char* str, font_t font, nine_slice_t nslice, uint32_t left_x
 
     uint32_t x = 0;
     uint32_t y = -row_height;
-
+    
     draw_nine_slice(
         nslice,
         left_x - padding,

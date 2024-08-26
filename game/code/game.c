@@ -2,6 +2,7 @@
 
 #include "pages/message_page_enter.h"
 #include "pages/how_to_play/page.h"
+#include "pages/settings/page.h"
 #include "pages/in_game/page.h"
 #include "pages/main_menu/page.h"
 #include "pages/play/page.h"
@@ -38,6 +39,15 @@ page_t pages[PAGES_AMOUNT] = {
         .exit = NULL,
         .update = NULL,
         .render = &render_how_to_play,
+        .mouse_press = NULL,
+        .key_press = NULL
+    },
+    [PAGE_SETTINGS] = (page_t){
+        .init = NULL,
+        .enter = &enter_settings,
+        .exit = NULL,
+        .update = &update_settings,
+        .render = &render_settings,
         .mouse_press = NULL,
         .key_press = NULL
     },

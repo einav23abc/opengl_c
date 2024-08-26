@@ -49,23 +49,23 @@ void nine_slices_init() {
     };
 
     nine_slice_slider_empty = (nine_slice_t){
-        .texture_width = 5,
-        .texture_height = 5,
-        .padding = 1,
+        .texture_width = 7,
+        .texture_height = 7,
+        .padding = 2,
         .texture = nine_slice_slider_empty_texture
     };
 
     nine_slice_slider_full = (nine_slice_t){
-        .texture_width = 5,
-        .texture_height = 5,
-        .padding = 1,
+        .texture_width = 7,
+        .texture_height = 7,
+        .padding = 2,
         .texture = nine_slice_slider_full_texture
     };
     
     nine_slice_slider_pin = (nine_slice_t){
-        .texture_width = 7,
-        .texture_height = 7,
-        .padding = 3,
+        .texture_width = 11,
+        .texture_height = 11,
+        .padding = 4,
         .texture = nine_slice_slider_pin_texture
     };
 }
