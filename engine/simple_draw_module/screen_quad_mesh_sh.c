@@ -1,4 +1,5 @@
 static char screen_quad_mesh_frag_arr[] =
+"   #version 150\n"
 "	varying vec2 v_vertex_data;	\n"
 "		\n"
 "	uniform sampler2D u_texture;	\n"
@@ -10,6 +11,7 @@ static char screen_quad_mesh_frag_arr[] =
 static char* screen_quad_mesh_frag = screen_quad_mesh_frag_arr;
 
 static char screen_quad_mesh_vert_arr[] =
+"   #version 150\n"
 "	in vec2 in_vertex_data;	\n"
 "		\n"
 "	varying vec2 v_vertex_data;	\n"
