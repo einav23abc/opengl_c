@@ -19,7 +19,7 @@ void render_how_to_play() {
         ""      "The game is played using only the mouse.\n"
         "\n"
         ""      "    Build structures in your side of\n"
-        ""      "        the grid to gain wheight.\n"
+        ""      "        the grid to gain weight.\n"
         ""      "The first player to be heavier by 5 wins.\n"
         "\n"
         ""      " Think strategicly about what you build!\n"
@@ -29,6 +29,7 @@ void render_how_to_play() {
         ""      "     Using the 'Soldiers' resource,\n"
         ""      "  you can attack the enemy's buildings."
     ;
+
     ivec2_t size = get_str_boxed_size(&big_letters_font, str, big_letters_font.letter_height);
     draw_str_boxed(
         str,

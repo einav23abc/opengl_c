@@ -167,4 +167,6 @@ void mouse_press_in_game() {
             }
         );
     }
+
+    update_costing_ui_list_buttons();
 }

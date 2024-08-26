@@ -17,6 +17,10 @@
 #include "../textures/nine_slice2_texture_surface.c"
 #include "../textures/nine_slice3_texture_surface.c"
 #include "../textures/nine_slice4_texture_surface.c"
+#include "../textures/nine_slice5_texture_surface.c"
+#include "../textures/nine_slice_slider_empty_texture_surface.c"
+#include "../textures/nine_slice_slider_full_texture_surface.c"
+#include "../textures/nine_slice_slider_pin_texture_surface.c"
 #include "../textures/menu_background_scroll_texture_surface.c"
 #endif
 texture_t* floor_texture;
@@ -35,6 +39,10 @@ texture_t* nine_slice1_texture;
 texture_t* nine_slice2_texture;
 texture_t* nine_slice3_texture;
 texture_t* nine_slice4_texture;
+texture_t* nine_slice5_texture;
+texture_t* nine_slice_slider_empty_texture;
+texture_t* nine_slice_slider_full_texture;
+texture_t* nine_slice_slider_pin_texture;
 texture_t* menu_background_scroll_texture;
 
 void game_textures_init() {
@@ -56,6 +64,10 @@ void game_textures_init() {
     nine_slice2_texture = load_texture("./game/textures/nslice2.png");
     nine_slice3_texture = load_texture("./game/textures/nslice3.png");
     nine_slice4_texture = load_texture("./game/textures/nslice4.png");
+    nine_slice5_texture = load_texture("./game/textures/nslice5.png");
+    nine_slice_slider_empty_texture = load_texture("./game/textures/nslice_slider_empty.png");
+    nine_slice_slider_full_texture = load_texture("./game/textures/nslice_slider_full.png");
+    nine_slice_slider_pin_texture = load_texture("./game/textures/nslice_slider_pi.png");
     menu_background_scroll_texture = load_texture("./game/textures/menu_background_scroll.png");
 
     save_surface_to_c_file("./game/textures/floor.png", "floor_texture_surface", "./game/textures/floor_texture_surface.c");
@@ -75,6 +87,10 @@ void game_textures_init() {
     save_surface_to_c_file("./game/textures/nslice2.png", "nine_slice2_texture_surface", "./game/textures/nine_slice2_texture_surface.c");
     save_surface_to_c_file("./game/textures/nslice3.png", "nine_slice3_texture_surface", "./game/textures/nine_slice3_texture_surface.c");
     save_surface_to_c_file("./game/textures/nslice4.png", "nine_slice4_texture_surface", "./game/textures/nine_slice4_texture_surface.c");
+    save_surface_to_c_file("./game/textures/nslice5.png", "nine_slice5_texture_surface", "./game/textures/nine_slice5_texture_surface.c");
+    save_surface_to_c_file("./game/textures/nslice_slider_empty.png", "nine_slice_slider_empty_texture_surface", "./game/textures/nine_slice_slider_empty_texture_surface.c");
+    save_surface_to_c_file("./game/textures/nslice_slider_full.png", "nine_slice_slider_full_texture_surface", "./game/textures/nine_slice_slider_full_texture_surface.c");
+    save_surface_to_c_file("./game/textures/nslice_slider_pin.png", "nine_slice_slider_pin_texture_surface", "./game/textures/nine_slice_slider_pin_texture_surface.c");
     save_surface_to_c_file("./game/textures/menu_background_scroll.png", "menu_background_scroll_texture_surface", "./game/textures/menu_background_scroll_texture_surface.c");
     #else
     floor_texture = load_texture_from_surface(floor_texture_surface);
@@ -94,6 +110,10 @@ void game_textures_init() {
     nine_slice2_texture = load_texture_from_surface(nine_slice2_texture_surface);
     nine_slice3_texture = load_texture_from_surface(nine_slice3_texture_surface);
     nine_slice4_texture = load_texture_from_surface(nine_slice4_texture_surface);
+    nine_slice5_texture = load_texture_from_surface(nine_slice5_texture_surface);
+    nine_slice_slider_empty_texture = load_texture_from_surface(nine_slice_slider_empty_texture_surface);
+    nine_slice_slider_full_texture = load_texture_from_surface(nine_slice_slider_full_texture_surface);
+    nine_slice_slider_pin_texture = load_texture_from_surface(nine_slice_slider_pin_texture_surface);
     menu_background_scroll_texture = load_texture_from_surface(menu_background_scroll_texture_surface);
 
     #endif

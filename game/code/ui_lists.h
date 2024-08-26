@@ -18,7 +18,8 @@
 typedef void(*button_callback_t)(int32_t, int32_t);
 
 typedef enum {
-    ELEMENT_TYPE_BUTTON
+    ELEMENT_TYPE_BUTTON,
+    ELEMENT_TYPE_SLIDER
 } UI_LIST_ELEMENT_TYPE;
 
 typedef struct {
@@ -31,11 +32,29 @@ typedef struct {
             int32_t padding;
             nine_slice_t* nslice;
             nine_slice_t* hover_nslice;
+
             char* info_string;
             font_t* info_string_font;
             int32_t info_string_padding;
             nine_slice_t* info_string_nslice;
         } button;
+        struct {
+            float* value;
+            int32_t width;
+            int32_t height;
+            int32_t padding;
+            nine_slice_t* nslice;
+            int32_t pin_width;
+            int32_t pin_height;
+            nine_slice_t* pin_nslice;
+            nine_slice_t* full_nslice;
+            nine_slice_t* empty_nslice;
+            
+            char* info_string;
+            font_t* info_string_font;
+            int32_t info_string_padding;
+            nine_slice_t* info_string_nslice;
+        } slider;
     };
 } ui_list_element_t;
 
@@ -79,6 +98,8 @@ void close_unsafe_ui_lists();
 void close_unperm_ui_lists();
 void close_all_ui_lists();
 
+uint32_t get_ui_list_slider_element_width(ui_list_element_t* slider_element);
+uint32_t get_ui_list_slider_element_height(ui_list_element_t* slider_element);
 uint32_t get_ui_list_button_element_width(ui_list_element_t* button_element);
 uint32_t get_ui_list_button_element_height(ui_list_element_t* button_element);
 uint32_t get_ui_list_element_width(int32_t id, int32_t element_i);
@@ -86,7 +107,7 @@ uint32_t get_ui_list_element_height(int32_t id, int32_t element_i);
 void update_ui_list_billboard_size(int32_t id);
 int32_t get_ui_list_width(int32_t id);
 int32_t get_ui_list_height(int32_t id);
-ivec2_t get_ui_list_element_pos(int32_t id, int32_t ei);
+ivec2_t get_ui_list_element_padded_pos(int32_t id, int32_t ei);
 ivec2_t get_ui_list_pos(int32_t id);
 ivec2_t get_ui_list_pos_padded(int32_t id);
 /* x = x pos inside ui-list
@@ -96,7 +117,7 @@ ivec2_t get_ui_list_pos_padded(int32_t id);
  */
 ivec3_t get_ui_list_inside_pos();
 
-// is anybody even using this???
+// TODO: is anybody even using this???
 ivec2_t get_ui_list_button_element_info_size(int32_t id, int32_t element_i, char* info_str);
 
 /* x = ui_list_id
@@ -104,10 +125,12 @@ ivec2_t get_ui_list_button_element_info_size(int32_t id, int32_t element_i, char
  */
 ivec2_t get_ui_list_hovered_element();
 
+void ui_list_slider_element_pressed(int32_t id, int32_t ei);
 void ui_list_button_element_pressed(int32_t id, int32_t ei);
-void ui_list_handle_mouse_presse();
+void ui_list_handle_mouse_pressed();
 
 void draw_ui_list_hovered_element_info_string();
+void draw_ui_list_slider_element(int32_t id, int32_t element_i, int8_t hovered);
 void draw_ui_list_button_element(int32_t id, int32_t element_i, int8_t hovered);
 void draw_ui_list_element(int32_t id, int32_t element_i, int8_t hovered);
 void draw_ui_list(int32_t id);

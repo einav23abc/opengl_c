@@ -7,6 +7,10 @@ nine_slice_t nine_slice1;
 nine_slice_t nine_slice2;
 nine_slice_t nine_slice3;
 nine_slice_t nine_slice4;
+nine_slice_t nine_slice5;
+nine_slice_t nine_slice_slider_empty;
+nine_slice_t nine_slice_slider_full;
+nine_slice_t nine_slice_slider_pin;
 
 void nine_slices_init() {
     nine_slice1 = (nine_slice_t){
@@ -19,22 +23,50 @@ void nine_slices_init() {
     nine_slice2 = (nine_slice_t){
         .texture_width = 16,
         .texture_height = 16,
-        .padding = 3,
+        .padding = 2,
         .texture = nine_slice2_texture
     };
     
     nine_slice3 = (nine_slice_t){
         .texture_width = 16,
         .texture_height = 16,
-        .padding = 3,
+        .padding = 1,
         .texture = nine_slice3_texture
     };
     
     nine_slice4 = (nine_slice_t){
         .texture_width = 16,
         .texture_height = 16,
-        .padding = 3,
+        .padding = 2,
         .texture = nine_slice4_texture
+    };
+    
+    nine_slice5 = (nine_slice_t){
+        .texture_width = 16,
+        .texture_height = 16,
+        .padding = 2,
+        .texture = nine_slice5_texture
+    };
+
+    nine_slice_slider_empty = (nine_slice_t){
+        .texture_width = 5,
+        .texture_height = 5,
+        .padding = 1,
+        .texture = nine_slice_slider_empty_texture
+    };
+
+    nine_slice_slider_full = (nine_slice_t){
+        .texture_width = 5,
+        .texture_height = 5,
+        .padding = 1,
+        .texture = nine_slice_slider_full_texture
+    };
+    
+    nine_slice_slider_pin = (nine_slice_t){
+        .texture_width = 7,
+        .texture_height = 7,
+        .padding = 3,
+        .texture = nine_slice_slider_pin_texture
     };
 }
 

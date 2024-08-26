@@ -226,6 +226,7 @@ void camera_update() {
     #endif
 }
 
+// TODO: this function is a mess
 // also updates tiles attack/built effects
 void tile_cooldowns_update() {
     in_cooldowns_translation = 0;
@@ -288,6 +289,8 @@ void tile_cooldowns_update() {
                             
                             .string = tile_type->give_alert_string
                         };
+
+                        update_costing_ui_list_buttons();
                     }
                 }else {
                     // go down

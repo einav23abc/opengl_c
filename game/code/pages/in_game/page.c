@@ -576,6 +576,46 @@ void remove_resources(int32_t player_id, resources_t cost) {
     game_struct.players[player_id].resources.soldiers   -= cost.soldiers;
 }
 
+void update_costing_ui_list_buttons() {
+    for (int32_t i = 0; i < _MAX_UI_LISTS_AMOUNT_; i++) {
+        
+        if (ui_lists[i].active == 0) continue;
+        
+        for (int32_t ei = 0; ei < ui_lists[i].elements_amount; ei++) {
+            
+            if (ui_lists[i].elements[ei].type != ELEMENT_TYPE_BUTTON) continue;
+
+            int8_t costs = 0;
+            resources_t cost;
+
+            if (ui_lists[i].elements[ei].button.callback == &build_specific_button_callback) {
+                costs = 1;
+                cost = tile_type_properties[ei].cost;
+            }
+            
+            if (ui_lists[i].elements[ei].button.callback == &shield_button_callback) {
+                costs = 1;
+                cost = shield_cost;
+            }
+            
+            if (ui_lists[i].elements[ei].button.callback == &attack_button_callback) {
+                costs = 1;
+                cost = (resources_t){.population=0, .soldiers=1, .stone=0, .wheat=0, .wood=0};
+            }
+
+            if (costs == 1) {
+                if (has_enough_resources(0, cost) == 1) {
+                    ui_lists[i].elements[ei].button.nslice = NULL;
+                    ui_lists[i].elements[ei].button.hover_nslice = &nine_slice3;
+                }else {
+                    ui_lists[i].elements[ei].button.nslice = &nine_slice5;
+                    ui_lists[i].elements[ei].button.hover_nslice = NULL;
+                }
+            }
+        }
+    }
+}
+
 void exit_game_button_callback(int32_t ui_list_id, int32_t button_id) {
     if (play_type == PLAY_TYPE_AGAINST_CLIENT) {
         #ifdef DEBUG_SOFT_MODE
@@ -719,7 +759,7 @@ void build_button_callback(int32_t ui_list_id, int32_t button_id) {
                 .padding = 2,
                 .nslice = NULL,
                 .hover_nslice = &nine_slice3,
-                .info_string = tile_type_properties[3].build_info_string,
+                .info_string = tile_type_properties[4].build_info_string,
                 .info_string_font = &letters_font,
                 .info_string_padding = 3,
                 .info_string_nslice = &nine_slice1
@@ -727,6 +767,8 @@ void build_button_callback(int32_t ui_list_id, int32_t button_id) {
         }
     );
     make_ui_list_safe(new_ui_list_id);
+
+    update_costing_ui_list_buttons();
 }
 void attack_button_callback(int32_t ui_list_id, int32_t button_id) {
     if (game_struct.game_ended == 1) {

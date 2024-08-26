@@ -163,6 +163,12 @@ void close_all_ui_lists() {
     }
 }
 
+uint32_t get_ui_list_slider_element_width(ui_list_element_t* slider_element) {
+    return (slider_element->slider.width + slider_element->slider.padding*2);
+}
+uint32_t get_ui_list_slider_element_height(ui_list_element_t* slider_element) {
+    return (slider_element->slider.height + slider_element->slider.padding*2);
+}
 uint32_t get_ui_list_button_element_width(ui_list_element_t* button_element) {
     return (strlen(button_element->button.string) * button_element->button.font->letter_width + button_element->button.padding*2);
 }
@@ -175,12 +181,20 @@ uint32_t get_ui_list_element_width(int32_t id, int32_t element_i) {
             return get_ui_list_button_element_width(&(ui_lists[id].elements[element_i]));
             break;
         }
+        case ELEMENT_TYPE_SLIDER: {
+            return get_ui_list_slider_element_width(&(ui_lists[id].elements[element_i]));
+            break;
+        }
     }
 }
 uint32_t get_ui_list_element_height(int32_t id, int32_t element_i) {
     switch (ui_lists[id].elements[element_i].type) {
         case ELEMENT_TYPE_BUTTON: {
             return get_ui_list_button_element_height(&(ui_lists[id].elements[element_i]));
+            break;
+        }
+        case ELEMENT_TYPE_SLIDER: {
+            return get_ui_list_slider_element_height(&(ui_lists[id].elements[element_i]));
             break;
         }
     }
@@ -204,7 +218,7 @@ int32_t get_ui_list_width(int32_t id) {
 int32_t get_ui_list_height(int32_t id) {
     return (ui_lists[id].billboard.box_height);
 }
-ivec2_t get_ui_list_element_pos(int32_t id, int32_t element_i) {
+ivec2_t get_ui_list_element_padded_pos(int32_t id, int32_t element_i) {
     ivec2_t pos = get_ui_list_pos(id);
     for (uint32_t ei = 0; ei < element_i; ei++) {
         pos.y += get_ui_list_element_height(id, ei);
@@ -289,6 +303,10 @@ ivec2_t get_ui_list_hovered_element() {
     };
 }
 
+void ui_list_slider_element_pressed(int32_t id, int32_t ei) {
+    // float value = *(element->slider.value);
+    // int32_t pin_x = (int32_t)(((float)element->slider.width)*value);
+}
 void ui_list_button_element_pressed(int32_t id, int32_t ei) {
     audio_sound_play(button_press_sound);
 
@@ -297,7 +315,7 @@ void ui_list_button_element_pressed(int32_t id, int32_t ei) {
         button_callback(id, ei);
     }
 }
-void ui_list_handle_mouse_presse() {
+void ui_list_handle_mouse_pressed() {
     set_ui_lists_to_unsafe();
     
     ivec2_t hovered_element = get_ui_list_hovered_element();
@@ -314,6 +332,10 @@ void ui_list_handle_mouse_presse() {
             ui_list_button_element_pressed(hovered_element.x, hovered_element.y);
             break;
         }
+        case ELEMENT_TYPE_SLIDER: {
+            ui_list_slider_element_pressed(hovered_element.x, hovered_element.y);
+            break;
+        }
     }
 
     close_unsafe_ui_lists();
@@ -324,9 +346,7 @@ void draw_ui_list_hovered_element_info_string() {
     if (in_element.x == -1 || in_element.y == -1) return;
 
     vec2_t outport_space_position = fbo_view_position_from_mouse_position(outport_fbo);
-    ivec2_t pos = get_ui_list_element_pos(in_element.x, in_element.y);
-
-    // TODO: stay in window
+    ivec2_t pos = get_ui_list_element_padded_pos(in_element.x, in_element.y);
 
     char* str;
     font_t font;
@@ -343,10 +363,30 @@ void draw_ui_list_hovered_element_info_string() {
             padding = ui_lists[in_element.x].elements[in_element.y].button.info_string_padding;
             break;
         }
+        case ELEMENT_TYPE_SLIDER: {
+            str = ui_lists[in_element.x].elements[in_element.y].slider.info_string;
+            if (str == NULL) return;
+            if (str[0] == '\0') return;
+            font = *(ui_lists[in_element.x].elements[in_element.y].slider.info_string_font);
+            nine_slice = *(ui_lists[in_element.x].elements[in_element.y].slider.info_string_nslice);
+            padding = ui_lists[in_element.x].elements[in_element.y].slider.info_string_padding;
+            break;
+        }
     }
 
     int32_t left_x = outport_space_position.x;
     int32_t bottom_y = pos.y + get_ui_list_element_height(in_element.x, in_element.y) + padding;
+    
+    ivec2_t str_box_size = get_str_boxed_size(&font, str, font.letter_height);
+
+    if (left_x - padding < 0)
+        left_x = padding;
+    if (left_x + padding + str_box_size.x > _OUTPORT_WIDTH_)
+        left_x = _OUTPORT_WIDTH_ - str_box_size.x - padding;
+    if (bottom_y - padding < 0)
+        bottom_y = padding;
+    if (bottom_y + padding + str_box_size.y > _OUTPORT_HEIGHT_)
+        bottom_y = _OUTPORT_HEIGHT_ - str_box_size.y - padding;
 
     draw_str_boxed(
         str,
@@ -358,16 +398,67 @@ void draw_ui_list_hovered_element_info_string() {
         font.letter_height
     );
 }
+void draw_ui_list_slider_element(int32_t id, int32_t element_i, int8_t hovered) {
+    ivec2_t padded_pos = get_ui_list_element_padded_pos(id, element_i);
+    int32_t width = get_ui_list_element_width(id, element_i);
+    int32_t height = get_ui_list_element_height(id, element_i);
+
+    ui_list_element_t* element = &(ui_lists[id].elements[element_i]);
+    
+    if (element->slider.nslice != NULL) {
+        draw_nine_slice(
+            *(element->slider.nslice),
+            padded_pos.x,
+            padded_pos.y,
+            width,
+            height
+        );
+    }
+
+    float value = *(element->slider.value);
+    int32_t pin_x = (int32_t)(((float)element->slider.width)*value);
+
+    // full slider part
+    if (element->slider.full_nslice != NULL) {
+        draw_nine_slice(
+            *(element->slider.full_nslice),
+            padded_pos.x + element->slider.padding,
+            padded_pos.y + element->slider.padding,
+            pin_x,
+            element->slider.height
+        );
+    }
+    // empty slider part
+    if (element->slider.empty_nslice != NULL) {
+        draw_nine_slice(
+            *(element->slider.empty_nslice),
+            padded_pos.x + element->slider.padding + pin_x,
+            padded_pos.y + element->slider.padding,
+            element->slider.width - pin_x,
+            element->slider.height
+        );
+    }
+    // pin
+    if (element->slider.pin_nslice != NULL) {
+        draw_nine_slice(
+            *(element->slider.pin_nslice),
+            padded_pos.x + element->slider.padding + pin_x - element->slider.pin_width*0.5,
+            padded_pos.y + element->slider.padding + (element->slider.height - element->slider.pin_height)*0.5,
+            element->slider.pin_width,
+            element->slider.pin_height
+        );
+    }
+}
 void draw_ui_list_button_element(int32_t id, int32_t element_i, int8_t hovered) {
-    ivec2_t pos = get_ui_list_element_pos(id, element_i);
+    ivec2_t padded_pos = get_ui_list_element_padded_pos(id, element_i);
     int32_t width = get_ui_list_element_width(id, element_i);
     int32_t height = get_ui_list_element_height(id, element_i);
 
     if (ui_lists[id].elements[element_i].button.nslice != NULL) {
         draw_nine_slice(
             *(ui_lists[id].elements[element_i].button.nslice),
-            pos.x,
-            pos.y,
+            padded_pos.x,
+            padded_pos.y,
             width,
             height
         );
@@ -378,8 +469,8 @@ void draw_ui_list_button_element(int32_t id, int32_t element_i, int8_t hovered) 
         if (ui_lists[id].elements[element_i].button.hover_nslice != NULL) {
             draw_nine_slice(
                 *(ui_lists[id].elements[element_i].button.hover_nslice),
-                pos.x,
-                pos.y,
+                padded_pos.x,
+                padded_pos.y,
                 width,
                 height
             );
@@ -390,8 +481,8 @@ void draw_ui_list_button_element(int32_t id, int32_t element_i, int8_t hovered) 
         *(ui_lists[id].elements[element_i].button.font),
         ui_lists[id].elements[element_i].button.string,
         (vec3_t){
-            .x = pos.x + ui_lists[id].elements[element_i].button.padding,
-            .y = pos.y + ui_lists[id].elements[element_i].button.padding,
+            .x = padded_pos.x + ui_lists[id].elements[element_i].button.padding,
+            .y = padded_pos.y + ui_lists[id].elements[element_i].button.padding,
             .z = 0
         },
         quat_from_axis_angles_yzx(-0, -0, -0),

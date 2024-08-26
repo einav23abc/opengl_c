@@ -149,6 +149,8 @@ tile_types_amount_sorted_t get_tile_types_amounts_sorted(int32_t player);
 int32_t has_enough_resources(int32_t player_id, resources_t cost);
 void remove_resources(int32_t player_id, resources_t cost);
 
+void update_costing_ui_list_buttons();
+
 void exit_game_button_callback(int32_t ui_list_id, int32_t button_id);
 void build_specific_button_callback(int32_t ui_list_id, int32_t button_id);
 void build_button_callback(int32_t ui_list_id, int32_t button_id);

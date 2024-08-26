@@ -563,7 +563,7 @@ void render_game_effects() {
                     quat_t quat_rotation = quat_from_axis_angles_yzx(-0, -0, -0);
                     glUniform4f(shaders_list[current_shader]->uniform_locations[2], quat_rotation.x, quat_rotation.y, quat_rotation.z, quat_rotation.w);
                     // u_color
-                    glUniform3f(shaders_list[current_shader]->uniform_locations[3], ((float)161)/255, ((float)61)/255, ((float)59)/255);
+                    glUniform3f(shaders_list[current_shader]->uniform_locations[3], ((float)108)/255, ((float)140)/255, ((float)80)/255);
                     // u_speed
                     glUniform1f(shaders_list[current_shader]->uniform_locations[4], 0.0012);
                     // u_freq

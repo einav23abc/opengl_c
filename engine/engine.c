@@ -143,10 +143,6 @@ uint32_t backend_init() {
         return 1;
     }
 
-    if (SDL_GL_SetSwapInterval(1) != 0) {
-        printf("failed to enable Vsync");
-    }
-
     // create window
     window = SDL_CreateWindow(
         WINDOW_TITLE,
@@ -178,6 +174,11 @@ uint32_t backend_init() {
         SDL_DestroyWindow(window);
         SDL_Quit();
         return 1;
+    }
+
+    // use VSYNC
+    if (SDL_GL_SetSwapInterval(1) != 0) {
+        printf("failed to enable Vsync");
     }
 
     // retrieve GL functions
@@ -360,8 +361,9 @@ void engine_render() {
     // not in render period
     current_camera = -1;
     
-    // show drawn image
+    // show drawn image - swap the buffers
     SDL_GL_SwapWindow(window);
+    // wait until the buffers have been swaped
     glFinish();
 }
 

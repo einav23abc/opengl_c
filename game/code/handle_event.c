@@ -9,7 +9,7 @@ void handle_event() {
             // dont do page specific if inside ui-list
             ivec3_t in_ui_list = get_ui_list_inside_pos();
             
-            ui_list_handle_mouse_presse();
+            ui_list_handle_mouse_pressed();
 
             // dont do page specific if inside ui-list
             if (in_ui_list.z != -1) break;
